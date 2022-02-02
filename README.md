@@ -1,2 +1,13 @@
 # spica-tools-devel
-SPICA tools
+SPICA tools  
+## Tools
+* C  
+  * setup_lammps  
+  * setup_gromacs  
+* Python  
+  * common  
+    * map_to_cg  
+    * gen_elastic_network  
+  * pspica
+    * WAT2PWAT  
+    * convert_PARM    
