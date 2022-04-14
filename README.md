@@ -17,7 +17,7 @@ SPICA tools
            * -maxr MAXR  Cutoff length of ENM (default: 9.0 A).  
            * -kENM KENM  Force constant for ENM (default: 1.195 kcal/A2).  
            * -pspica     Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).  
-      * example: gen_elastic_network.py protein.cg.pdb protein.cg.top
+      * example: (python2) gen_top_elastic_network.py protein.cg.pdb protein.cg.top -pspica
     
   * pspica
     * WAT2PWAT  
