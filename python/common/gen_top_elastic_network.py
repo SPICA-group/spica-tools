@@ -31,11 +31,27 @@
 
 import sys
 import math
+from argparse import ArgumentParser
 
+def get_option():
 # maximum bond length 
-MAXdr = 9.0
+	MAXdr = 9.0
 # force constant for elastic network model 
-kENM  = 1.195  
+	kENM  = 1.195
+	argparser = ArgumentParser()
+	argparser.add_argument('input', type=str,
+							help='Specify input CG PDB file name.')
+	argparser.add_argument('output', type=str,
+							help='Specify output topology file name.')
+	argparser.add_argument('-maxr', type=float,
+							default=MAXdr,
+							help='Cutoff length of ENM (default: 9.0 A).')
+	argparser.add_argument('-kENM', type=float,
+							default=kENM,
+							help='Force constant for ENM (default: 1.195 kcal/A2).')
+	argparser.add_argument('-pspica', action='store_true',
+							help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+	return argparser.parse_args()
 
 ncomp = 7
 ncomp_pdb = 15
@@ -280,15 +296,22 @@ def read_pdb(infile,pdb_list,cryst):
 # START BY LOOPING OVER EACH RESIDUE (DOMAIN)
 ########################################################
 if __name__ == "__main__":
-	args = sys.argv
-	if len(args) != 3:
-		print "USAGE: gen_elastic_network.py <cg.pdb filename> <cg.top filename (output)>"
-		sys.exit(0)
-	infile  = args[1]
-	outfile = args[2]
-	cryst             = []
-	pdb_data          = []
-    	natom             = read_pdb(infile,pdb_data,cryst)
+	args = get_option()
+	if args.pspica:
+		charge_unit = 0.5590 
+		charge["LY2"] = charge_unit
+		charge["AR2"] = charge_unit
+		charge["ASP"] = -charge_unit
+		charge["GLU"] = -charge_unit
+		charge["GBT"] = charge_unit
+		charge["ABT"] = charge_unit
+	infile  = args.input
+	outfile = args.output
+	kENM  = args.kENM
+	MAXdr = args.maxr
+	cryst = []
+	pdb_data = []
+	natom = read_pdb(infile,pdb_data,cryst)
 	nat = 0
 	nbb = 0
 	bbndx   = []
@@ -539,5 +562,10 @@ if __name__ == "__main__":
 					%(ndx1+1,ndx2+1,ndx3+1,ndx4+1,name[bbndx[i]+1],name[bbndx[i]+2],name[bbndx[i]+3],name[bbndx[i]+4])
 
 	ftop.close()
-	print "Normal Termination."
+	if args.pspica:
+		print '## Protein topology file has been generated for pSPICA FF ##'
+		print 'NOTE: Remove "-pspica" option when you use generated protein topology files for SPICA FF.'
+	else:
+		print '## Protein topology file has been generated for SPICA FF ##'
+		print 'NOTE: Use "-pspica" option when you use generated protein topology files for pSPICA FF.'
 	print
