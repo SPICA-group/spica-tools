@@ -6,9 +6,11 @@ SPICA tools
   * setup_gromacs  
 * Python (python2 and python3)
   * common  
+    * json_to_top
     * map_to_cg  
-    * gen_top_elastic_network  
-      * usage: gen_top_elastic_network.py [-h] [-maxr MAXR] [-kENM KENM] [-pspica] input output  
+    * map_traj
+    * gen_top_ENM
+      * usage: gen_top_ENM.py [-h] [-maxr MAXR] [-kENM KENM] [-pspica] input output  
          * positional arguments:  
            * input    Specify input CG PDB file name.  
            * output    Specify output topology file name.  
