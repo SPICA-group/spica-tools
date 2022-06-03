@@ -17,6 +17,5 @@ _cg_spica () {
   ENM )
       COMPREPLY=( `compgen -S ' ' -f -- $c; compgen -S '/' -d $c`);;
   esac
-  #COMPREPLY=( `compgen -W "$args" -- $c; compgen -S '/' -d $c`)
 }
 complete -F _cg_spica cg_spica
