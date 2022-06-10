@@ -14,7 +14,7 @@ def get_option():
                                       # list of tool_names #------------------------------------------------
                                       json2top : make top file from json file  
                                       map2cg   : map AA configuration to CG (only PDB format).  
-                                      map_traj : map AA MD trajectory to CG (MDAnalysis module is required).  
+                                      maptraj  : map AA MD trajectory to CG (MDAnalysis module is required).  
                                       ENM      : generate top file of protein with elastic network.
                                       ----------------------------------------------------------------------
                                                  """))

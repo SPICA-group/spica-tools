@@ -11,11 +11,11 @@ def get_option():
     json   = Path(__file__).parents[0] / "spica_top.json"
     outpdb = "fin.cg.pdb"
     argparser = ArgumentParser()
-    argparser.add_argument('inputPDB', type=str,
+    argparser.add_argument('inputAAPDB', type=str,
                             help='Specify input AA PDB file name.')
-    argparser.add_argument('inputTRAJ', type=str,
+    argparser.add_argument('inputAATRAJ', type=str,
                             help='Specify input AA TRAJ file name.')
-    argparser.add_argument('outputTRAJ', type=str,
+    argparser.add_argument('outputCGTRAJ', type=str,
                             help='Specify output CG TRAJ file name.')
     argparser.add_argument('-outpdb', type=str,
                             default=outpdb,
@@ -38,11 +38,11 @@ def get_option_script(argv):
     outpdb = "fin.cg.pdb"
     argparser = ArgumentParser(usage='maptraj [-h] [-outpdb OUTPDB] [-json JSON] [-begin BEGIN] [-last LAST] [-nodelwat] inputPDB inputTRAJ outputTRAJ',
                                prog ="maptraj")
-    argparser.add_argument('inputPDB', type=str,
+    argparser.add_argument('inputAAPDB', type=str,
                             help='Specify input AA PDB file name.')
-    argparser.add_argument('inputTRAJ', type=str,
+    argparser.add_argument('inputAATRAJ', type=str,
                             help='Specify input AA TRAJ file name.')
-    argparser.add_argument('outputTRAJ', type=str,
+    argparser.add_argument('outputCGTRAJ', type=str,
                             help='Specify output CG TRAJ file name.')
     argparser.add_argument('-outpdb', type=str,
                             default=outpdb,
