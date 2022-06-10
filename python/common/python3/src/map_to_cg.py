@@ -235,8 +235,10 @@ def read_pdb(infile):
         indicat = line[16:17]
         resname = line[17:21]
         chainid = line[21:22]
-        resid   = line[22:26]
-        code    = line[26:27]
+        resid   = line[22:27]
+        code    = " "
+        #resid   = line[22:26]
+        #code    = line[26:27]
         posX   = float(line[30:38])
         posY   = float(line[38:46])
         posZ   = float(line[46:54])
@@ -270,8 +272,10 @@ def write_domain(pdb_domain,cryst,f):
         posY     = pdb_domain[i][POSY]
         posZ     = pdb_domain[i][POSZ]
         index    = str(cnt)
-        print ('%-6s%5s %4s%1s%-4s%1s%4s%1s   %8.3f%8.3f%8.3f' \
-                    %(recname,index[0:5],atmname,indicat,resname,chainid,resid,code,posX,posY,posZ), file=f)
+        print ('%-6s%5s %4s%1s%-4s%1s%5s   %8.3f%8.3f%8.3f' \
+                    %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ), file=f)
+        #print ('%-6s%5s %4s%1s%-4s%1s%4s%1s   %8.3f%8.3f%8.3f' \
+        #            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,code,posX,posY,posZ), file=f)
         cnt += 1
     print ('%s' % "END", file=f)
 
