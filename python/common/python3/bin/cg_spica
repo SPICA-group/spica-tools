@@ -2,7 +2,7 @@
 
 import sys, textwrap
 from pathlib import Path
-sys.path.append(Path(__file__).parents[0].resolve())
+sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
 import gen_top_ENM, json_to_top, map_to_cg, map_traj
 from argparse import ArgumentParser, RawTextHelpFormatter
 
