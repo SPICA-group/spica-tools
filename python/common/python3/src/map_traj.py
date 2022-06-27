@@ -114,9 +114,9 @@ class map_traj:
 
 if __name__ == "__main__":
     args     = get_option()
-    inPDB    = args.inputPDB
-    inTRAJ   = args.inputTRAJ
-    outTRAJ  = args.outputTRAJ
+    inPDB    = args.inputAAPDB
+    inTRAJ   = args.inputAATRAJ
+    outTRAJ  = args.outputCGTRAJ
     outPDB   = args.outpdb
     jsonfile = args.json
     nodelwat = args.nodelwat
