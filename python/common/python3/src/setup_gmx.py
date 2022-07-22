@@ -894,7 +894,11 @@ def run():
     args = sys.argv[1:]
     opts,args = getopt.getopt(args,"p", []) 
     nargs = len(args)
-    if opts[0][0] == '-p':
+    if len(opts) > 0:
+        opt = opts[0][0]
+    else:
+        opt = ''
+    if opt == '-p':
         if nargs < 4:
             print("DUMPS input files for a GROMACS run.")
             print("USAGE: setup_gromacs -p <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <database> <pdbfile>");
@@ -945,7 +949,7 @@ def run():
         sysdat.total_angs	 += topdat[idx].nang*topdat[idx].nmol
         sysdat.total_improps += topdat[idx].nimprop*topdat[idx].nmol
         sysdat.total_diheds	 += topdat[idx].ndihed*topdat[idx].nmol
-    if opts[0][0] == '-p':
+    if opt == '-p':
         count_params(args[nargs-2], database)
         read_database(args[nargs-2], database)
     else:
@@ -954,7 +958,7 @@ def run():
     print("FOUND {} UNIQUE VDW PAIR PARAMS".format(database.nvdwtype))
     print("FOUND {} UNIQUE BOND PARAMS".format(database.nbndtype))
     print("FOUND {} UNIQUE ANGLE PARAMS".format(database.nangtype))
-    if opts[0][0] == '-p':
+    if opt == '-p':
         if ".pdb" in args[nargs-1]:
             print("Takes angles from {}".format(args[nargs-1]))
             read_pdb(args[nargs-1],sysdat)
