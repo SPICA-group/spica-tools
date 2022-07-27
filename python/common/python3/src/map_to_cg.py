@@ -340,14 +340,14 @@ class map_to_cg:
                 for aatype in aatypes:
                     mass, com = self._weight_pos(aa_domain, aatype, mass, com)
             else :
-                sys.exit ("ERROR:", aa_domain[RESNAME][0],"ATOM",aatypes,"IS MISSING ON MOLECULE")
+                sys.exit (f"ERROR: {aa_domain[RESNAME][0]} ATOM {aatypes} IS MISSING ON MOLECULE")
         else:
             for aatype in aatypes:
                 if aa_domain[ATMNAME].count(aatype):
                     mass, com = self._weight_pos(aa_domain, aatype, mass, com)
                 else :
                     bad_res = aa_domain[RESID][0]
-                    print ("ERROR:", aa_domain[RESNAME][0],"BACKBONE ATOM",aatypes,"IS MISSING ON RESIDUE",bad_res)
+                    print (f"ERROR: {aa_domain[RESNAME][0]} BACKBONE ATOM {aatypes} IS MISSING ON RESIDUE {bad_res}")
                     return np.zeros(3), "UNK"
         com /= mass
         return com, aa_domain[RESNAME][0]
