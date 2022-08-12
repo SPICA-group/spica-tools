@@ -1,5 +1,5 @@
 # spica-tools-devel
-SPICA tools  
+Tools to set up CG-MD with SPICA and support SPICA CG parametrization.
 ## Tools
 * C  
   * setup_lammps  
