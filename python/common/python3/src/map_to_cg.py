@@ -431,7 +431,7 @@ class map_to_cg:
                     if bead_name == "CLA":
                         self.ncla += 1
                     if bead_name == "WAT" or bead_name == "W":
-                        self.wat_index.append(self.cg_domain_count)
+                        self.wat_index.append(self.cg_domain_count - 1)
         else:
             self._warn_TYPE(TYPE)
     
