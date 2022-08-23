@@ -104,6 +104,32 @@ atm_mass = {
        }
 res_name = {}
 res_map  = {}    
+
+# CG mapping for DNA/RNA ##
+AD1 = ["N1", "C6", "N6"]
+AD2 = ["C5", "N7", "C8"]
+AD3 = ["C4", "N9"]
+AD4 = ["C2", "N3"]
+res_map["ADE"] = [ AD1, AD2, AD3, AD4 ]
+GU1 = ["N1", "C6", "O6"]
+GU2 = ["C5", "N7", "C8"]
+GU3 = ["C4", "N9"]
+GU4 = ["C2", "N2", "N3"]
+res_map["GUA"] = [ GU1, GU2, GU3, GU4 ]
+CY1 = ["N3", "C4", "N4"]
+CY2 = ["N1", "C2", "O2"]
+CY3 = ["C5", "C6"]
+res_map["CYT"] = [ CY1, CY2, CY3 ]
+TH1 = ["N3", "C4", "O4"]
+TH2 = ["N1", "C2", "O2"]
+TH3 = ["C5", "C5M", "C6"]
+TH3 = ["C5", "C7",  "C6"]
+res_map["THY"] = [ TH1, TH2, TH3 ]
+UR1 = ["N3", "C4", "O4"]
+UR2 = ["N1", "C2", "O2"]
+UR3 = ["C5", "C6"]
+res_map["URA"] = [ UR1, UR2, UR3 ]
+# CG mapping for protein ##
 res_map["ALA"] = [ [ "CB"] ]
 res_map["VAL"] = [ [ "CB", "CG1", "CG2"] ]
 res_map["LEU"] = [ [ "CB", "CD1", "CD2", "CG" ] ]
@@ -150,15 +176,20 @@ res_map["DCYS"] = [ [ "CB", "SG" ] ]
 res_map["DLYS"] = [ LY1, LY2 ]
 res_map["DARG"] = [ AR1, AR2 ]
 
-prot_list = ["GLY","ALA","VAL","LEU","ILE","PRO","MET","PHE","TRP","SER","THR","CYS","ASN","GLN","TYR","ASP","GLU","LYS","ARG","HIS",
-         "HSP","HSD","HSE",
-         "SERP","DCYS","DLYS","DARG"
-         ]
+prot_list = ["GLY", "ALA", "VAL", "LEU", "ILE", "PRO", "MET", "PHE", "TRP", 
+             "SER", "THR", "CYS", "ASN", "GLN", "TYR", "ASP", "GLU", "LYS",
+             "ARG", "HIS", "HSP", "HSD", "HSE",
+             "SERP", "DCYS", "DLYS", "DARG"
+            ]
+na_list   = ["ADE", "GUA", "CYT", "THY", "URA"]
 ### END OF SIDECHAIN HASH 
 ### BACKBONE MAPPING FOR GENERAL AND ALANINE
 GBB = ["CA"]
 ABB = ["CA"]
-
+RB1 = ["C4\'", "O4\'", "C5\'"]
+RB2 = ["C1\'", "C2\'", "O2\'", "C3\'" ]
+DB2 = ["C1\'", "C2\'", "C3\'"]
+PB  = ["P"]
 ######################################################
 def read_json(jsonfile,mol_list,res_name,res_map):
     try:
@@ -340,15 +371,23 @@ class map_to_cg:
                 for aatype in aatypes:
                     mass, com = self._weight_pos(aa_domain, aatype, mass, com)
             else :
-                sys.exit (f"ERROR: {aa_domain[RESNAME][0]} ATOM {aatypes} IS MISSING ON MOLECULE")
+                bad_res = aa_domain[RESID][0]
+                sys.exit (f"ERROR: {aa_domain[RESNAME][0]} ATOM {aatypes} IS MISSING ON MOLECULE {bad_res}")
         else:
             for aatype in aatypes:
                 if aa_domain[ATMNAME].count(aatype):
                     mass, com = self._weight_pos(aa_domain, aatype, mass, com)
                 else :
                     bad_res = aa_domain[RESID][0]
-                    print (f"ERROR: {aa_domain[RESNAME][0]} BACKBONE ATOM {aatypes} IS MISSING ON RESIDUE {bad_res}")
-                    return np.zeros(3), "UNK"
+                    if aatypes in [GBB, ABB, PB, RB1, DB2]:
+                        print (f"WARNING: {aa_domain[RESNAME][0]} BACKBONE ATOM {aatypes} IS MISSING ON RESIDUE {bad_res}")
+                        print (f"WARNING: THIS BEAD WILL BE SKIPPED")
+                        return np.zeros(3), "UNK"
+                    elif aatypes in [RB2]:
+                        #print (f"LOG: CHECK IF RESIDUE {bad_res} IS DNA OR NOT")
+                        return np.zeros(3), "UNK"
+                    else:
+                        sys.exit (f"ERROR: {aa_domain[RESNAME][0]} ATOM {aatypes} IS MISSING ON MOLECULE {bad_res}")
         com /= mass
         return com, aa_domain[RESNAME][0]
     
@@ -395,9 +434,10 @@ class map_to_cg:
         if TYPE != "ALA" :
             # CREATE A NEW DOMAIN FOR THIS RESIDUE BACKBONE
             # AND STORE THE COM OF THE BACKBONE ATOMS
-            com, _    = self._com(aa_domain, GBB)
             bead_name = self._bead_name(TYPE)
-            self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+            com, ret  = self._com(aa_domain, GBB)
+            if ret != "UNK":
+                self._set_cg_domain(aa_domain, TYPE, bead_name, com)
             # Just finished the backbone
             # NOW TAKE CARE OF THE SIDECHAINS
             if TYPE != "GLY" :
@@ -412,9 +452,38 @@ class map_to_cg:
                 else:
                     self._warn_TYPE(TYPE)
         else:
-            com, _    = self._com(aa_domain, ABB)
             bead_name = self._bead_name(TYPE)
+            com, _    = self._com(aa_domain, ABB)
             self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+
+    def na_map(self, aa_domain):
+        TYPE = aa_domain[RESNAME][0]
+        com, ret  = self._com(aa_domain, PB)
+        if ret != "UNK":
+            bead_name = "PB"
+            self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+        com, ret  = self._com(aa_domain, RB1)
+        if ret != "UNK":
+            bead_name = "RB1"
+            self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+        com, ret  = self._com(aa_domain, RB2)
+        if ret != "UNK":
+            bead_name = "RB2"
+            self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+        else:
+            com, ret  = self._com(aa_domain, DB2)
+            if ret != "UNK":
+                bead_name = "DB2"
+                self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+        # Just finished the backbone
+        # NOW TAKE CARE OF THE SIDECHAINS
+        if TYPE in res_map: 
+            for idx, res in enumerate(res_map[TYPE]):
+                com, bead_name  = self._com(aa_domain, res)
+                bead_name = self._bead_numbering(bead_name, idx)
+                self._set_cg_domain(aa_domain, TYPE, bead_name, com)
+        else:
+            self._warn_TYPE(TYPE)
     
     def mol_map(self, aa_domain):
         TYPE = aa_domain[RESNAME][0]
@@ -452,6 +521,8 @@ class map_to_cg:
                 print (TYPE)
             if prot_list.count(TYPE):
                 self.prot_map(aa_domain)
+            elif na_list.count(TYPE):
+                self.na_map(aa_domain)
             elif self.mol_list.count(TYPE):
                 self.mol_map(aa_domain)
             else:
