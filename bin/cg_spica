@@ -4,6 +4,7 @@ import sys, textwrap
 from pathlib import Path
 sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
 import gen_top_ENM, json_to_top, map_to_cg, map_traj
+import wat_to_polar
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 def get_option():
@@ -16,6 +17,7 @@ def get_option():
                                       map2cg   : map AA configuration to CG (only PDB format)
                                       maptraj  : map AA MD trajectory to CG (MDAnalysis module is required)
                                       ENM      : generate top file of protein with elastic network
+                                      wat2polar: convert SPICA CG water to pSPICA polar CG water
                                       ----------------------------------------------------------------------
                                                  """))
     argparser.add_argument('tool_name', type=str,
@@ -63,5 +65,11 @@ if __name__ == "__main__":
         last     = args.last
         mt       = map_traj.map_traj(inPDB, inTRAJ, outTRAJ, outPDB, jsonfile, nodelwat, beg, last)
         mt.run()
+    elif args.tool_name == "wat2polar":
+        args     = wat_to_polar.get_option_script(sub)
+        infile   = args.input
+        outfile  = args.output
+        wat2polar = wat_to_polar.wat_to_polar(infile, outfile)
+        wat2polar.run()
     else:
         sys.exit("ERROR: invalid tool name.")
