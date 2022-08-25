@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 def get_option():
     argparser = ArgumentParser()
     argparser.add_argument('input_files', type=str, nargs="+",
-                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> [ <coordfile> ]')
     argparser.add_argument('-prot', action="store_true",
                             help='read a pdb file to extract reference angle for protein models.')
     return argparser.parse_args()
@@ -16,7 +16,7 @@ def get_option():
 def get_option_script(argv):
     argparser = ArgumentParser()
     argparser.add_argument('input_files', type=str, nargs="+",
-                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> [ <coordfile> ]')
     argparser.add_argument('-prot', action="store_true",
                             help='read a pdb file to extract reference angle for protein models.')
     return argparser.parse_args(argv)
