@@ -5,6 +5,18 @@ from math import pi
 from pathlib import Path
 from argparse import ArgumentParser
 
+def get_option():
+    argparser = ArgumentParser()
+    argparser.add_argument('input_files', type=str, nargs="+",
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    return argparser.parse_args()
+
+def get_option_script(argv):
+    argparser = ArgumentParser()
+    argparser.add_argument('input_files', type=str, nargs="+",
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    return argparser.parse_args(argv)
+
 def get_angle(r1, r2, r3):
     r12   = r1 - r2
     r32   = r3 - r2
@@ -891,8 +903,8 @@ def read_top(fname, topdat, ntop):
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
-def run():
-    nargs = len(sys.argv)
+def run(inputs):
+    nargs = len(inputs)
     if nargs < 5:
        print("usage: setup_lmp <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
        print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
@@ -901,18 +913,18 @@ def run():
     database  = Database() 
     sysdat    = Sysdat()
     ischarged = 0
-    ntops = int((nargs - 3)/2)
+    ntops = int((nargs - 2)/2)
     print("WILL READ {} TOPOLOGY FILE(S).".format(ntops))
     print()
     rdtp = 0
     # Loop through the topologies and count the number of atoms, bonds and bends
     while rdtp < ntops:
-        topdat[rdtp].nmol = int(sys.argv[(2*rdtp) + 2])
-        count_atoms(sys.argv[(2*rdtp)+1], topdat, rdtp)
+        topdat[rdtp].nmol = int(inputs[(2*rdtp) + 1])
+        count_atoms(inputs[2*rdtp], topdat, rdtp)
         rdtp += 1
     sysdat.ntops = ntops
     for idx in range(ntops):
-        print("TOPFILE {}".format(sys.argv[(2*idx)+1]))
+        print("TOPFILE {}".format(inputs[2*idx]))
         print("FOUND: {} atoms".format(topdat[idx].nat))
         print("FOUND: {} bonds".format(topdat[idx].nbnd))
         print("FOUND: {} angles".format(topdat[idx].nang))                                                                             
@@ -936,22 +948,23 @@ def run():
     print("FOUND: {} dihderals".format(sysdat.total_diheds))
     rdtp = 0
     while rdtp < ntops:
-            topdat[rdtp].nmol = int(sys.argv[(2*rdtp + 2)])
-            read_top(sys.argv[(2*rdtp) + 1], topdat, rdtp)
+            topdat[rdtp].nmol = int(inputs[(2*rdtp + 1)])
+            read_top(inputs[2*rdtp], topdat, rdtp)
             rdtp += 1
-    count_params(sys.argv[nargs-2], database)
-    read_database(sys.argv[nargs-2], database)
+    count_params(inputs[nargs-2], database)
+    read_database(inputs[nargs-2], database)
     print("###########################")
     print("####  DATABASE SUMMARY ####")
     print("FOUND {} UNIQUE VDW PAIR PARAMS".format(database.nvdwtype))
     print("FOUND {} UNIQUE BOND PARAMS".format(database.nbndtype))
     print("FOUND {} UNIQUE ANGLE PARAMS".format(database.nangtype))
-    read_pdb(sys.argv[nargs-1], sysdat)
+    read_pdb(inputs[nargs-1], sysdat)
     # write PARM.FILE
     get_unique(database, topdat, sysdat) 
     # write DATA.FILE
-    read_coords(sys.argv[nargs-1], database, topdat, sysdat)
-    write_psf(sys.argv[nargs-1], database, topdat, sysdat)
+    read_coords(inputs[nargs-1], database, topdat, sysdat)
+    write_psf(inputs[nargs-1], database, topdat, sysdat)
 
 if __name__ == "__main__":
-    run()
+    args = get_option()
+    run(args.input_files)

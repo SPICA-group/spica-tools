@@ -4,21 +4,21 @@ import sys, textwrap
 from pathlib import Path
 sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
 import gen_top_ENM, json_to_top, map_to_cg, map_traj
-import wat_to_polar
+import wat_to_polar, setup_lmp, setup_gmx
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 def get_option():
     argparser = ArgumentParser(add_help=False, formatter_class=RawTextHelpFormatter,
                                usage=textwrap.dedent("""\
-                                      cg_spica tool_name 
+    cg_spica tool_name 
 
-                                      # list of tool_names #------------------------------------------------
-                                      json2top : make top file from json file  
-                                      map2cg   : map AA configuration to CG (only PDB format)
-                                      maptraj  : map AA MD trajectory to CG (MDAnalysis module is required)
-                                      ENM      : generate top file of protein with elastic network
-                                      wat2polar: convert SPICA CG water to pSPICA polar CG water
-                                      ----------------------------------------------------------------------
+    # list of tool_names #------------------------------------------------
+    json2top : make top file from json file  
+    map2cg   : map AA configuration to CG (only PDB format)
+    maptraj  : map AA MD trajectory to CG (MDAnalysis module is required)
+    ENM      : generate top file of protein with elastic network
+    wat2polar: convert SPICA CG water to pSPICA polar CG water
+    ----------------------------------------------------------------------
                                                  """))
     argparser.add_argument('tool_name', type=str,
                             help='input tool_name.')
@@ -71,5 +71,11 @@ if __name__ == "__main__":
         outfile  = args.output
         wat2polar = wat_to_polar.wat_to_polar(infile, outfile)
         wat2polar.run()
+    elif args.tool_name == "setup_lmp":
+        args = setup_lmp.get_option_script(sub)
+        setup_lmp.run(args.input_files)
+    elif args.tool_name == "setup_gmx":
+        args = setup_gmx.get_option_script(sub)
+        setup_gmx.run(args)
     else:
-        sys.exit("ERROR: invalid tool name.")
+        sys.exit(f"ERROR: invalid tool name {args.tool_name}")
