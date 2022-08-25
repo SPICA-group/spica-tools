@@ -296,7 +296,10 @@ def get_unique(database, topdat, sysdat):
         print("dihedral_style  charmm", file=fout)
     if sysdat.total_improps > 0:
         print("improper_style  harmonic", file=fout)
-    print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+    if ischarged:
+        print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+    else:
+        print("special_bonds   lj 0.0 0.0 1.0", file=fout)
     print(file=fout)
     for idx in range(sysdat.ntops):
         for jdx in range(topdat[idx].nat):
@@ -754,6 +757,7 @@ def count_atoms(fname, topdat, ntop):
 # Read the topology file and store the data
 def read_top(fname, topdat, ntop):
     global ischarged
+    log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
     ndx = bndx = andx = dndx = indx = lc = 0
     print("######################")
     print("##### READING {}".format(fname))
@@ -776,9 +780,10 @@ def read_top(fname, topdat, ntop):
                     topdat[ntop].segid.append(items[7])
                 except:
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
-                if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5:
+                if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5 and log_charge:
                     print("CHARGE IN TOP FILE {} {}".format(fname, topdat[ntop].charge[ndx]))
                     ischarged = 1
+                    log_charge = False
                 ndx += 1
             if items[0] == "bond":
                 try:
@@ -791,7 +796,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].bndpset.append(False)
                 bndx += 1
             if items[0] == "bondparam":
-                print("WARNING: Using bond parameters from the top file.")
+                if log_bndprm:
+                    print("WARNING: Using bond parameters from the top file.")
+                    log_bndprm = False
                 if len(items) < 5:
                     sys.exit("ERROR: Not enough args for bondparam: must be: ndx1 ndx2 fk eq.")
                 try:
@@ -815,7 +822,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].angpset.append(-1)
                 andx += 1
             if items[0] == "angleparam":
-                print("WARNING: Using angle parameters from the top file.")
+                if log_angprm:
+                    print("WARNING: Using angle parameters from the top file.")
+                    log_angprm = False
                 if len(items) < 6:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk eq.")
                 try:
@@ -842,7 +851,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].improppset.append(-1)
                 indx += 1
             if items[0] == "improperparam":
-                print("WARNING: Using improper parameters from the top file.")
+                if log_impprm:
+                    print("WARNING: Using improper parameters from the top file.")
+                    log_impprm = False
                 if len(items) < 7:
                     sys.exit("ERROR: Not enough args for improperparam: must be: ndx1 ndx2 ndx3 ndx4 fk eq.")
                 try:
@@ -857,7 +868,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].dihedpset.append(1)
                 indx += 1
             if items[0] == "dihedralparam":
-                print("WARNING: Using dihedral parameters from the top file.")
+                if log_dihprm:
+                    print("WARNING: Using dihedral parameters from the top file.")
+                    log_dihprm = False
                 if len(items) < 9:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk n eq onefour.")
                 try:
