@@ -24,7 +24,7 @@ def get_option():
                             help='input tool_name.')
     return argparser
 
-if __name__ == "__main__":
+def main():
     ap        = get_option()
     args, sub = ap.parse_known_args()
     if args.tool_name == "ENM":
@@ -79,3 +79,6 @@ if __name__ == "__main__":
         setup_gmx.run(args)
     else:
         sys.exit(f"ERROR: invalid tool name {args.tool_name}")
+
+if __name__ == "__main__":
+    main()
