@@ -14,7 +14,8 @@ def get_option():
     return argparser.parse_args()
 
 def get_option_script(argv):
-    argparser = ArgumentParser()
+    argparser = ArgumentParser(usage='setup_gmx [-h] [-prot] input_files',
+                               prog ="setup_gmx")
     argparser.add_argument('input_files', type=str, nargs="+",
                             help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> [ <coordfile> ]')
     argparser.add_argument('-prot', action="store_true",
