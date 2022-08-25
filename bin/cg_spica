@@ -13,11 +13,13 @@ def get_option():
     cg_spica tool_name 
 
     # list of tool_names #------------------------------------------------
-    json2top : make top file from json file  
-    map2cg   : map AA configuration to CG (only PDB format)
-    maptraj  : map AA MD trajectory to CG (MDAnalysis module is required)
-    ENM      : generate top file of protein with elastic network
-    wat2polar: convert SPICA CG water to pSPICA polar CG water
+    json2top  : make top file from json file  
+    map2cg    : map AA configuration to CG (only PDB format)
+    maptraj   : map AA MD trajectory to CG (MDAnalysis module is required)
+    ENM       : generate top file of protein with elastic network
+    wat2polar : convert SPICA CG water to pSPICA polar CG water
+    setup_lmp : generate input files to run CG-MD with LAMMPS
+    setup_gmx : generate input files to run CG-MD with GROMACS
     ----------------------------------------------------------------------
                                                  """))
     argparser.add_argument('tool_name', type=str,
