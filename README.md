@@ -6,7 +6,8 @@ The tools were developed by members of SPICA-group. Details about the SPICA forc
 the members can be found at (https://www.spica-ff.org).  
 
 ## Installation  
-The command to call the tools in src directory is `cg_spica` and requires bash and python 3 enviroment.
+The command to call the tools in src/ directory is `cg_spica` and requires 
+**Python 3** enviroment. Bash enviroment is also needed to excute the tools with commands on consoles. 
 You can dowload this repository including a setup file to use the command by the following command:  
 
     git clone git@github.com:SPICA-group/spica-tools-devel.git  
@@ -20,9 +21,10 @@ command:
 
     source set.sh  
     
-The path to cg_spica has been added to the environmental variable `PATH`. To make sure that the command 
-integrating
-python codes in src/ directory is available on consoles, run the following commands:
+The path to cg_spica has been added to the environmental variable `PATH`. Adding the above line in your 
+setup files like `.bash_profile` would be convinient if you often need to use the spica-tools. To make 
+sure that the command integrating python codes in src/ directory is available on consoles, 
+run the following commands:
 
     cg_spica -h  
     
