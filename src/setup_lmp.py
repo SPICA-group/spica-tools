@@ -5,6 +5,19 @@ from math import pi
 from pathlib import Path
 from argparse import ArgumentParser
 
+def get_option():
+    argparser = ArgumentParser()
+    argparser.add_argument('input_files', type=str, nargs="+",
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    return argparser.parse_args()
+
+def get_option_script(argv):
+    argparser = ArgumentParser(usage='setup_lmp [-h] input_files',
+                               prog ="setup_lmp")
+    argparser.add_argument('input_files', type=str, nargs="+",
+                            help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    return argparser.parse_args(argv)
+
 def get_angle(r1, r2, r3):
     r12   = r1 - r2
     r32   = r3 - r2
@@ -296,7 +309,10 @@ def get_unique(database, topdat, sysdat):
         print("dihedral_style  charmm", file=fout)
     if sysdat.total_improps > 0:
         print("improper_style  harmonic", file=fout)
-    print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+    if ischarged:
+        print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+    else:
+        print("special_bonds   lj 0.0 0.0 1.0", file=fout)
     print(file=fout)
     for idx in range(sysdat.ntops):
         for jdx in range(topdat[idx].nat):
@@ -754,6 +770,7 @@ def count_atoms(fname, topdat, ntop):
 # Read the topology file and store the data
 def read_top(fname, topdat, ntop):
     global ischarged
+    log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
     ndx = bndx = andx = dndx = indx = lc = 0
     print("######################")
     print("##### READING {}".format(fname))
@@ -776,9 +793,10 @@ def read_top(fname, topdat, ntop):
                     topdat[ntop].segid.append(items[7])
                 except:
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
-                if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5:
+                if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5 and log_charge:
                     print("CHARGE IN TOP FILE {} {}".format(fname, topdat[ntop].charge[ndx]))
                     ischarged = 1
+                    log_charge = False
                 ndx += 1
             if items[0] == "bond":
                 try:
@@ -791,7 +809,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].bndpset.append(False)
                 bndx += 1
             if items[0] == "bondparam":
-                print("WARNING: Using bond parameters from the top file.")
+                if log_bndprm:
+                    print("WARNING: Using bond parameters from the top file.")
+                    log_bndprm = False
                 if len(items) < 5:
                     sys.exit("ERROR: Not enough args for bondparam: must be: ndx1 ndx2 fk eq.")
                 try:
@@ -815,7 +835,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].angpset.append(-1)
                 andx += 1
             if items[0] == "angleparam":
-                print("WARNING: Using angle parameters from the top file.")
+                if log_angprm:
+                    print("WARNING: Using angle parameters from the top file.")
+                    log_angprm = False
                 if len(items) < 6:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk eq.")
                 try:
@@ -842,7 +864,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].improppset.append(-1)
                 indx += 1
             if items[0] == "improperparam":
-                print("WARNING: Using improper parameters from the top file.")
+                if log_impprm:
+                    print("WARNING: Using improper parameters from the top file.")
+                    log_impprm = False
                 if len(items) < 7:
                     sys.exit("ERROR: Not enough args for improperparam: must be: ndx1 ndx2 ndx3 ndx4 fk eq.")
                 try:
@@ -857,7 +881,9 @@ def read_top(fname, topdat, ntop):
                 topdat[ntop].dihedpset.append(1)
                 indx += 1
             if items[0] == "dihedralparam":
-                print("WARNING: Using dihedral parameters from the top file.")
+                if log_dihprm:
+                    print("WARNING: Using dihedral parameters from the top file.")
+                    log_dihprm = False
                 if len(items) < 9:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk n eq onefour.")
                 try:
@@ -867,7 +893,7 @@ def read_top(fname, topdat, ntop):
                     topdat[ntop].dihedndx4.append(int(items[4]))
                     topdat[ntop].dihedfk.append(float(items[5]))
                     topdat[ntop].dihedn.append(int(items[6]))
-                    topdat[ntop].dihedeq.append(int(items[7]))
+                    topdat[ntop].dihedeq.append(float(items[7]))
                     topdat[ntop].dihedof.append(float(items[8]))
                 except:
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
@@ -878,8 +904,8 @@ def read_top(fname, topdat, ntop):
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
-def run():
-    nargs = len(sys.argv)
+def run(inputs):
+    nargs = len(inputs)
     if nargs < 5:
        print("usage: setup_lmp <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
        print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
@@ -888,18 +914,18 @@ def run():
     database  = Database() 
     sysdat    = Sysdat()
     ischarged = 0
-    ntops = int((nargs - 3)/2)
+    ntops = int((nargs - 2)/2)
     print("WILL READ {} TOPOLOGY FILE(S).".format(ntops))
     print()
     rdtp = 0
     # Loop through the topologies and count the number of atoms, bonds and bends
     while rdtp < ntops:
-        topdat[rdtp].nmol = int(sys.argv[(2*rdtp) + 2])
-        count_atoms(sys.argv[(2*rdtp)+1], topdat, rdtp)
+        topdat[rdtp].nmol = int(inputs[(2*rdtp) + 1])
+        count_atoms(inputs[2*rdtp], topdat, rdtp)
         rdtp += 1
     sysdat.ntops = ntops
     for idx in range(ntops):
-        print("TOPFILE {}".format(sys.argv[(2*idx)+1]))
+        print("TOPFILE {}".format(inputs[2*idx]))
         print("FOUND: {} atoms".format(topdat[idx].nat))
         print("FOUND: {} bonds".format(topdat[idx].nbnd))
         print("FOUND: {} angles".format(topdat[idx].nang))                                                                             
@@ -923,22 +949,23 @@ def run():
     print("FOUND: {} dihderals".format(sysdat.total_diheds))
     rdtp = 0
     while rdtp < ntops:
-            topdat[rdtp].nmol = int(sys.argv[(2*rdtp + 2)])
-            read_top(sys.argv[(2*rdtp) + 1], topdat, rdtp)
+            topdat[rdtp].nmol = int(inputs[(2*rdtp + 1)])
+            read_top(inputs[2*rdtp], topdat, rdtp)
             rdtp += 1
-    count_params(sys.argv[nargs-2], database)
-    read_database(sys.argv[nargs-2], database)
+    count_params(inputs[nargs-2], database)
+    read_database(inputs[nargs-2], database)
     print("###########################")
     print("####  DATABASE SUMMARY ####")
     print("FOUND {} UNIQUE VDW PAIR PARAMS".format(database.nvdwtype))
     print("FOUND {} UNIQUE BOND PARAMS".format(database.nbndtype))
     print("FOUND {} UNIQUE ANGLE PARAMS".format(database.nangtype))
-    read_pdb(sys.argv[nargs-1], sysdat)
+    read_pdb(inputs[nargs-1], sysdat)
     # write PARM.FILE
     get_unique(database, topdat, sysdat) 
     # write DATA.FILE
-    read_coords(sys.argv[nargs-1], database, topdat, sysdat)
-    write_psf(sys.argv[nargs-1], database, topdat, sysdat)
+    read_coords(inputs[nargs-1], database, topdat, sysdat)
+    write_psf(inputs[nargs-1], database, topdat, sysdat)
 
 if __name__ == "__main__":
-    run()
+    args = get_option()
+    run(args.input_files)

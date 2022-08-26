@@ -104,66 +104,97 @@ ncomp_pdb = 15
     POSZ,
 ) = range(ncomp)
 
-res_map={}
-res_map["ALA"] = ["ALA"];
-res_map["VAL"] = ["VAL"];
-res_map["LEU"] = ["LEU"];
-res_map["ILE"] = ["ILE"];
-res_map["PRO"] = ["PRO"];
-res_map["MET"] = ["MET"];
-res_map["SER"] = ["SER"];
-res_map["THR"] = ["THR"];
-res_map["CYS"] = ["CYS"];
-res_map["ASN"] = ["ASN"];
-res_map["GLN"] = ["GLN"];
-res_map["ASP"] = ["ASP"];
-res_map["GLU"] = ["GLU"];
-res_map["ARG"] = ["AR1", "AR2"];
-res_map["LYS"] = ["LY1", "LY2"];
-res_map["PHE"] = ["PH1", "PH2", "PH3", "PH4"];
-res_map["TYR"] = ["TY1", "TY2", "TY3", "TY4"];
-res_map["TRP"] = ["TR1", "TR2", "TR3"];
-res_map["HIS"] = ["HI1", "HI2", "HI3"];
-res_map["HSP"] = ["HI1", "HI2", "HI3"];
-res_map["HSD"] = ["HI1", "HI2", "HI3"];
-res_map["HSE"] = ["HI1", "HI2", "HI3"];
-
+res_map = {}
 this_type = {}
-this_type["GBB"] = "GBB";
-this_type["GBM"] = "GBM";
-this_type["ABB"] = "ABB";
-this_type["VAL"] = "VAL";
-this_type["LEU"] = "LEU";
-this_type["ILE"] = "ILE";
-this_type["PRO"] = "PRO";
-this_type["MET"] = "MET";
-this_type["PH1"] = "XYR";
-this_type["PH2"] = "BER";
-this_type["PH3"] = "BER";
-this_type["PH4"] = "BER";
-this_type["TR1"] = "TR1";
-this_type["TR2"] = "TR2";
-this_type["TR3"] = "TR3";
-this_type["SER"] = "SER";
-this_type["THR"] = "THR";
-this_type["CYS"] = "CYS";
-this_type["ASN"] = "ASN";
-this_type["GLN"] = "GLN";
-this_type["TY1"] = "XYR";
-this_type["TY2"] = "BER";
-this_type["TY3"] = "PHR";
-this_type["TY4"] = "BER";
-this_type["ASP"] = "ASP";
-this_type["GLU"] = "GLU";
-this_type["LY1"] = "LY1";
-this_type["LY2"] = "LY2";
-this_type["AR1"] = "AR1";
-this_type["AR2"] = "AR2";
-this_type["HI1"] = "HI1";
-this_type["HI2"] = "HI2";
-this_type["HI3"] = "HI3";
-this_type["GBT"] = "GBT";
-this_type["ABT"] = "ABT";
+
+# CG map for DNA/RNA #
+res_map["ADE"] = ["AD1", "AD2", "AD3", "AD4"]
+res_map["GUA"] = ["GU1", "GU2", "GU3", "GU4"]
+res_map["CYT"] = ["CY1", "CY2", "CY3"]
+res_map["THY"] = ["TH1", "TH2", "TH3"]
+res_map["URA"] = ["UR1", "UR2", "UR3"]
+
+this_type["PB"]  = "PH"
+this_type["RB1"] = "RB1"
+this_type["RB2"] = "RB2"
+this_type["DB2"] = "DB2"
+this_type["AD1"] = "BPY2"
+this_type["AD2"] = "BPU1"
+this_type["AD3"] = "BPU2"
+this_type["AD4"] = "BPU2"
+this_type["GU1"] = "BPY1"
+this_type["GU2"] = "BPU1"
+this_type["GU3"] = "BPU2"
+this_type["GU4"] = "BPYG"
+this_type["CY1"] = "BPY2"
+this_type["CY2"] = "BPY1"
+this_type["CY3"] = "CMD2"
+this_type["TH1"] = "BPY0"
+this_type["TH2"] = "BPY1"
+this_type["TH3"] = "CMD3"
+this_type["UR1"] = "BPY0"
+this_type["UR2"] = "BPY1"
+this_type["UR3"] = "CMD2"
+
+# CG map for protein #
+res_map["ALA"] = ["ALA"]
+res_map["VAL"] = ["VAL"]
+res_map["LEU"] = ["LEU"]
+res_map["ILE"] = ["ILE"]
+res_map["PRO"] = ["PRO"]
+res_map["MET"] = ["MET"]
+res_map["SER"] = ["SER"]
+res_map["THR"] = ["THR"]
+res_map["CYS"] = ["CYS"]
+res_map["ASN"] = ["ASN"]
+res_map["GLN"] = ["GLN"]
+res_map["ASP"] = ["ASP"]
+res_map["GLU"] = ["GLU"]
+res_map["ARG"] = ["AR1", "AR2"]
+res_map["LYS"] = ["LY1", "LY2"]
+res_map["PHE"] = ["PH1", "PH2", "PH3", "PH4"]
+res_map["TYR"] = ["TY1", "TY2", "TY3", "TY4"]
+res_map["TRP"] = ["TR1", "TR2", "TR3"]
+res_map["HIS"] = ["HI1", "HI2", "HI3"]
+res_map["HSP"] = ["HI1", "HI2", "HI3"]
+res_map["HSD"] = ["HI1", "HI2", "HI3"]
+res_map["HSE"] = ["HI1", "HI2", "HI3"]
+
+this_type["GBB"] = "GBB"
+this_type["GBM"] = "GBM"
+this_type["ABB"] = "ABB"
+this_type["VAL"] = "VAL"
+this_type["LEU"] = "LEU"
+this_type["ILE"] = "ILE"
+this_type["PRO"] = "PRO"
+this_type["MET"] = "MET"
+this_type["PH1"] = "XYR"
+this_type["PH2"] = "BER"
+this_type["PH3"] = "BER"
+this_type["PH4"] = "BER"
+this_type["TR1"] = "TR1"
+this_type["TR2"] = "TR2"
+this_type["TR3"] = "TR3"
+this_type["SER"] = "SER"
+this_type["THR"] = "THR"
+this_type["CYS"] = "CYS"
+this_type["ASN"] = "ASN"
+this_type["GLN"] = "GLN"
+this_type["TY1"] = "XYR"
+this_type["TY2"] = "BER"
+this_type["TY3"] = "PHR"
+this_type["TY4"] = "BER"
+this_type["ASP"] = "ASP"
+this_type["GLU"] = "GLU"
+this_type["LY1"] = "LY1"
+this_type["LY2"] = "LY2"
+this_type["AR1"] = "AR1"
+this_type["AR2"] = "AR2"
+this_type["HI1"] = "HI1"
+this_type["HI2"] = "HI2"
+this_type["HI3"] = "HI3"
+this_type["GBT"] = "GBT"
+this_type["ABT"] = "ABT"
 
 ###############################################################################
 #  IDENTIFY UNIQUE SIDECHAIN BONDS...I.E. RINGS
@@ -171,6 +202,44 @@ this_type["ABT"] = "ABT";
 #  IF NOTHING HERE IT ASSUMES STRAIGHTFORWARD BONDING
 ######################################################
 spec_bond={}
+
+rbbnd1 = ["PB",  "RB1"]
+rbbnd2 = ["RB1", "RB2"]
+dbbnd2 = ["RB1", "DB2"]
+
+adbnd1 = ["DB2", "AD3"]
+adbnd2 = ["AD1", "AD2"]
+adbnd3 = ["AD2", "AD3"]
+adbnd4 = ["AD3", "AD4"]
+adbnd5 = ["AD4", "AD1"]
+adbnd6 = ["AD2", "AD4"]
+spec_bond["ADE"] = [adbnd1, adbnd2, adbnd3, adbnd4, adbnd5]
+
+gubnd1 = ["DB2", "GU3"]
+gubnd2 = ["GU1", "GU2"]
+gubnd3 = ["GU2", "GU3"]
+gubnd4 = ["GU3", "GU4"]
+gubnd5 = ["GU4", "GU1"]
+gubnd6 = ["GU2", "GU4"]
+spec_bond["GUA"] = [gubnd1, gubnd2, gubnd3, gubnd4, gubnd5]
+
+cybnd1 = ["DB2", "CY2"]
+cybnd2 = ["CY1", "CY2"]
+cybnd3 = ["CY2", "CY3"]
+cybnd4 = ["CY3", "CY1"]
+spec_bond["CYT"] = [cybnd1, cybnd2, cybnd3, cybnd4]
+
+thbnd1 = ["DB2", "TH2"]
+thbnd2 = ["TH1", "TH2"]
+thbnd3 = ["TH2", "TH3"]
+thbnd4 = ["TH3", "TH1"]
+spec_bond["THY"] = [thbnd1, thbnd2, thbnd3, thbnd4]
+
+urbnd1 = ["RB2", "UR2"]
+urbnd2 = ["UR1", "UR2"]
+urbnd3 = ["UR2", "UR3"]
+urbnd4 = ["UR3", "UR1"]
+spec_bond["URA"] = [urbnd1, urbnd2, urbnd3, urbnd4]
 
 lysbnd1 = ["GBM", "LY1"]
 lysbnd2 = ["LY1", "LY2"]
@@ -195,20 +264,20 @@ trpbnd3 = ["TR1", "TR3"]
 trpbnd4 = ["TR2", "TR3"]
 spec_bond["TRP"] = [trpbnd1, trpbnd2, trpbnd3, trpbnd4];
 
-phebnd1 = ["GBM", "PH1"];
-phebnd2 = ["PH1", "PH2"];
-phebnd3 = ["PH2", "PH3"];
-phebnd4 = ["PH3", "PH4"];
-phebnd5 = ["PH4", "PH1"];
-phebnd6 = ["PH2", "PH4"];
+phebnd1 = ["GBM", "PH1"]
+phebnd2 = ["PH1", "PH2"]
+phebnd3 = ["PH2", "PH3"]
+phebnd4 = ["PH3", "PH4"]
+phebnd5 = ["PH4", "PH1"]
+phebnd6 = ["PH2", "PH4"]
 spec_bond["PHE"] = [phebnd1, phebnd2, phebnd3, phebnd4, phebnd5];
 
-tyrbnd1 = ["GBM", "TY1"];
-tyrbnd2 = ["TY1", "TY2"];
-tyrbnd3 = ["TY2", "TY3"];
-tyrbnd4 = ["TY3", "TY4"];
-tyrbnd5 = ["TY4", "TY1"];
-tyrbnd6 = ["TY2", "TY4"];
+tyrbnd1 = ["GBM", "TY1"]
+tyrbnd2 = ["TY1", "TY2"]
+tyrbnd3 = ["TY2", "TY3"]
+tyrbnd4 = ["TY3", "TY4"]
+tyrbnd5 = ["TY4", "TY1"]
+tyrbnd6 = ["TY2", "TY4"]
 spec_bond["TYR"] = [tyrbnd1, tyrbnd2, tyrbnd3, tyrbnd4, tyrbnd5];
 
 
@@ -221,14 +290,19 @@ spec_dihed={}
 # THIS IS NOT FULLY IMPLEMENTED.  THE CODE JUST ASSUMES
 # THE FOUR CG SITE ARE PART OF THE DIHEDRAL...FINE FOR NOW
 # YOU STILL NEED THESE LINE!!!!
-spec_dihed["PHE"] = ["PH1", "PH2", "PH3", "PH4"];
-spec_dihed["TYR"] = ["TY1", "TY2", "TY3", "TY4"];
+spec_dihed["ADE"] = ["AD1", "AD2", "AD3", "AD4"]
+spec_dihed["GUA"] = ["GU1", "GU2", "GU3", "GU4"]
+
+spec_dihed["PHE"] = ["PH1", "PH2", "PH3", "PH4"]
+spec_dihed["TYR"] = ["TY1", "TY2", "TY3", "TY4"]
 
 
 #######################################################
 
 # CHARGE HASH
 charge={}
+charge["PB"]  = -0.1118
+
 charge["LY2"] = 0.1118
 charge["AR2"] = 0.1118
 charge["HI1"] = 0.00
@@ -239,6 +313,28 @@ charge["GBT"] = 0.1118
 charge["ABT"] = 0.1118
 # MASS HASH
 bd_mass={}
+bd_mass["RB1"] = 43.0454 
+bd_mass["RB2"] = 56.0644 
+bd_mass["DB2"] = 40.0650 
+bd_mass["PB"]  = 87.1647 
+bd_mass["AD1"] = 42.041 
+bd_mass["AD2"] = 39.037 
+bd_mass["AD3"] = 26.018 
+bd_mass["AD4"] = 27.026 
+bd_mass["GU1"] = 43.0254 
+bd_mass["GU2"] = 39.037  
+bd_mass["GU3"] = 26.018  
+bd_mass["GU4"] = 42.041  
+bd_mass["CY1"] = 42.041  
+bd_mass["CY2"] = 43.0254 
+bd_mass["CY3"] = 26.038  
+bd_mass["TH1"] = 43.0254 
+bd_mass["TH2"] = 43.0254 
+bd_mass["TH3"] = 41.073  
+bd_mass["UR1"] = 43.0254 
+bd_mass["UR2"] = 43.0254 
+bd_mass["UR3"] = 26.038  
+
 bd_mass["GBB"] = 56.0385
 bd_mass["GBM"] = 56.0385
 bd_mass["GBT"] = 56.0385
@@ -253,18 +349,15 @@ bd_mass["MET"] = 75.1543
 bd_mass["TR1"] = 39.0567
 bd_mass["TR2"] = 38.0488
 bd_mass["TR3"] = 53.0634
-
 bd_mass["SER"] = 31.0287
 bd_mass["THR"] = 45.0555
 bd_mass["CYS"] = 46.0928
 bd_mass["ASN"] = 58.0543
 bd_mass["GLN"] = 72.0811
-
 bd_mass["PH1"] = 33.5575
 bd_mass["PH2"] = 19.5275 
 bd_mass["PH3"] = 19.5275
 bd_mass["PH4"] = 19.5275 
-
 bd_mass["TY1"] = 33.5575
 bd_mass["TY2"] = 19.5275
 bd_mass["TY3"] = 35.5275
@@ -281,7 +374,7 @@ bd_mass["HI1"] = 26.0378
 bd_mass["HI2"] = 27.0256
 bd_mass["HI3"] = 28.0335
 
-def read_pdb(infile,pdb_list,cryst):
+def read_pdb(infile, pdb_list, cryst, ters):
     natom = 0
     try:
         f = open(infile,"r")
@@ -290,28 +383,30 @@ def read_pdb(infile,pdb_list,cryst):
         sys.exit(0)
     line = f.readline()
     while line:
-      recname = line[0:6].strip()
-      if recname == "CRYST1":
-        cryst.append(line.strip())
-      elif recname == "ATOM":
-        natom += 1
-        index    = line[6:11]
-        atmname = line[12:16]
-        indicat  = line[16:17]
-        resname =  line[17:21]
-        chainid =  line[21:22]
-        resid   =  line[22:26]
-        code    =  line[26:27]
-        posX = float(line[30:38])
-        posY = float(line[38:46])
-        posZ = float(line[46:54])
-        occup = line[54:60]
-        Tfact = line[60:66]
-        segid = line[72:76]
-        elesym = line[76:78].split("\n")[0]
-        #charge = line[78:80]
-        pdb_list.append([recname,index,atmname,indicat,resname,chainid,resid,code,posX,posY,posZ,occup,Tfact,segid,elesym])
-      line = f.readline()
+        recname = line[0:6].strip()
+        if recname == "CRYST1":
+            cryst.append(line.strip())
+        elif recname == "ATOM":
+            natom += 1
+            index    = line[6:11]
+            atmname = line[12:16]
+            indicat  = line[16:17]
+            resname =  line[17:21]
+            chainid =  line[21:22]
+            resid   =  line[22:26]
+            code    =  line[26:27]
+            posX = float(line[30:38])
+            posY = float(line[38:46])
+            posZ = float(line[46:54])
+            occup = line[54:60]
+            Tfact = line[60:66]
+            segid = line[72:76]
+            elesym = line[76:78].split("\n")[0]
+            #charge = line[78:80]
+            pdb_list.append([recname,index,atmname,indicat,resname,chainid,resid,code,posX,posY,posZ,occup,Tfact,segid,elesym])
+        elif recname == "TER":
+            ters.append(float(resid))
+        line = f.readline()
     f.close()
     return natom
 
@@ -342,8 +437,9 @@ class gen_top_ENM:
         self.bPH1TY1   = []
         self.coord     = []
         self.pdb_data  = []
+        self.ters      = []
         cryst    = []
-        self.natom = read_pdb(infile, self.pdb_data, cryst)
+        self.natom = read_pdb(infile, self.pdb_data, cryst, self.ters)
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
@@ -360,14 +456,13 @@ class gen_top_ENM:
 
     def _set_array(self):
         for i in range(self.natom):
-            tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()[:2]
+            tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()
+            #tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()[:2]
             tmp_resname = self.pdb_data[i][PDB_RESNAME].strip()
-            if tmp_name == "GB" or tmp_name == "AB":
-                if tmp_resname == "ALA":
-                    self.name.append("ABB")
-                elif tmp_resname == "GLY":
-                    self.name.append("GBB")
-                else :
+            if tmp_name in ["GBB", "ABB", "GBM", "PB", "RB1", "RB2", "DB2"]:
+                if tmp_resname in ["GLY", "ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
+                    self.name.append(tmp_name)
+                else:
                     self.name.append("GBM")
                 self.bbtype.append(tmp_resname)
                 self.resname.append(tmp_resname)
@@ -378,7 +473,7 @@ class gen_top_ENM:
                 self.bBackbone.append(1)
                 self.bPH1TY1.append(0)
                 self.nat += 1; self.nbb += 1
-                if tmp_resname != "GLY" and tmp_resname != "ALA":
+                if tmp_resname not in ["GLY", "ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
                     for j in res_map[tmp_resname]:
                         self.name.append(j)
                         self.coord.append([None, None, None])
@@ -387,6 +482,19 @@ class gen_top_ENM:
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
                         if j == "PH2" or j == "TY2" or j == "PH4" or j == "TY4":
+                            self.bPH1TY1.append(1)
+                        else :
+                            self.bPH1TY1.append(0)
+                        self.nat += 1
+                if tmp_name in ["RB2", "DB2"]:
+                    for j in res_map[tmp_resname]:
+                        self.name.append(j)
+                        self.coord.append([None, None, None])
+                        self.resname.append(tmp_resname)
+                        self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                        self.iat2ibb.append(None)
+                        self.bBackbone.append(0)
+                        if j == "AD2" or j == "GU2" or j == "AD4" or j == "GU4":
                             self.bPH1TY1.append(1)
                         else :
                             self.bPH1TY1.append(0)
@@ -409,29 +517,29 @@ class gen_top_ENM:
             wtype = this_type[name_i]
             mass  = bd_mass[name_i]
 
-            if self.bbndx[0] == i:
-                # backbone N-terminal
-                thischrg = charge["GBT"]
-                #print ("charge of terminal is",thischrg)
-
-                if resname_i == "ALA":
-                    print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                        %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+            if resname_i not in ["ADE", "GUA", "CYT", "THY", "URA"]:
+                if self.bbndx[0] == i:
+                    # backbone N-terminal
+                    thischrg = charge["GBT"]
+                    #print ("charge of terminal is",thischrg)
+                    if resname_i == "ALA":
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                    else :
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                elif self.bbndx[self.nbb-1] == i:
+                    # backbone C-terminal
+                    thischrg = -1*charge["GBT"]
+                    if resname_i == "ALA":
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                    else :
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
                 else :
                     print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                        %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
-                
-            elif self.bbndx[self.nbb-1] == i:
-                # backbone C-terminal
-                thischrg = -1*charge["GBT"]
-                
-                if resname_i == "ALA":
-                    print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                        %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
-                else :
-                    print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                        %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
-                    
+                        %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
             else :
                 print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                     %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
@@ -448,6 +556,7 @@ class gen_top_ENM:
     def write_ENM(self):
         ftop  = self.ftop
         MAXdr = self.MAXdr
+        MINdr = 0.0
         kENM  = self.kENM
         print ()
         print ("******** Elastic network info ********")
@@ -465,7 +574,7 @@ class gen_top_ENM:
                     dy = self.coord[i1][1] - self.coord[i2][1]
                     dz = self.coord[i1][2] - self.coord[i2][2]
                     dr = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    if dr < MAXdr and self.resid[i2] - self.resid[i1] >= 3:
+                    if dr < MAXdr and dr > MINdr and self.resid[i2] - self.resid[i1] >= 3:
                         print ("bondparam %5d %5d   %f %f # %s-%s" \
                             %(I1, I2, kENM, dr, self.name[i1], self.name[i2]), file=ftop)
         print ("", file=ftop)
@@ -479,6 +588,10 @@ class gen_top_ENM:
         bond_index1 = []
         bond_index2 = []
         for i in range(self.nbb - 1):
+            if self.resid[self.bbndx[i]] > self.resid[self.bbndx[i+1]]:
+                continue
+            if self.resid[self.bbndx[i]] in self.ters:
+                continue
             self.total_bonds += 1
             print ("bond %5d %5d # %s-%s" \
                 %(self.bbndx[i]+1, self.bbndx[i+1]+1, self.name[self.bbndx[i]], self.name[self.bbndx[i+1]]), file=ftop)
@@ -498,7 +611,9 @@ class gen_top_ENM:
         for i in range(self.nbb):
             bbtype_i = self.bbtype[i]
             bbndx_i  = self.bbndx[i]
-            if bbtype_i != "GLY" and bbtype_i != "ALA":
+            if self.name[bbndx_i] in ["PB", "RB1"]:
+                continue
+            if bbtype_i not in ["GLY", "ALA"]:
                 # check to see if it is a special bond
                 if bbtype_i in spec_bond:
                     for j in spec_bond[bbtype_i]:
@@ -586,11 +701,13 @@ class gen_top_ENM:
         ftop  = self.ftop
         for i in range(self.nbb):
             bbtype_i = self.bbtype[i]
+            bbndx_i  = self.bbndx[i]
+            name_i   = self.name[bbndx_i]
             #MAKE SURE WE HAVE A SIDECHAIN
             if bbtype_i != "GLY" and bbtype_i != "ALA":
             #CHECK TO SEE IF IT IS A SPECIAL DIHEDRAL
-                if bbtype_i in spec_dihed:
-                    ndx1 = self.bbndx[i] + 1
+                if bbtype_i in spec_dihed and name_i not in ["PB", "RB1"]:
+                    ndx1 = bbndx_i + 1
                     ndx2 = ndx1 + 1
                     ndx3 = ndx2 + 1
                     ndx4 = ndx3 + 1
