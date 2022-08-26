@@ -35,7 +35,7 @@ directory and can be installed with `pip` by the following command:
 
     pip install -r requirements.txt  
     
-The documentation of cg_spica is now in preparation.
+The documentation of the above spica-tools is now in preparation.
 
 
 ## Tools
