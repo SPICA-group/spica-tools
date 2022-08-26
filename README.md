@@ -45,7 +45,7 @@ The documentation of cg_spica is now in prepareation.
   * `map2cg`    : map AA configuration to CG, only PDB format is available
   * `maptraj`   : map AA MD trajectory to CG, `MDAnalysis` module (https://www.mdanalysis.org) is required
   * `ENM`       : generate top file of protein with elastic network
-  * `wa2polar`  : convert SPICA CG water to pSPICA polar CG water
+  * `wat2polar` : convert SPICA CG water to pSPICA polar CG water
   * `setup_lmp` : generate input files to run CG-MD with LAMMPS (https://www.lammps.org)
   * `setup_gmx` : generate input files to run CG-MD with GROMACS (https://www.gromacs.org) that is modified 
                   for SPICA-FF by applying a patch file distributed in another repository of SPICA-group 
