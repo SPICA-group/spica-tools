@@ -40,14 +40,15 @@ The documentation of cg_spica is now in prepareation.
 
 ## Tools
 * Python (can be used with `cg_spica`)
-  * `json2top`  : make top files, required for setup_*** programs, from json file  
-  * `map2cg`    : map AA configuration to CG (only PDB format)
-  * `maptraj`   : map AA MD trajectory to CG (`MDAnalysis` module is required)
+  * `json2top`  : make top files, required for setup_*** programs, from a json file having SPICA mapping 
+                  information  
+  * `map2cg`    : map AA configuration to CG, only PDB format is available
+  * `maptraj`   : map AA MD trajectory to CG, `MDAnalysis` module (https://www.mdanalysis.org) is required
   * `ENM`       : generate top file of protein with elastic network
   * `wa2polar`  : convert SPICA CG water to pSPICA polar CG water
   * `setup_lmp` : generate input files to run CG-MD with LAMMPS (https://www.lammps.org)
-  * `setup_gmx` : generate input files to run CG-MD with GROMACS that is modified for SPICA-FF by applying 
-                  a patch file distributed in another repository of SPICA-group 
+  * `setup_gmx` : generate input files to run CG-MD with GROMACS (https://www.gromacs.org) that is modified 
+                  for SPICA-FF by applying a patch file distributed in another repository of SPICA-group 
                   (https://github.com/SPICA-group/gromacs-SPICA)
 
 * C (cannot be used with cg_spica, needed to compile by the unix command `make` in each directory) 
