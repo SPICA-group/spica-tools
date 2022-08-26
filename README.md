@@ -13,7 +13,7 @@ You can dowload this repository including a setup file to use the command by the
     
 Then change the current directory to the top directory of the repository:  
 
-    cd spica-tools-devel  
+    cd spica-tools-devel/  
     
 You can find a bash script `set.sh`, to add a path for using the command, and excute it by the following 
 command:  
@@ -28,7 +28,7 @@ python codes in src/ directory is available on consoles, run the following comma
     
     cg_spica map2cg -h  
     
-You can see the available option of the command by this if the command path is properly added to your PATH.  
+You can see the available option of the commands by this if the command path is properly added to your PATH.  
 Cg_spica requires several python libraries to excute some codes that include arithmetic operation and load 
 trajectory files obtained from MD simulation. The libraries are listed in `requirements.txt` in the top 
 directory and can be installed with `pip` by the following command:  
