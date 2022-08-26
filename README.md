@@ -39,7 +39,7 @@ The documentation of cg_spica is now in preparation.
 
 
 ## Tools
-* Python (can be used with `cg_spica`)
+* Python (in `src/`, can be used with `cg_spica`)
   * `json2top`  : make top files, required for setup_*** programs, from a json file having SPICA mapping 
                   information  
   * `map2cg`    : map AA configuration to CG, only PDB format is available
@@ -51,9 +51,9 @@ The documentation of cg_spica is now in preparation.
                   for SPICA-FF by applying a patch file distributed in another repository of SPICA-group 
                   (https://github.com/SPICA-group/gromacs-SPICA)
 
-* C (cannot be used with cg_spica, needed to compile by the unix command `make` in each directory) 
-  * setup_lammps.cpp 
-  * setup_gromacs.cpp  
+* C (in `c/`, cannot be used with cg_spica, needed to compile by the unix command `make` in each directory) 
+  * setup_lammps  
+  * setup_gromacs  
   
   The setup_lammps/gromacs codes have the same function as setup_lmp/gmx described above, 
   respectively. These may be useful to generate MD input files for extremely large systems.  
