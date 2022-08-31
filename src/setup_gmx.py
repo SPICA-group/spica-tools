@@ -64,7 +64,7 @@ def get_dihedral(r1, r2, r3, r4):
 class Sysdat:
     nats = nbnds = nangs = nimprops = ndiheds = ntops = 0 
     total_ats = total_bnds = total_angs = total_improps = total_diheds = 0
-    foundatoms = boxinfo = 0
+    foundatoms = boxinfo = ischarged = 0
     uniq_nats = uniq_nbnds = uniq_nangs = uniq_nimprops = uniq_ndiheds = 0
     param_bnds, param_angs  = [], []
     coordx, coordy, coordz = [], [], []
@@ -217,7 +217,6 @@ def read_coords(database, topdat, sysdat):
                             topdat[idx].impropfk[jdx]*4.184*2.0,topdat[idx].impropeq[jdx]))
 
 def write_psf(database, topdat, sysdat):
-    global ischarged
     with open("out.psf", "w") as fout:
         print("PSF ", file=fout)
         print(file=fout)
@@ -679,7 +678,6 @@ def count_atoms(fname, topdat, ntop):
 
 # Read the topology file and store the data
 def read_top(fname, topdat, ntop):
-    global ischarged
     log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
     ndx = bndx = andx = dndx = indx = lc = 0
     print("######################")
@@ -705,7 +703,7 @@ def read_top(fname, topdat, ntop):
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
                 if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5 and log_charge:
                     print("CHARGE IN TOP FILE {} {}".format(fname, topdat[ntop].charge[ndx]))
-                    ischarged = 1
+                    sysdat.ischarged = 1
                     log_charge = False
                 ndx += 1
             if items[0] == "bond":
@@ -940,7 +938,6 @@ def run(args):
     topdat   = [Topdat() for _ in range(1000)]
     database = Database()
     sysdat   = Sysdat()
-    ischarged = 0
     print("WILL READ {} TOPOLOGY FILE(S).".format(ntops))
 
     # Loop through the topologies and count the number of atoms, bonds and bends
