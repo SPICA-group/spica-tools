@@ -677,7 +677,7 @@ def count_atoms(fname, topdat, ntop):
             sys.exit("ERROR: natom in {} is zero.".format(fname))
 
 # Read the topology file and store the data
-def read_top(fname, topdat, ntop):
+def read_top(fname, sysdat, topdat, ntop):
     log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
     ndx = bndx = andx = dndx = indx = lc = 0
     print("######################")
@@ -953,7 +953,7 @@ def run(args):
     for idx in range(ntops):
         topdat[idx].nmol = int(inputs[2*idx+1])
         count_atoms(inputs[2*idx], topdat,idx)
-        read_top(inputs[2*idx], topdat, idx)
+        read_top(inputs[2*idx], sysdat, topdat, idx)
         print("BOOKKEEPING:")
         print("FOUND: {} atoms".format(topdat[idx].nat))
         print("FOUND: {} bonds".format(topdat[idx].nbnd))
