@@ -889,7 +889,7 @@ def read_top(fname, sysdat, topdat, ntop):
                     topdat[ntop].dihedndx4.append(int(items[4]))
                     topdat[ntop].dihedfk.append(float(items[5]))
                     topdat[ntop].dihedn.append(int(items[6]))
-                    topdat[ntop].dihedeq.append(float(items[7]))
+                    topdat[ntop].dihedeq.append(int(float(items[7])))
                     topdat[ntop].dihedof.append(float(items[8]))
                 except:
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
