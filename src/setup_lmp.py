@@ -622,7 +622,7 @@ def get_unique(database, topdat, sysdat):
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].nimprop):
                 if topdat[idx].improppset[jdx] == 1:
-                    topdat[idx].improptype[jdx] = uniq_improps
+                    topdat[idx].improptype.append(uniq_improps)
                     uniq_improps += 1
                     print("improper_coeff {:<10} {:8.4f} {:8.4f} # {} {} {} {} FROM TOP".format(uniq_improps,
                            topdat[idx].impropfk[jdx],
@@ -874,7 +874,7 @@ def read_top(fname, sysdat, topdat, ntop):
                     topdat[ntop].impropeq.append(float(items[6]))
                 except:
                     sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
-                topdat[ntop].dihedpset.append(1)
+                topdat[ntop].improppset.append(1)
                 indx += 1
             if items[0] == "dihedralparam":
                 if log_dihprm:
