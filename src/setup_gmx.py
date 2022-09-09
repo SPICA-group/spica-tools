@@ -2,7 +2,6 @@ import numpy as np
 import sys
 from math import sqrt
 from math import pi
-import getopt
 from argparse import ArgumentParser
 
 def get_option():
@@ -197,7 +196,7 @@ def read_coords(database, topdat, sysdat):
                             if database.angsdk[datndx] == 0:
                                 print("{:5d} {:5d} {:5d}    1".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
                             else:
-                                print("{:5d} {:5d} {:5d}    5".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
+                                print("{:5d} {:5d} {:5d}    4".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
             if topdat[idx].ndihed > 0:
                 print(file=fout)
                 print("[ dihedrals ]",file=fout)
@@ -499,7 +498,7 @@ def get_unique(database, topdat, sysdat):
                                             database.angtype3[ang_params[ uniq_angs-1]],
                                             tmpcalca, tmpcalcb), file=fout)
                                 else:
-                                    print("{:>6s} {:>6s} {:>6s}    5  {:8.4f} {:8.4f} {:8.4f} {:8.4f}".format(
+                                    print("{:>6s} {:>6s} {:>6s}    4  {:8.4f} {:8.4f} {:8.4f} {:8.4f}".format(
                                             database.angtype1[ang_params[ uniq_angs-1]],
                                             database.angtype2[ang_params[ uniq_angs-1]],
                                             database.angtype3[ang_params[ uniq_angs-1]],
@@ -536,7 +535,7 @@ def get_unique(database, topdat, sysdat):
                         tmpcalca = topdat[idx].angeq[jdx]
                         tmpcalcb = topdat[idx].angfk[jdx]*4.184*2.0
                         if tmpcalca > 0:
-                             print("{:>6s} {:>6s} {:>6s}    5  {:8.4f} {:8.4f} {:8.4f} {:8.4f} ; FROM TOP ".format(
+                             print("{:>6s} {:>6s} {:>6s}    4  {:8.4f} {:8.4f} {:8.4f} {:8.4f} ; FROM TOP ".format(
                                      topdat[i].type[topdat[i].angndx1[j]-1],topdat[i].type[topdat[i].angndx2[j]-1],
 		                             topdat[i].type[topdat[i].angndx3[j]-1], tmpcalca, tmpcalcb,sig,eps), file=fout)
         
