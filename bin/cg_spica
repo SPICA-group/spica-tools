@@ -3,7 +3,7 @@
 import sys, textwrap
 from pathlib import Path
 sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
-import gen_top_ENM, json_to_top, map_to_cg, map_traj
+import gen_top_ENM, gen_top_Go, json_to_top, map_to_cg, map_traj
 import wat_to_polar, setup_lmp, setup_gmx
 from argparse import ArgumentParser, RawTextHelpFormatter
 
@@ -17,6 +17,7 @@ def get_option():
     map2cg    : map AA configuration to CG (only PDB format)
     maptraj   : map AA MD trajectory to CG (MDAnalysis module is required)
     ENM       : generate top file of protein with elastic network
+    Go        : generate top file of protein with Go model
     wat2polar : convert SPICA CG water to pSPICA polar CG water
     setup_lmp : generate input files to run CG-MD with LAMMPS
     setup_gmx : generate input files to run CG-MD with GROMACS
@@ -37,6 +38,13 @@ def main():
         MAXdr   = args.maxr
         pspica  = args.pspica
         gen     = gen_top_ENM.gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
+        gen.run()
+    if args.tool_name == "Go":
+        args    = gen_top_Go.get_option_script(sub)
+        infile  = args.input
+        outfile = args.output
+        pspica  = args.pspica
+        gen     = gen_top_Go.gen_top_Go(infile, outfile, pspica)
         gen.run()
     elif args.tool_name == "json2top":
         args  = json_to_top.get_option_script(sub)
@@ -75,7 +83,8 @@ def main():
         wat2polar.run()
     elif args.tool_name == "setup_lmp":
         args = setup_lmp.get_option_script(sub)
-        setup_lmp.run(args.input_files)
+        Go   = args.Go
+        setup_lmp.run(args.input_files,Go)
     elif args.tool_name == "setup_gmx":
         args = setup_gmx.get_option_script(sub)
         setup_gmx.run(args)

@@ -9,13 +9,15 @@ def get_option():
     argparser = ArgumentParser()
     argparser.add_argument('input_files', type=str, nargs="+",
                             help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    argparser.add_argument('-Go', action='store_true',help='Go model for protein backbone')
     return argparser.parse_args()
 
 def get_option_script(argv):
-    argparser = ArgumentParser(usage='setup_lmp [-h] input_files',
+    argparser = ArgumentParser(usage='setup_lmp [-h] [-Go] input_files',
                                prog ="setup_lmp")
     argparser.add_argument('input_files', type=str, nargs="+",
                             help='<topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <param file> <coordfile>')
+    argparser.add_argument('-Go', action='store_true',help='Go model for protein backbone')
     return argparser.parse_args(argv)
 
 def get_angle(r1, r2, r3):
@@ -68,7 +70,8 @@ class Sysdat:
 
 class Topdat:
     def __init__(self):
-        self.nat = self.nbnd = self.nang = self.nimprop = self.nmol = 0
+        self.nat = self.nbnd = self.nang = self.nimprop = self.nmol = self.ngo =  0
+        self.gondx1, self.gondx2, self.gofunctype, self.eps, self.sig = [], [], [], [], []
         self.bndndx1, self.bndndx2, self.bndtype = [], [], []
         self.angndx1, self.angndx2, self.angndx3, self.angtype = [], [], [], []
         self.improp_func, self.impropndx1, self.impropndx2, self.impropndx3, self.impropndx4, self.improptype   = [], [], [], [], [], []
@@ -284,7 +287,7 @@ def write_psf(fname, database, topdat, sysdat):
         
 def cmp_wc(s1, s2):
     if s1[-1] == "*" or s2[-1] == "*":
-        return s1[:-1] == s2[:-1]       
+        return s1[0:2] == s2[0:2]       
     else:
         return s1 == s2
         
@@ -330,15 +333,41 @@ def get_unique(database, topdat, sysdat):
     for idx in range(uniq_nats):
         print("mass   {:<5}  {:6.4f} # {}".format(idx+1, uniq_mass[idx],uniq_atype[idx]), file=fout)
     print(file=fout)
+    # get pair interactions
+    # Go model for protein backbone
+    Go = [[0 for i in range(uniq_nats)] for j in range(uniq_nats)]
+    for idx in range(sysdat.ntops):
+        for jdx in range(topdat[idx].ngo):
+            Go_parm_atomtype1 = topdat[idx].parm_atomtype[topdat[idx].gondx1[jdx]-1]
+            Go_parm_atomtype2 = topdat[idx].parm_atomtype[topdat[idx].gondx2[jdx]-1]
+            print("pair_coeff  {:<5} {:<5} {:<6} {:5.4f} {:5.4f} # {:<4} {:<4} Go model".format(
+                    Go_parm_atomtype1+1,Go_parm_atomtype2+1,
+                    topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
+                    topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
+            Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
     for idx in range(uniq_nats):
+        if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+            tmp_type1 = uniq_atype[idx][0:4]
+        elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+            tmp_type1 = uniq_atype[idx][0:3]
+        else:
+            tmp_type1 = uniq_atype[idx]
         for jdx in range(idx, uniq_nats):
+            if Go[idx][jdx] == 1:
+                continue
+            if uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                tmp_type2 = uniq_atype[jdx][0:4]
+            elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                tmp_type2 = uniq_atype[jdx][0:3]
+            else:
+                tmp_type2 = uniq_atype[jdx]
             ifound=0;
             for kdx in range(database.nvdwtype):
-                if database.vdwtype1[kdx] == uniq_atype[idx] and database.vdwtype2[kdx] == uniq_atype[jdx]:
+                if database.vdwtype1[kdx] == tmp_type1 and database.vdwtype2[kdx] == tmp_type2:
                     ifound = 1
                     vdwtmp = kdx
                     break
-                elif database.vdwtype2[kdx] == uniq_atype[idx] and database.vdwtype1[kdx] == uniq_atype[jdx]:
+                elif database.vdwtype2[kdx] == tmp_type1 and database.vdwtype1[kdx] == tmp_type2:
                     ifound = 1
                     vdwtmp = kdx
                     break
@@ -448,10 +477,22 @@ def get_unique(database, topdat, sysdat):
                                 break
                     ifound = 0
                     for kdx in range(database.nvdwtype):
-                        f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                        f2 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                        f3 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                        f4 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
+                        if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4]
+                        elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3]
+                        else:
+                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
+                        if topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4]
+                        elif topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3]
+                        else:
+                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
+                        f1 = database.vdwtype1[kdx] == tmp_type1
+                        f2 = database.vdwtype2[kdx] == tmp_type2
+                        f3 = database.vdwtype1[kdx] == tmp_type2
+                        f4 = database.vdwtype2[kdx] == tmp_type1
                         if f1 and f2:
                             ifound = 1
                             vdwtmp = kdx
@@ -752,6 +793,8 @@ def count_atoms(fname, topdat, ntop):
                 continue
             if items[0] == "atom":
                 topdat[ntop].nat += 1
+            if items[0] == "goparam":
+                topdat[ntop].ngo += 1
             if items[0] == "bond"  or items[0] == "bondparam":
                 topdat[ntop].nbnd += 1
             if items[0] == "angle" or items[0] == "angleparam":
@@ -897,56 +940,357 @@ def read_top(fname, sysdat, topdat, ntop):
                 dndx += 1
             line = fin.readline()
 
+def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
+    log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
+    ndx = bndx = andx = dndx = indx = lc = 0
+    print("######################")
+    print("##### READING {}".format(fname))
+
+    # Count Number of GBM GBB GBT ABB ABT GBTP GBTN ABTP ABTN 
+    nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+    f = open(fname,"r")
+    lines = f.readlines()
+    for line in lines:
+        items = line.split()
+        if len(items) == 0:
+            continue
+        if items[0] == "atom":
+            if items[4] in nbb:
+                nbb[items[4]] += 1
+    f.close()
+    with open(fname, "r") as fin:
+        line = fin.readline()
+        while line:
+            lc    += 1
+            items = line.split()
+            if len(items) == 0:
+                line = fin.readline()
+                continue
+            if items[0] == "atom":
+                try:
+                    topdat[ntop].ind.append(int(items[1]))
+                    topdat[ntop].resname.append(items[2])
+                    topdat[ntop].atomname.append(items[3])
+                    if items[4] in bbind:
+                        bbind[items[4]] += 1
+                        topdat[ntop].atomtype.append(items[4]+str(bbind[items[4]]))
+                    else:
+                        topdat[ntop].atomtype.append(items[4])
+                    topdat[ntop].mass.append(float(items[5]))
+                    topdat[ntop].charge.append(float(items[6].replace("+","")))
+                    topdat[ntop].segid.append(items[7])
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                for i in range(1,ndup):
+                    topdat[ntop+i].ind.append(int(items[1]))
+                    topdat[ntop+i].resname.append(items[2])
+                    topdat[ntop+i].atomname.append(items[3])
+                    if items[4] in nbb:
+                        topdat[ntop+i].atomtype.append(items[4]+str(bbind[items[4]]+i*nbb[items[4]]))
+                    else:
+                        topdat[ntop+i].atomtype.append(items[4])
+                    topdat[ntop+i].mass.append(float(items[5]))
+                    topdat[ntop+i].charge.append(float(items[6].replace("+","")))
+                    topdat[ntop+i].segid.append(items[7])
+                if topdat[ntop].charge[ndx]*topdat[ntop].charge[ndx] > 1e-5 and log_charge:
+                    print("CHARGE IN TOP FILE {} {}".format(fname, topdat[ntop].charge[ndx]))
+                    sysdat.ischarged = 1
+                    log_charge = False
+                ndx += 1
+            if items[0] == "goparam":
+                try:
+                    topdat[ntop].gondx1.append(int(items[1]))
+                    topdat[ntop].gondx2.append(int(items[2]))
+                    topdat[ntop].gofunctype.append((items[3]))
+                    topdat[ntop].eps.append((float(items[4])))
+                    topdat[ntop].sig.append((float(items[5])))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                for i in range(1,ndup):
+                    topdat[ntop+i].gondx1.append(int(items[1]))
+                    topdat[ntop+i].gondx2.append(int(items[2]))
+                    topdat[ntop+i].gofunctype.append((items[3]))
+                    topdat[ntop+i].eps.append((float(items[4])))
+                    topdat[ntop+i].sig.append((float(items[5])))
+
+            if items[0] == "bond":
+                try:
+                    topdat[ntop].bndndx1.append(int(items[1]))
+                    topdat[ntop].bndndx2.append(int(items[2]))
+                    topdat[ntop].bndfk.append(None)
+                    topdat[ntop].bndeq.append(None)
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].bndpset.append(False)
+                for i in range(1,ndup):
+                    topdat[ntop+i].bndndx1.append(int(items[1]))
+                    topdat[ntop+i].bndndx2.append(int(items[2]))
+                    topdat[ntop+i].bndfk.append(None)
+                    topdat[ntop+i].bndeq.append(None)
+                    topdat[ntop+i].bndpset.append(False)
+                bndx += 1
+            if items[0] == "bondparam":
+                if log_bndprm:
+                    print("WARNING: Using bond parameters from the top file.")
+                    log_bndprm = False
+                if len(items) < 5:
+                    sys.exit("ERROR: Not enough args for bondparam: must be: ndx1 ndx2 fk eq.")
+                try:
+                    topdat[ntop].bndndx1.append(int(items[1]))
+                    topdat[ntop].bndndx2.append(int(items[2]))
+                    topdat[ntop].bndfk.append(float(items[3]))
+                    topdat[ntop].bndeq.append(float(items[4]))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].bndpset.append(True)
+                for i in range(1,ndup):
+                    topdat[ntop+i].bndndx1.append(int(items[1]))
+                    topdat[ntop+i].bndndx2.append(int(items[2]))
+                    topdat[ntop+i].bndfk.append(float(items[3]))
+                    topdat[ntop+i].bndeq.append(float(items[4]))
+                    topdat[ntop+i].bndpset.append(True)
+                bndx += 1
+            if items[0] == "angle":
+                try:
+                    topdat[ntop].angndx1.append(int(items[1]))
+                    topdat[ntop].angndx2.append(int(items[2]))
+                    topdat[ntop].angndx3.append(int(items[3]))
+                    topdat[ntop].angfk.append(None)
+                    topdat[ntop].angeq.append(None)
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].angpset.append(-1)
+                for i in range(1,ndup):
+                    topdat[ntop+i].angndx1.append(int(items[1]))
+                    topdat[ntop+i].angndx2.append(int(items[2]))
+                    topdat[ntop+i].angndx3.append(int(items[3]))
+                    topdat[ntop+i].angfk.append(None)
+                    topdat[ntop+i].angeq.append(None)
+                    topdat[ntop+i].angpset.append(-1)
+                andx += 1
+            if items[0] == "angleparam":
+                if log_angprm:
+                    print("WARNING: Using angle parameters from the top file.")
+                    log_angprm = False
+                if len(items) < 6:
+                    sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk eq.")
+                try:
+                    topdat[ntop].angndx1.append(int(items[1]))
+                    topdat[ntop].angndx2.append(int(items[2]))
+                    topdat[ntop].angndx3.append(int(items[3]))
+                    topdat[ntop].angfk.append(float(items[4]))
+                    topdat[ntop].angeq.append(float(items[5]))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].angpset.append(1)
+                for i in range(1,ndup):
+                    topdat[ntop+i].angndx1.append(int(items[1]))
+                    topdat[ntop+i].angndx2.append(int(items[2]))
+                    topdat[ntop+i].angndx3.append(int(items[3]))
+                    topdat[ntop+i].angfk.append(float(items[4]))
+                    topdat[ntop+i].angeq.append(float(items[5]))
+                    topdat[ntop+i].angpset.append(1)
+                andx += 1
+            if items[0] == "improper":
+                print("WARNING: This is not implemented. must use improperparam and assign improper parameters in the top file.")
+                try:
+                    topdat[ntop].impropndx1.append(int(items[1]))
+                    topdat[ntop].impropndx2.append(int(items[2]))
+                    topdat[ntop].impropndx3.append(int(items[3]))
+                    topdat[ntop].impropndx4.append(int(items[4]))
+                    topdat[ntop].impropfk.append(float(items[5]))
+                    topdat[ntop].impropeq.append(float(items[6]))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].improppset.append(-1)
+                for i in range(1,ndup):
+                    topdat[ntop+i].impropndx1.append(int(items[1]))
+                    topdat[ntop+i].impropndx2.append(int(items[2]))
+                    topdat[ntop+i].impropndx3.append(int(items[3]))
+                    topdat[ntop+i].impropndx4.append(int(items[4]))
+                    topdat[ntop+i].impropfk.append(float(items[5]))
+                    topdat[ntop+i].impropeq.append(float(items[6]))
+                    topdat[ntop+i].improppset.append(-1)
+                indx += 1
+            if items[0] == "improperparam":
+                if log_impprm:
+                    print("WARNING: Using improper parameters from the top file.")
+                    log_impprm = False
+                if len(items) < 7:
+                    sys.exit("ERROR: Not enough args for improperparam: must be: ndx1 ndx2 ndx3 ndx4 fk eq.")
+                try:
+                    topdat[ntop].impropndx1.append(int(items[1]))
+                    topdat[ntop].impropndx2.append(int(items[2]))
+                    topdat[ntop].impropndx3.append(int(items[3]))
+                    topdat[ntop].impropndx4.append(int(items[4]))
+                    topdat[ntop].impropfk.append(float(items[5]))
+                    topdat[ntop].impropeq.append(float(items[6]))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].improppset.append(1)
+                for i in range(1,ndup):
+                    topdat[ntop+i].impropndx1.append(int(items[1]))
+                    topdat[ntop+i].impropndx2.append(int(items[2]))
+                    topdat[ntop+i].impropndx3.append(int(items[3]))
+                    topdat[ntop+i].impropndx4.append(int(items[4]))
+                    topdat[ntop+i].impropfk.append(float(items[5]))
+                    topdat[ntop+i].impropeq.append(float(items[6]))
+                    topdat[ntop+i].improppset.append(1)
+                indx += 1
+            if items[0] == "dihedralparam":
+                if log_dihprm:
+                    print("WARNING: Using dihedral parameters from the top file.")
+                    log_dihprm = False
+                if len(items) < 9:
+                    sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk n eq onefour.")
+                try:
+                    topdat[ntop].dihedndx1.append(int(items[1]))
+                    topdat[ntop].dihedndx2.append(int(items[2]))
+                    topdat[ntop].dihedndx3.append(int(items[3]))
+                    topdat[ntop].dihedndx4.append(int(items[4]))
+                    topdat[ntop].dihedfk.append(float(items[5]))
+                    topdat[ntop].dihedn.append(int(items[6]))
+                    topdat[ntop].dihedeq.append(int(float(items[7])))
+                    topdat[ntop].dihedof.append(float(items[8]))
+                except:
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                topdat[ntop].dihedpset.append(1)
+                for i in range(1,ndup):
+                    topdat[ntop+i].dihedndx1.append(int(items[1]))
+                    topdat[ntop+i].dihedndx2.append(int(items[2]))
+                    topdat[ntop+i].dihedndx3.append(int(items[3]))
+                    topdat[ntop+i].dihedndx4.append(int(items[4]))
+                    topdat[ntop+i].dihedfk.append(float(items[5]))
+                    topdat[ntop+i].dihedn.append(int(items[6]))
+                    topdat[ntop+i].dihedeq.append(int(float(items[7])))
+                    topdat[ntop+i].dihedof.append(float(items[8]))
+                    topdat[ntop+i].dihedpset.append(1)
+                dndx += 1
+            line = fin.readline()
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
-def run(inputs):
+def run(inputs,Go):
     nargs = len(inputs)
-    if nargs < 4:
+    if Go and nargs < 5:
+       print("usage: setup_lmp [-Go] <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
+       print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
+
+    if (not Go) and nargs < 4:
        print("usage: setup_lmp <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
        print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
        sys.exit(1)
     topdat    = [Topdat() for _ in range(1000)]
     database  = Database() 
     sysdat    = Sysdat()
-    ntops = int((nargs - 2)/2)
-    print("WILL READ {} TOPOLOGY FILE(S).".format(ntops))
-    print()
-    rdtp = 0
-    # Loop through the topologies and count the number of atoms, bonds and bends
-    while rdtp < ntops:
-        topdat[rdtp].nmol = int(inputs[(2*rdtp) + 1])
-        count_atoms(inputs[2*rdtp], topdat, rdtp)
-        rdtp += 1
-    sysdat.ntops = ntops
-    for idx in range(ntops):
-        print("TOPFILE {}".format(inputs[2*idx]))
-        print("FOUND: {} atoms".format(topdat[idx].nat))
-        print("FOUND: {} bonds".format(topdat[idx].nbnd))
-        print("FOUND: {} angles".format(topdat[idx].nang))                                                                             
-        print("FOUND: {} impropers".format(topdat[idx].nimprop))
-        print("FOUND: {} dihedrals".format(topdat[idx].ndihed))
+    if Go:
+        bbind = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+        tmp_ntops = int((nargs-2)/2)
+        print("WILL READ {} TOPOLOGY FILE(S).".format(tmp_ntops))
         print()
-        sysdat.nats     += topdat[idx].nat
-        sysdat.nbnds    += topdat[idx].nbnd
-        sysdat.nangs    += topdat[idx].nang
-        sysdat.nimprops += topdat[idx].nimprop
-        sysdat.ndiheds  += topdat[idx].ndihed
-        
-        sysdat.total_ats     += topdat[idx].nat*topdat[idx].nmol
-        sysdat.total_bnds    += topdat[idx].nbnd*topdat[idx].nmol
-        sysdat.total_angs    += topdat[idx].nang*topdat[idx].nmol
-        sysdat.total_improps += topdat[idx].nimprop*topdat[idx].nmol
-        sysdat.total_diheds  += topdat[idx].ndihed*topdat[idx].nmol
-        
-    print("TOTALS:")
-    print("FOUND: {} impropers".format(sysdat.total_improps))
-    print("FOUND: {} dihderals".format(sysdat.total_diheds))
-    rdtp = 0
-    while rdtp < ntops:
-            topdat[rdtp].nmol = int(inputs[(2*rdtp + 1)])
-            read_top(inputs[2*rdtp], sysdat, topdat, rdtp)
+        rdtp = 0
+        ndup = []
+        protein = []
+        for i in range(tmp_ntops):
+            f = open(inputs[2*i], 'r')
+            line = f.readline() 
+            f.close()
+            if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT']:
+                protein.append(True)
+            else:
+                protein.append(False)
+            count_atoms(inputs[2*i], topdat, rdtp)
+            if protein[i]:
+                ndup.append(int(inputs[2*i+1]))
+                topdat[rdtp].nmol = 1
+                for j in range(1,ndup[i]):
+                    topdat[rdtp+j].nmol = 1
+                    topdat[rdtp+j].nat = topdat[rdtp].nat 
+                    topdat[rdtp+j].ngo = topdat[rdtp].ngo 
+                    topdat[rdtp+j].nbnd = topdat[rdtp].nbnd 
+                    topdat[rdtp+j].nang = topdat[rdtp].nang 
+                    topdat[rdtp+j].nimprop = topdat[rdtp].nimprop 
+                    topdat[rdtp+j].ndihed = topdat[rdtp].ndihed 
+                rdtp += ndup[i]
+            else:
+                ndup.append(1)
+                topdat[rdtp].nmol = int(inputs[2*i+1])
+                rdtp += 1
+        rdtp = 0
+        for idx in range(tmp_ntops):
+            print("TOPFILE {}".format(inputs[2*idx]))
+            print("FOUND: {} atoms".format(topdat[rdtp].nat))
+            print("FOUND: {} bonds".format(topdat[rdtp].nbnd))
+            print("FOUND: {} angles".format(topdat[rdtp].nang))                                                                             
+            print("FOUND: {} impropers".format(topdat[rdtp].nimprop))
+            print("FOUND: {} dihedrals".format(topdat[rdtp].ndihed))
+            print()
+            sysdat.nats     += topdat[rdtp].nat
+            sysdat.nbnds    += topdat[rdtp].nbnd
+            sysdat.nangs    += topdat[rdtp].nang
+            sysdat.nimprops += topdat[rdtp].nimprop
+            sysdat.ndiheds  += topdat[rdtp].ndihed
+            
+            sysdat.total_ats     += topdat[rdtp].nat*topdat[rdtp].nmol*ndup[idx]
+            sysdat.total_bnds    += topdat[rdtp].nbnd*topdat[rdtp].nmol*ndup[idx]
+            sysdat.total_angs    += topdat[rdtp].nang*topdat[rdtp].nmol*ndup[idx]
+            sysdat.total_improps += topdat[rdtp].nimprop*topdat[rdtp].nmol*ndup[idx]
+            sysdat.total_diheds  += topdat[rdtp].ndihed*topdat[rdtp].nmol*ndup[idx]
+            rdtp += ndup[idx]
+            
+        print("TOTALS:")
+        print("FOUND: {} impropers".format(sysdat.total_improps))
+        print("FOUND: {} dihderals".format(sysdat.total_diheds))
+        rdtp = 0
+        for idx in range(tmp_ntops):
+            if protein[idx]:
+                read_top_Go(inputs[2*idx], sysdat, topdat, rdtp, ndup[idx], bbind)
+                rdtp += ndup[idx]
+            else:
+                read_top(inputs[2*idx], sysdat, topdat, rdtp)
+                rdtp += ndup[idx]
+        sysdat.ntops = rdtp
+
+    
+    else:
+        ntops = int((nargs - 2)/2)
+        print("WILL READ {} TOPOLOGY FILE(S).".format(ntops))
+        print()
+        rdtp = 0
+        # Loop through the topologies and count the number of atoms, bonds and bends
+        while rdtp < ntops:
+            topdat[rdtp].nmol = int(inputs[(2*rdtp) + 1])
+            count_atoms(inputs[2*rdtp], topdat, rdtp)
             rdtp += 1
+        sysdat.ntops = ntops
+        for idx in range(ntops):
+            print("TOPFILE {}".format(inputs[2*idx]))
+            print("FOUND: {} atoms".format(topdat[idx].nat))
+            print("FOUND: {} bonds".format(topdat[idx].nbnd))
+            print("FOUND: {} angles".format(topdat[idx].nang))                                                                             
+            print("FOUND: {} impropers".format(topdat[idx].nimprop))
+            print("FOUND: {} dihedrals".format(topdat[idx].ndihed))
+            print()
+            sysdat.nats     += topdat[idx].nat
+            sysdat.nbnds    += topdat[idx].nbnd
+            sysdat.nangs    += topdat[idx].nang
+            sysdat.nimprops += topdat[idx].nimprop
+            sysdat.ndiheds  += topdat[idx].ndihed
+            
+            sysdat.total_ats     += topdat[idx].nat*topdat[idx].nmol
+            sysdat.total_bnds    += topdat[idx].nbnd*topdat[idx].nmol
+            sysdat.total_angs    += topdat[idx].nang*topdat[idx].nmol
+            sysdat.total_improps += topdat[idx].nimprop*topdat[idx].nmol
+            sysdat.total_diheds  += topdat[idx].ndihed*topdat[idx].nmol
+            
+        print("TOTALS:")
+        print("FOUND: {} impropers".format(sysdat.total_improps))
+        print("FOUND: {} dihderals".format(sysdat.total_diheds))
+        rdtp = 0
+        while rdtp < ntops:
+                topdat[rdtp].nmol = int(inputs[(2*rdtp + 1)])
+                read_top(inputs[2*rdtp], sysdat, topdat, rdtp)
+                rdtp += 1
     count_params(inputs[nargs-2], database)
     read_database(inputs[nargs-2], database)
     print("###########################")
