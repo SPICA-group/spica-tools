@@ -60,8 +60,8 @@ def get_dihedral(r1, r2, r3, r4):
         return sign*np.arccos(cosp)
     
 class Sysdat:
-    nats = nbnds = nangs = nimprops = ndiheds = ntops = 0 
-    total_ats = total_bnds = total_angs = total_improps = total_diheds = 0
+    nats = ngo = nbnds = nangs = nimprops = ndiheds = ntops = 0 
+    total_ats = total_go = total_bnds = total_angs = total_improps = total_diheds = 0
     foundatoms = boxinfo = ischarged = 0
     uniq_nats = uniq_nbnds = uniq_nangs = uniq_nimprops = uniq_ndiheds = 0
     param_bnds, param_angs  = [], []
@@ -336,15 +336,16 @@ def get_unique(database, topdat, sysdat):
     # get pair interactions
     # Go model for protein backbone
     Go = [[0 for i in range(uniq_nats)] for j in range(uniq_nats)]
-    for idx in range(sysdat.ntops):
-        for jdx in range(topdat[idx].ngo):
-            Go_parm_atomtype1 = topdat[idx].parm_atomtype[topdat[idx].gondx1[jdx]-1]
-            Go_parm_atomtype2 = topdat[idx].parm_atomtype[topdat[idx].gondx2[jdx]-1]
-            print("pair_coeff  {:<5} {:<5} {:<6} {:5.4f} {:5.4f} # {:<4} {:<4} Go model".format(
-                    Go_parm_atomtype1+1,Go_parm_atomtype2+1,
-                    topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
-                    topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
-            Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
+    if sysdat.ngo > 0:
+        for idx in range(sysdat.ntops):
+            for jdx in range(topdat[idx].ngo):
+                Go_parm_atomtype1 = topdat[idx].parm_atomtype[topdat[idx].gondx1[jdx]-1]
+                Go_parm_atomtype2 = topdat[idx].parm_atomtype[topdat[idx].gondx2[jdx]-1]
+                print("pair_coeff  {:<5} {:<5} {:<6} {:5.4f} {:5.4f} # {:<4} {:<4} Go model".format(
+                        Go_parm_atomtype1+1,Go_parm_atomtype2+1,
+                        topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
+                        topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
+                Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
     for idx in range(uniq_nats):
         if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
             tmp_type1 = uniq_atype[idx][0:4]
@@ -948,17 +949,15 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
 
     # Count Number of GBM GBB GBT ABB ABT GBTP GBTN ABTP ABTN 
     nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
-    f = open(fname,"r")
-    lines = f.readlines()
-    for line in lines:
-        items = line.split()
-        if len(items) == 0:
-            continue
-        if items[0] == "atom":
-            if items[4] in nbb:
-                nbb[items[4]] += 1
-    f.close()
     with open(fname, "r") as fin:
+        lines = fin.readlines()
+        for line in lines:
+            items = line.split()
+            if len(items) == 0:
+                continue
+            if items[0] == "atom":
+                if items[4] in nbb:
+                    nbb[items[4]] += 1
         line = fin.readline()
         while line:
             lc    += 1
@@ -1167,17 +1166,15 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop+i].dihedpset.append(1)
                 dndx += 1
             line = fin.readline()
+            for bb in nbb:
+                bbind[bb] += nbb[bb]*(ndup-1)
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
 def run(inputs,Go):
     nargs = len(inputs)
-    if Go and nargs < 5:
+    if nargs < 4:
        print("usage: setup_lmp [-Go] <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
-       print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
-
-    if (not Go) and nargs < 4:
-       print("usage: setup_lmp <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
        print("Prints out input files for a lammps run. Takes a pdb file as the coordfile");
        sys.exit(1)
     topdat    = [Topdat() for _ in range(1000)]
@@ -1226,12 +1223,14 @@ def run(inputs,Go):
             print("FOUND: {} dihedrals".format(topdat[rdtp].ndihed))
             print()
             sysdat.nats     += topdat[rdtp].nat
+            sysdat.ngo      += topdat[rdtp].ngo
             sysdat.nbnds    += topdat[rdtp].nbnd
             sysdat.nangs    += topdat[rdtp].nang
             sysdat.nimprops += topdat[rdtp].nimprop
             sysdat.ndiheds  += topdat[rdtp].ndihed
             
             sysdat.total_ats     += topdat[rdtp].nat*topdat[rdtp].nmol*ndup[idx]
+            sysdat.total_go      += topdat[rdtp].ngo*topdat[rdtp].nmol*ndup[idx]
             sysdat.total_bnds    += topdat[rdtp].nbnd*topdat[rdtp].nmol*ndup[idx]
             sysdat.total_angs    += topdat[rdtp].nang*topdat[rdtp].nmol*ndup[idx]
             sysdat.total_improps += topdat[rdtp].nimprop*topdat[rdtp].nmol*ndup[idx]
