@@ -459,9 +459,11 @@ class gen_top_ENM:
             tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()
             #tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()[:2]
             tmp_resname = self.pdb_data[i][PDB_RESNAME].strip()
-            if tmp_name in ["GBB", "ABB", "GBM", "PB", "RB1", "RB2", "DB2"]:
-                if tmp_resname in ["GLY", "ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
+            if tmp_name in ["GBB", "GB", "ABB", "GBM", "PB", "RB1", "RB2", "DB2"]:
+                if tmp_resname in ["ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
                     self.name.append(tmp_name)
+                elif tmp_resname == "GLY":
+                    self.name.append("GBB")
                 else:
                     self.name.append("GBM")
                 self.bbtype.append(tmp_resname)

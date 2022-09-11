@@ -441,9 +441,11 @@ class gen_top_Go:
             tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()
             #tmp_name    = self.pdb_data[i][PDB_ATMNAME].strip()[:2]
             tmp_resname = self.pdb_data[i][PDB_RESNAME].strip()
-            if tmp_name in ["GBB", "ABB", "GBM", "PB", "RB1", "RB2", "DB2"]:
-                if tmp_resname in ["GLY", "ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
+            if tmp_name in ["GBB", "GB", "ABB", "GBM", "PB", "RB1", "RB2", "DB2"]:
+                if tmp_resname in ["ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
                     self.name.append(tmp_name)
+                elif tmp_resname == "GLY":
+                    self.name.append("GBB")
                 else:
                     self.name.append("GBM")
                 self.bbtype.append(tmp_resname)
@@ -538,7 +540,6 @@ class gen_top_Go:
     def write_Go(self):
         ftop  = self.ftop
         cutoff = self.cutoff
-        MINdr = 0.0
         eps_tm  = self.eps_tm
         eps_wp  = self.eps_wp
         print ()
@@ -558,9 +559,10 @@ class gen_top_Go:
                     dy = self.coord[i1][1] - self.coord[i2][1]
                     dz = self.coord[i1][2] - self.coord[i2][2]
                     dr = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    if dr < MAXdr and dr > MINdr and self.resid[i2] - self.resid[i1] >= 3:
-                        print ("bondparam %5d %5d   %f %f # %s-%s" \
-                            %(I1, I2, kENM, dr, self.name[i1], self.name[i2]), file=ftop)
+                    if dr < cutoff and self.resid[i2] - self.resid[i1] >= 3:
+                        sig = dr/1.122462048
+                        print ("goparam %5d %5d  lj12_6 %f %f # %s-%s" \
+                            %(I1, I2, eps_wp, sig, self.name[i1], self.name[i2]), file=ftop)
         print ("", file=ftop)
 
     #######################################
@@ -712,7 +714,7 @@ class gen_top_Go:
 
     def run(self):
         self.write_atom()
-        self.write_ENM()
+        self.write_Go()
         self.write_bond_BB()
         self.write_bond_SC()
         self.write_angle()

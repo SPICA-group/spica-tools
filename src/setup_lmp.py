@@ -781,6 +781,7 @@ def count_params(fname, database):
 # count the number of things in the topology files so we can allocate
 def count_atoms(fname, topdat, ntop):
     topdat[ntop].nat     = 0
+    topdat[ntop].ngo     = 0
     topdat[ntop].nbnd    = 0
     topdat[ntop].nang    = 0
     topdat[ntop].ndihed  = 0
@@ -943,7 +944,7 @@ def read_top(fname, sysdat, topdat, ntop):
 
 def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
     log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
-    ndx = bndx = andx = dndx = indx = lc = 0
+    ndx = bndx = andx = dndx = indx = 0
     print("######################")
     print("##### READING {}".format(fname))
 
@@ -958,12 +959,9 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
             if items[0] == "atom":
                 if items[4] in nbb:
                     nbb[items[4]] += 1
-        line = fin.readline()
-        while line:
-            lc    += 1
-            items = line.split()
+        for i in range(len(lines)):
+            items = lines[i].split()
             if len(items) == 0:
-                line = fin.readline()
                 continue
             if items[0] == "atom":
                 try:
@@ -979,7 +977,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].charge.append(float(items[6].replace("+","")))
                     topdat[ntop].segid.append(items[7])
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 for i in range(1,ndup):
                     topdat[ntop+i].ind.append(int(items[1]))
                     topdat[ntop+i].resname.append(items[2])
@@ -1004,7 +1002,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].eps.append((float(items[4])))
                     topdat[ntop].sig.append((float(items[5])))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 for i in range(1,ndup):
                     topdat[ntop+i].gondx1.append(int(items[1]))
                     topdat[ntop+i].gondx2.append(int(items[2]))
@@ -1019,7 +1017,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].bndfk.append(None)
                     topdat[ntop].bndeq.append(None)
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].bndpset.append(False)
                 for i in range(1,ndup):
                     topdat[ntop+i].bndndx1.append(int(items[1]))
@@ -1040,7 +1038,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].bndfk.append(float(items[3]))
                     topdat[ntop].bndeq.append(float(items[4]))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].bndpset.append(True)
                 for i in range(1,ndup):
                     topdat[ntop+i].bndndx1.append(int(items[1]))
@@ -1057,7 +1055,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].angfk.append(None)
                     topdat[ntop].angeq.append(None)
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].angpset.append(-1)
                 for i in range(1,ndup):
                     topdat[ntop+i].angndx1.append(int(items[1]))
@@ -1080,7 +1078,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].angfk.append(float(items[4]))
                     topdat[ntop].angeq.append(float(items[5]))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].angpset.append(1)
                 for i in range(1,ndup):
                     topdat[ntop+i].angndx1.append(int(items[1]))
@@ -1100,7 +1098,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].impropfk.append(float(items[5]))
                     topdat[ntop].impropeq.append(float(items[6]))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].improppset.append(-1)
                 for i in range(1,ndup):
                     topdat[ntop+i].impropndx1.append(int(items[1]))
@@ -1125,7 +1123,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].impropfk.append(float(items[5]))
                     topdat[ntop].impropeq.append(float(items[6]))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].improppset.append(1)
                 for i in range(1,ndup):
                     topdat[ntop+i].impropndx1.append(int(items[1]))
@@ -1152,7 +1150,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop].dihedeq.append(int(float(items[7])))
                     topdat[ntop].dihedof.append(float(items[8]))
                 except:
-                    sys.exit("ERROR at FILE {}, line {}".format(fname, lc))
+                    sys.exit("ERROR at FILE {}, line {}".format(fname, i+1))
                 topdat[ntop].dihedpset.append(1)
                 for i in range(1,ndup):
                     topdat[ntop+i].dihedndx1.append(int(items[1]))
@@ -1165,7 +1163,6 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop+i].dihedof.append(float(items[8]))
                     topdat[ntop+i].dihedpset.append(1)
                 dndx += 1
-            line = fin.readline()
             for bb in nbb:
                 bbind[bb] += nbb[bb]*(ndup-1)
 # Main routine. Call and allocate                                       

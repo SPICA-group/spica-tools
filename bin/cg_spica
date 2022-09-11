@@ -39,7 +39,7 @@ def main():
         pspica  = args.pspica
         gen     = gen_top_ENM.gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
         gen.run()
-    if args.tool_name == "Go":
+    elif args.tool_name == "Go":
         args    = gen_top_Go.get_option_script(sub)
         infile  = args.input
         outfile = args.output
