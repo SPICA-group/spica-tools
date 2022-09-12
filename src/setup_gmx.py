@@ -214,7 +214,7 @@ def read_coords(database, topdat, sysdat):
                 for jdx in range(topdat[idx].nimprop):
                     print("{:5d} {:5d} {:5d} {:5d}  2  {:8.4f} {:8.4f} ; FROM TOP".format(
                             topdat[idx].impropndx1[jdx],topdat[idx].impropndx2[jdx],topdat[idx].impropndx3[jdx],topdat[idx].impropndx4[jdx],
-                            topdat[idx].impropfk[jdx]*4.184*2.0,topdat[idx].impropeq[jdx]))
+                            topdat[idx].impropfk[jdx]*4.184*2.0,topdat[idx].impropeq[jdx]), file=fout)
 
 def write_psf(database, topdat, sysdat):
     with open("out.psf", "w") as fout:
