@@ -102,7 +102,8 @@ def read_pdb(fname, sysdat):
                 sysdat.boxz = float(items[3])
             elif items[0] == "ATOM" or items[0] == "HETATM":
                 if sysdat.foundatoms >= sysdat.total_ats:
-                    sys.exit("ERROR: found atoms in pdb file >= total atoms in top files.")
+                    sys.exit(f"ERROR: found atoms in pdb file ({sysdat.foundatoms}) >
+                                      total atoms in top files ({sysdat.total_ats}).")
                 sysdat.coordx.append(float(line[col:col+8]))
                 sysdat.coordy.append(float(line[col+8:col+16]))
                 sysdat.coordz.append(float(line[col+16:col+24]))
