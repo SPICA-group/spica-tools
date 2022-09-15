@@ -1,6 +1,0 @@
-###### Requirements without Version Specifiers ######
-numpy
-tqdm
-MDAnalysis
-
-###### Requirements with Version Specifiers ######

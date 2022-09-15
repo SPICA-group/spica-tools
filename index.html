@@ -1,0 +1,158 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Welcome to spica-tools’ documentation! &#8212; spica-tools 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="json2top" href="json2top.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="json2top.html" title="json2top"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to spica-tools’ documentation!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="welcome-to-spica-tools-documentation">
+<h1>Welcome to spica-tools’ documentation!<a class="headerlink" href="#welcome-to-spica-tools-documentation" title="Permalink to this heading">¶</a></h1>
+<p>Spica-tools are to set up coarse-grained (CG) molecular dynamics (MD) simulation with
+SPICA (Surface Property fItting Coarse grAined model, see <a class="reference external" href="https://www.spica-ff.org/">SPICA-web</a>
+for details) and support the SPICA parametrization.
+The tools can be used with the <code class="docutils literal notranslate"><span class="pre">cg_spica</span></code> command integrating python codes.
+The github repository of spica-tools is found at
+<a class="reference external" href="https://github.com/SPICA-group/spica-tools-devel">spica-tools-devel</a>.</p>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
+<p>The command to call the tools in src/ directory is cg_spica and requires
+Python 3 enviroment.
+Bash enviroment is also needed to excute the tools with commands on consoles.
+You can dowload this repository including a setup file to use the command
+by the following command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:SPICA-group/spica-tools-devel.git</span></code></p>
+<p>Then change the current directory to the top directory of the repository:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">spica-tools-devel/</span></code></p>
+<p>You can find a bash script set.sh, to add a path for using the command,
+and excute it by the following command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">source</span> <span class="pre">set.sh</span></code></p>
+<p>The path to cg_spica has been added to the environmental variable PATH.
+Adding the above line in your setup files like <em>.bash_profile</em> would
+be convinient if you often need to use the spica-tools.
+To make sure that the command integrating python codes in src/ directory
+is available on consoles, run the following commands:</p>
+<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">-h</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">map2cg</span> <span class="pre">-h</span></code></p>
+<p>You can see the available option of the commands by this if the command path
+is properly added to your PATH. Cg_spica requires several python libraries to
+excute some codes that include arithmetic operation and load trajectory files
+obtained from MD simulation. The libraries are listed in requirements.txt in
+the top directory and can be installed with pip by the following command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></p>
+</section>
+<section id="available-command-line-tools">
+<h1>Available command-line tools<a class="headerlink" href="#available-command-line-tools" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="json2top.html">json2top</a></li>
+<li class="toctree-l1"><a class="reference internal" href="map2cg.html">map2cg</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maptraj.html">maptraj</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ENM.html">ENM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wat2polar.html">wat2polar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_lmp.html">setup_lmp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_gmx.html">setup_gmx</a></li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Welcome to spica-tools’ documentation!</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#available-command-line-tools">Available command-line tools</a></li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="json2top.html"
+                          title="next chapter">json2top</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="json2top.html" title="json2top"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to spica-tools’ documentation!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Yusuke Miyazaki.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>
