@@ -1,0 +1,159 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>wat2polar &#8212; spica-tools 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="setup_lmp" href="setup_lmp.html" />
+    <link rel="prev" title="ENM" href="ENM.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="setup_lmp.html" title="setup_lmp"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ENM.html" title="ENM"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">wat2polar</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="wat2polar">
+<h1>wat2polar<a class="headerlink" href="#wat2polar" title="Permalink to this heading">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<pre class="literal-block">cg_spica map2cg <strong>SPICA_PDB</strong> <strong>pSPICA_PDB</strong></pre>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">wat2polar</span></code> converts SPICA CG water to pSPICA polar CG water.
+SPICA CG ions are also converted to pSPICA’s. This program recognizes
+resname <strong>WAT</strong> or <strong>TIP3</strong> as SPICA CG water, and resname <strong>SOD</strong> and
+<strong>CLA</strong> as SPICA CG ions in PDB formatted CG configuration files.
+The resname of SPICA water is converted to <strong>PWAT</strong> for pSPICA water.</p>
+<p>The pSPICA water is created by randomly adding a site at 1.1 A
+away from the center of SPICA water without energy minimization.
+The center and additional sites become the WO and WH segments of pSPICA
+water, respectively.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">map2cg</span> <span class="pre">dopc.cg.pdb</span> <span class="pre">p_dopc.cg.pdb</span></code></p>
+<a class="reference internal image-reference" href="_images/wat2polar_example.jpg"><img alt="_images/wat2polar_example.jpg" src="_images/wat2polar_example.jpg" style="width: 439.20000000000005px; height: 212.0px;" /></a>
+<p><a class="reference download internal" download="" href="_downloads/1a260e983dc98e6f15d47fe2d2b549e8/dopc.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">dopc.cg.pdb</span></code></a>
+<a class="reference download internal" download="" href="_downloads/64e9f355d8aaed9eb3813e5a6dd949bf/p_dopc.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">p_dopc.cg.pdb</span></code></a></p>
+</section>
+<section id="positional-args">
+<h2>Positional args<a class="headerlink" href="#positional-args" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">SPICA_PDB</span></code> [&lt;.pdb&gt;]</dt><dd><p>Input SPICA configuration</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pSPICA_PDB</span></code> [&lt;.pdb&gt;]</dt><dd><p>Output pSPICA configuration after the above conversion</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">wat2polar</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#positional-args">Positional args</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="ENM.html"
+                          title="previous chapter">ENM</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="setup_lmp.html"
+                          title="next chapter">setup_lmp</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/wat2polar.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="setup_lmp.html" title="setup_lmp"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ENM.html" title="ENM"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">wat2polar</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Yusuke Miyazaki.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

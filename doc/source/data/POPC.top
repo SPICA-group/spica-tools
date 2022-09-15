@@ -1,0 +1,49 @@
+atom     1  POPC    NC    NC   87.1647    0.1118  U
+atom     2  POPC    PH    PH   94.9716   -0.1118  U
+atom     3  POPC    GL    GL   41.0725    0.0000  U
+atom     4  POPC  EST1  EST1   58.0358    0.0000  U
+atom     5  POPC   C11    CM   42.0804    0.0000  U
+atom     6  POPC   C12    CM   42.0804    0.0000  U
+atom     7  POPC   C13  CMD2   26.0378    0.0000  U
+atom     8  POPC   C14    CM   42.0804    0.0000  U
+atom     9  POPC   C15    CM   42.0804    0.0000  U
+atom    10  POPC   C16   CT2   29.0615    0.0000  U
+atom    11  POPC  EST2  EST2   58.0358    0.0000  U
+atom    12  POPC   C21    CM   42.0804    0.0000  U
+atom    13  POPC   C22    CM   42.0804    0.0000  U
+atom    14  POPC   C23    CM   42.0804    0.0000  U
+atom    15  POPC   C24    CM   42.0804    0.0000  U
+atom    16  POPC   C25   CT2   29.0615    0.0000  U
+
+bond     1     2 # NC PH
+bond     2     3 # PH GL
+bond     3     4 # GL EST1
+bond     4     5 # EST1 C11
+bond     5     6 # C11 C12
+bond     6     7 # C12 C13
+bond     7     8 # C13 C14
+bond     8     9 # C14 C15
+bond     9    10 # C15 C16
+bond     3    11 # GL EST2
+bond    11    12 # EST2 C21
+bond    12    13 # C21 C22
+bond    13    14 # C22 C23
+bond    14    15 # C23 C24
+bond    15    16 # C24 C25
+
+angle     1     2     3 # NC PH GL
+angle     2     3     4 # PH GL EST1
+angle     2     3    11 # PH GL EST2
+angle     3     4     5 # GL EST1 C11
+angle     4     3    11 # EST1 GL EST2
+angle     4     5     6 # EST1 C11 C12
+angle     5     6     7 # C11 C12 C13
+angle     6     7     8 # C12 C13 C14
+angle     7     8     9 # C13 C14 C15
+angle     8     9    10 # C14 C15 C16
+angle     3    11    12 # GL EST2 C21
+angle    11    12    13 # EST2 C21 C22
+angle    12    13    14 # C21 C22 C23
+angle    13    14    15 # C22 C23 C24
+angle    14    15    16 # C23 C24 C25
+

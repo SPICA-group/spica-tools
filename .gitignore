@@ -1,2 +1,4 @@
 **/__pycache__
 **/*.pyc
+doc/build/doctrees
+doc/.DS_Store
