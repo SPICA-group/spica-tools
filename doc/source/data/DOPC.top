@@ -1,0 +1,51 @@
+atom  1   DOPC NC   NC   87.1647  +0.1118033989  U
+atom  2   DOPC PH   PH   94.9716  -0.1118033989  U
+atom  3   DOPC GL   GL   41.0725  0.0  U
+atom  4   DOPC EST1 EST1 58.0358  0.0  U
+atom  5   DOPC C11  CM   42.0804  0.0  U
+atom  6   DOPC C12  CM   42.0804  0.0  U
+atom  7   DOPC C13  CMD2 26.0378  0.0  U
+atom  8   DOPC C14  CM   42.0804  0.0  U
+atom  9   DOPC C15  CM   42.0804  0.0  U
+atom  10  DOPC C16  CT2  29.0615  0.0  U
+atom  11  DOPC EST2 EST2 58.0358  0.0  U
+atom  12  DOPC C21  CM   42.0804  0.0  U
+atom  13  DOPC C22  CM   42.0804  0.0  U
+atom  14  DOPC C23  CMD2 26.0378  0.0  U
+atom  15  DOPC C24  CM   42.0804  0.0  U
+atom  16  DOPC C25  CM   42.0804  0.0  U
+atom  17  DOPC C26  CT2  29.0615  0.0  U
+
+bond  1   2
+bond  2   3
+bond  3   4
+bond  4   5
+bond  5   6
+bond  6   7
+bond  7   8
+bond  8   9
+bond  9  10
+bond  3  11
+bond 11  12
+bond 12  13
+bond 13  14
+bond 14  15
+bond 15  16
+bond 16  17
+
+angle  1   2   3
+angle  2   3   4
+angle  3   4   5
+angle  4   5   6
+angle  5   6   7
+angle  6   7   8
+angle  7   8   9
+angle  8   9  10
+angle  2   3  11
+angle  4   3  11
+angle  3  11  12
+angle 11  12  13
+angle 12  13  14
+angle 13  14  15
+angle 14  15  16
+angle 15  16  17

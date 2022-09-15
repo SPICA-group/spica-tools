@@ -1,0 +1,169 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>ENM &#8212; spica-tools 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="wat2polar" href="wat2polar.html" />
+    <link rel="prev" title="maptraj" href="maptraj.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="wat2polar.html" title="wat2polar"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="maptraj.html" title="maptraj"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ENM</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="enm">
+<h1>ENM<a class="headerlink" href="#enm" title="Permalink to this heading">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<pre class="literal-block">cg_spica ENM <strong>CG_PDB</strong> <strong>CG_TOP</strong> [<strong>-maxr</strong> <em>&lt;float&gt;</em>] [<strong>-kENM</strong> <em>&lt;float&gt;</em>] [<strong>-pspica</strong>]</pre>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ENM</span></code> applies the elastic network model (ENM) to CG configuration and generates
+topology files to prepare input files for performing CG-MD with SPICA.
+Cutoff length and force constant values are required for the ENM and can be
+specified with the <code class="docutils literal notranslate"><span class="pre">-maxr</span></code> and <code class="docutils literal notranslate"><span class="pre">-kENM</span></code> options, respectively. In default,
+They are set to 9.0 A and 1.195 kcal/A2, and these values are employed in the SPICA
+protein model (See the <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.jctc.1c01207">protein SPICA</a> paper).</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">ENM</span> <span class="pre">2mag.cg.pdb</span> <span class="pre">2mag.cg.top</span></code></p>
+<a class="reference internal image-reference" href="_images/ENM_example.jpg"><img alt="_images/ENM_example.jpg" src="_images/ENM_example.jpg" style="width: 264.9px; height: 274.2px;" /></a>
+<p>protein CG configuration (CPK) applied ENM (red)</p>
+<p><a class="reference download internal" download="" href="_downloads/acb6ef50e53365ffe7be54c2ac67a28e/2mag.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.pdb</span></code></a>
+<a class="reference download internal" download="" href="_downloads/3f844940f71883aeeef4a7b771cf347e/2mag.cg.top"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.top</span></code></a></p>
+</section>
+<section id="positional-args">
+<h2>Positional args<a class="headerlink" href="#positional-args" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">CG_PDB</span></code> [&lt;.pdb&gt;]</dt><dd><p>Input protein CG configuration</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CG_TOP</span></code> [&lt;.top&gt;]</dt><dd><p>Output SPICA topology</p>
+</dd>
+</dl>
+</section>
+<section id="optional-args">
+<h2>Optional args<a class="headerlink" href="#optional-args" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-maxr</span></code> &lt;float&gt; (9.0) [A]</dt><dd><p>cutoff length for applying ENM</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-kENM</span></code> &lt;float&gt; (1.195) [kcal/A2]</dt><dd><p>force constant of harmonic potential for ENM</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-pspica</span></code> (off)</dt><dd><p>Assign partial charge (0.5590) for pSPICA FF (default: 0.1118, for SPICA FF)</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ENM</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#positional-args">Positional args</a></li>
+<li><a class="reference internal" href="#optional-args">Optional args</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="maptraj.html"
+                          title="previous chapter">maptraj</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="wat2polar.html"
+                          title="next chapter">wat2polar</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ENM.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="wat2polar.html" title="wat2polar"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="maptraj.html" title="maptraj"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ENM</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Yusuke Miyazaki.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>
