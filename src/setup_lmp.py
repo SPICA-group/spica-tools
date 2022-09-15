@@ -105,7 +105,7 @@ def read_pdb(fname, sysdat):
                 sysdat.boxz = float(items[3])
             elif items[0] == "ATOM" or items[0] == "HETATM":
                 if sysdat.foundatoms >= sysdat.total_ats:
-                    sys.exit(f"ERROR: found atoms in pdb file ({sysdat.foundatoms}) >
+                    sys.exit(f"ERROR: found atoms in pdb file ({sysdat.foundatoms}) > \
                                       total atoms in top files ({sysdat.total_ats}).")
                 sysdat.coordx.append(float(line[col:col+8]))
                 sysdat.coordy.append(float(line[col+8:col+16]))
@@ -1164,8 +1164,8 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
                     topdat[ntop+i].dihedof.append(float(items[8]))
                     topdat[ntop+i].dihedpset.append(1)
                 dndx += 1
-            for bb in nbb:
-                bbind[bb] += nbb[bb]*(ndup-1)
+    for bb in nbb:
+        bbind[bb] += nbb[bb]*(ndup-1)
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
@@ -1189,11 +1189,16 @@ def run(inputs,Go):
         for i in range(tmp_ntops):
             f = open(inputs[2*i], 'r')
             line = f.readline() 
+            while line:
+                if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT']:
+                    protein.append(True)
+                    break
+                elif line.split()[0] == "atom":
+                    protein.append(False)
+                    break
+                else:
+                    line = f.readline()
             f.close()
-            if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT']:
-                protein.append(True)
-            else:
-                protein.append(False)
             count_atoms(inputs[2*i], topdat, rdtp)
             if protein[i]:
                 ndup.append(int(inputs[2*i+1]))
