@@ -27,7 +27,6 @@ sure that the command integrating python codes in src/ directory is available on
 run the following commands:
 
     cg_spica -h  
-    
     cg_spica map2cg -h  
     
 You can see the available option of the commands by this if the command path is properly added to your PATH.  
@@ -37,12 +36,13 @@ directory and can be installed with `pip` by the following command:
 
     pip install -r requirements.txt  
     
+## Documentation  
+
 The documentation of the above spica-tools can be found at https://spica-group.github.io/spica-tools-devel.  
 You can create the documentation on your machine by the following commands:  
 
-    cd doc/
-    
-    make html
+    cd doc/  
+    make html  
 
 
 ## Tools
