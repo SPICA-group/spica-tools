@@ -37,7 +37,12 @@ directory and can be installed with `pip` by the following command:
 
     pip install -r requirements.txt  
     
-The documentation of the above spica-tools can be found at https://spica-group.github.io/spica-tools-devel.
+The documentation of the above spica-tools can be found at https://spica-group.github.io/spica-tools-devel.  
+You can create the documentation on your machine by the following commands:  
+
+    cd doc/
+    
+    make html
 
 
 ## Tools
