@@ -9,18 +9,19 @@ Usage
 
 Description
 -----------
-``maptraj`` executes CG mapping to generate CG trajectory from AA trajectory.
+``maptraj`` executes CG mapping to generate CG trajectories from AA trajectories.
 
-To read and write trajectory files, this program uses `MDAnalysis`_, 
-which is a python library to analyze MD simulation trajectories. 
-Therefore, available trajectory formats in the program are the same as those 
-able to be read with the library. For its installation, see the official web 
+This program uses `MDAnalysis`_, a python library for analyzing MD trajectories
+to read and write trajectory files. 
+Therefore, the file format of MD trajectory available in this program is the same as 
+that can be read by this library. For installation instructions, see the official web 
 page about `MDAnalysis Installation <https://www.mdanalysis.org/pages/installation_quick_start>`_.
 
-The program requires a json formatted file having CG mapping information
-that is included in ``spica-tools-devel/src`` directory. 
-``-json`` can specify other json files you want to use for mapping.
-Option ``-begin`` and ``-last`` can be used to select mapped trajectory frames.
+The program requires a json formatted file with CG mapping information
+contained in the ``spica-tools-devel/src`` directory. 
+The option ``-json`` enables to select other json files to used for mapping.
+The option ``-begin`` and ``-last`` can be used to select the frames of the
+mapped trajectory.
 
 .. _MDAnalysis: https://www.mdanalysis.org
 

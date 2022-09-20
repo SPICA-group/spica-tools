@@ -9,11 +9,11 @@ Usage
 Description
 -----------
 ``ENM`` applies the elastic network model (ENM) to CG configuration and generates
-topology files to prepare input files for performing CG-MD with SPICA.
-Cutoff length and force constant values are required for the ENM and can be 
-specified with the ``-maxr`` and ``-kENM`` options, respectively. In default,
-They are set to 9.0 A and 1.195 kcal/A2, and these values are employed in the SPICA
-protein model (See the `protein SPICA`_ paper).
+topology files to prepare input files for running CG-MD with SPICA.
+ENM requires values for cutoff length and force constants, 
+specified with the ``-maxr`` and ``-kENM`` options, respectively. 
+The default values are set to 9.0 A and 1.195 kcal/A2, and these values are ueed 
+in the SPICA protein model (See the `protein SPICA`_ paper).
 
 .. _protein SPICA: https://pubs.acs.org/doi/10.1021/acs.jctc.1c01207
 

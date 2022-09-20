@@ -8,10 +8,10 @@ Usage
 
 Description
 -----------
-``map2cg`` executes CG mapping to create CG configuration from AA configuration.
-The program requires a json formatted file having CG mapping information
-that is included in ``spica-tools-devel/src`` directory. 
-``-json`` can specify other json files you want to use for mapping.
+``map2cg`` performs CG mapping, which converts AA coordinates to CG coordinates.
+This program requires a json formatted file with CG mapping information
+contained in the ``spica-tools-devel/src`` directory. 
+With the ``-json`` option, you can specify other json files to be used for mapping.
 
 Example
 -------

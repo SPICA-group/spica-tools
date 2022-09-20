@@ -56,17 +56,18 @@
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">json2top</span></code> generates topology files needed to setup CG-MD with SPICA.
-Output will be <code class="docutils literal notranslate"><span class="pre">(RESNAME).top</span></code>, where <code class="docutils literal notranslate"><span class="pre">RESNAME</span></code> is a mandatory argument to excute
+<p><code class="docutils literal notranslate"><span class="pre">json2top</span></code> generates the topology files needed to setup CG-MD with SPICA.
+The output is <code class="docutils literal notranslate"><span class="pre">(RESNAME).top</span></code>, where <code class="docutils literal notranslate"><span class="pre">RESNAME</span></code> is a mandatory argument to run
 the program.
-This command requires a json formatted file having CG mapping information
-that is included in <code class="docutils literal notranslate"><span class="pre">spica-tools-devel/src</span></code> directory.
-<code class="docutils literal notranslate"><span class="pre">-json</span></code> can specify other json files you want to use for generating topology files.
+This command requires a file in json format with CG mapping information,
+contained in <code class="docutils literal notranslate"><span class="pre">spica-tools-devel/src</span></code> directory.
+<code class="docutils literal notranslate"><span class="pre">-json</span></code> can specify other json files to be used to generate topology files.
 Angle indices in generated topology files are created based on bond information decribed
-in the json file. In default, the program automatically deletes duplicated angle indices
-in case of ring molecules. This deletion can be turned off with the <code class="docutils literal notranslate"><span class="pre">-dupang</span></code> option.</p>
-<p><strong>NOTE</strong>: After generating topology files, please make sure the bond and angle indices
-in the file are correct and what you expect, especially for molecules including ring groups.</p>
+in the json file. By default, for cyclic molecules, duplicated angle indices are
+automatically removed.
+This removal can be turned off with the <code class="docutils literal notranslate"><span class="pre">-dupang</span></code> option.</p>
+<p><strong>NOTE</strong>: After generating topology files, please make sure that the bond and angle indices
+in the file are correct and as expected, especially for molecules containing cyclic groups.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>

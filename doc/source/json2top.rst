@@ -8,18 +8,19 @@ Usage
 
 Description
 -----------
-``json2top`` generates topology files needed to setup CG-MD with SPICA.
-Output will be ``(RESNAME).top``, where ``RESNAME`` is a mandatory argument to excute
+``json2top`` generates the topology files needed to setup CG-MD with SPICA.
+The output is ``(RESNAME).top``, where ``RESNAME`` is a mandatory argument to run
 the program. 
-This command requires a json formatted file having CG mapping information
-that is included in ``spica-tools-devel/src`` directory. 
-``-json`` can specify other json files you want to use for generating topology files.
+This command requires a file in json format with CG mapping information,
+contained in ``spica-tools-devel/src`` directory. 
+``-json`` can specify other json files to be used to generate topology files.
 Angle indices in generated topology files are created based on bond information decribed
-in the json file. In default, the program automatically deletes duplicated angle indices 
-in case of ring molecules. This deletion can be turned off with the ``-dupang`` option. 
+in the json file. By default, for cyclic molecules, duplicated angle indices are 
+automatically removed. 
+This removal can be turned off with the ``-dupang`` option. 
 
-**NOTE**: After generating topology files, please make sure the bond and angle indices 
-in the file are correct and what you expect, especially for molecules including ring groups.
+**NOTE**: After generating topology files, please make sure that the bond and angle indices 
+in the file are correct and as expected, especially for molecules containing cyclic groups.
 
 Example
 -------

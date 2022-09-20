@@ -16,22 +16,22 @@ This program requires the following files as inputs:
 - ``paramfile``: SPICA parameter file, distributed at `SPICA web <https://www.spica-ff.org/download.html>`_
 - ``coordfile``: CG configuration file in PDB format
 
-``topfile`` can be generated with ``json2top``, or ``ENM`` (only for proteins) commands.
-For details about them, see :doc:`json2top <json2top>` and :doc:`ENM <ENM>`.
-``nmol`` is the number of ``topfile`` molecules included in your system.  
-**Note** that one should be careful with the order of arguments. Especially, molecule 
-topology and number should be the same as in the system configuration file. 
+The ``topfile`` can be generated with the ``json2top`` or ``ENM`` (for proteins only) commands.
+For more details, see :doc:`json2top <json2top>` and :doc:`ENM <ENM>`.
+The ``nmol`` is the number of ``topfile`` molecules in the system.  
+It is sensitive to the order of arguments, so the molecule topology and number 
+should be given in the same order as given in the prepared configuration file. 
 
-Unlike the ``setup_lmp`` command, this program normally does not require pdb 
-configuration file because it generates input files that are needed just to execute
+Unlike the ``setup_lmp`` command, this program does not normally require a pdb 
+configuration file, because it generates input files needed only to execute
 the `gmx grompp <https://manual.gromacs.org/current/onlinehelp/gmx-grompp.html>`_ 
-command of GROMACS. 
-The ``-prot`` option is used to setup systems including proteins because in SPICA
-the proteins' equilibrium angle values are taken from the initial configuration.
-In this case, the configuration file in PDB format must be specified as the last 
+command in GROMACS. 
+Use the ``-prot`` option is used to set up systems containing proteins.
+This is because SPICA takes protein equilibrium angle values from the initial configuration.
+In this case, a configuration file in PDB format must be specified as the last 
 argument of the program. 
 
-Executing the program with proper input files, you can obtain the following outputs:
+Running the program with the appropriate input files yields the following outputs:
 
 - ``SPICA.itp``: SPICA force field parameter
 - ``molecule.itp``: Molecule's information, such as atom types/names, residue names, and topology.
@@ -41,10 +41,10 @@ Executing the program with proper input files, you can obtain the following outp
 
 .. topic:: NOTE
 
-    The standard GROMACS package does NOT support the SPICA angle and nonbonded interactions. 
-    To use SPICA with GROMACS, one must modify the package with a patch file found in 
-    `gromacs-SPICA <https://github.com/SPICA-group/gromacs-SPICA>`_ repository for 
-    the angle interaction, and apply tabulated potentials for the nonbonded interaction.
+    The standard GROMACS package does NOT support the SPICA angle or nonbonded interactions. 
+    To use SPICA with GROMACS, the package must be modified with the patch file for the angular
+    interaction in `gromacs-SPICA <https://github.com/SPICA-group/gromacs-SPICA>`_ repository,
+    and the tabulated potentials for the nonbonded interaction must be applied.
 
 Example
 -------

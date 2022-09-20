@@ -64,22 +64,24 @@ This program requires the following files as inputs:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">paramfile</span></code>: SPICA parameter file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">coordfile</span></code>: CG configuration file in PDB format</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with <code class="docutils literal notranslate"><span class="pre">json2top</span></code>, or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (only for proteins) commands.
-For details about them, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
-<code class="docutils literal notranslate"><span class="pre">nmol</span></code> is the number of <code class="docutils literal notranslate"><span class="pre">topfile</span></code> molecules included in your system.
-<strong>Note</strong> that one should be careful with the order of arguments. Especially, molecule
-topology and number should be the same as in the PDB file.</p>
-<p>Executing the program with proper input files, you can obtain the following outputs:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with <code class="docutils literal notranslate"><span class="pre">json2top</span></code>, or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (for proteins only) commands.
+For more information on these, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">nmol</span></code> is the number of <code class="docutils literal notranslate"><span class="pre">topfile</span></code> molecules included in your system.
+It is sensitive to the order of arguments, so the molecule topology and number
+should be given in the same order as given in the prepared configuration file in the PDB file.</p>
+<p>Running the program with the appropriate input files yields the following outputs:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">DATA.FILE</span></code>: LAMMPS DATA file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code>: Interaction parameter file, which should be read when performing LAMMPS CG-MD.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code>: Interaction parameter file that should be read when executing LAMMPS CG-MD.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">out.psf</span></code>: Topology file of a target system in PSF format</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">DATA.FILE</span></code> and <code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code> will be mandatory to run LAMMPS CG-MD with SPICA FF. They are specified in
-a LAMMPS simulation input file to launch simulations. Example inputs are distributed at
-<a class="reference external" href="https://www.spica-ff.org/tutorial_lipid3.html">lipid membrane tutorial</a> in SPICA web.
-<code class="docutils literal notranslate"><span class="pre">out.psf</span></code> is not needed in terms of running CG-MD, but it would be useful to visualize or analyze your
-system because it has all topology information on bonds and angles of molecules included in the system.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DATA.FILE</span></code> and <code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code> are required to run LAMMPS CG-MD with SPICA FF.
+Specify them in the LAMMPS simulation input file to start the simulation.
+Input examples are distributed in
+<a class="reference external" href="https://www.spica-ff.org/tutorial_lipid3.html">lipid membrane tutorial</a> on SPICA web.
+Although <code class="docutils literal notranslate"><span class="pre">out.psf</span></code> is not needed to run CG-MD, it will be useful to visualization and
+analysis of the system because it has all the topology information on the bonds and angles
+of molecules included in the system.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
