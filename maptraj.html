@@ -57,16 +57,17 @@
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">maptraj</span></code> executes CG mapping to generate CG trajectory from AA trajectory.</p>
-<p>To read and write trajectory files, this program uses <a class="reference external" href="https://www.mdanalysis.org">MDAnalysis</a>,
-which is a python library to analyze MD simulation trajectories.
-Therefore, available trajectory formats in the program are the same as those
-able to be read with the library. For its installation, see the official web
+<p><code class="docutils literal notranslate"><span class="pre">maptraj</span></code> executes CG mapping to generate CG trajectories from AA trajectories.</p>
+<p>This program uses <a class="reference external" href="https://www.mdanalysis.org">MDAnalysis</a>, a python library for analyzing MD trajectories
+to read and write trajectory files.
+Therefore, the file format of MD trajectory available in this program is the same as
+that can be read by this library. For installation instructions, see the official web
 page about <a class="reference external" href="https://www.mdanalysis.org/pages/installation_quick_start">MDAnalysis Installation</a>.</p>
-<p>The program requires a json formatted file having CG mapping information
-that is included in <code class="docutils literal notranslate"><span class="pre">spica-tools-devel/src</span></code> directory.
-<code class="docutils literal notranslate"><span class="pre">-json</span></code> can specify other json files you want to use for mapping.
-Option <code class="docutils literal notranslate"><span class="pre">-begin</span></code> and <code class="docutils literal notranslate"><span class="pre">-last</span></code> can be used to select mapped trajectory frames.</p>
+<p>The program requires a json formatted file with CG mapping information
+contained in the <code class="docutils literal notranslate"><span class="pre">spica-tools-devel/src</span></code> directory.
+The option <code class="docutils literal notranslate"><span class="pre">-json</span></code> enables to select other json files to used for mapping.
+The option <code class="docutils literal notranslate"><span class="pre">-begin</span></code> and <code class="docutils literal notranslate"><span class="pre">-last</span></code> can be used to select the frames of the
+mapped trajectory.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>

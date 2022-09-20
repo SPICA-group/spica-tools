@@ -16,23 +16,25 @@ This program requires the following files as inputs:
 - ``paramfile``: SPICA parameter file, distributed at `SPICA web <https://www.spica-ff.org/download.html>`_
 - ``coordfile``: CG configuration file in PDB format
 
-``topfile`` can be generated with ``json2top``, or ``ENM`` (only for proteins) commands.
-For details about them, see :doc:`json2top <json2top>` and :doc:`ENM <ENM>`.
-``nmol`` is the number of ``topfile`` molecules included in your system.  
-**Note** that one should be careful with the order of arguments. Especially, molecule 
-topology and number should be the same as in the PDB file. 
+The ``topfile`` can be generated with ``json2top``, or ``ENM`` (for proteins only) commands.
+For more information on these, see :doc:`json2top <json2top>` and :doc:`ENM <ENM>`.
+The ``nmol`` is the number of ``topfile`` molecules included in your system.  
+It is sensitive to the order of arguments, so the molecule topology and number 
+should be given in the same order as given in the prepared configuration file in the PDB file. 
 
-Executing the program with proper input files, you can obtain the following outputs:
+Running the program with the appropriate input files yields the following outputs:
 
 - ``DATA.FILE``: LAMMPS DATA file 
-- ``PARM.FILE``: Interaction parameter file, which should be read when performing LAMMPS CG-MD. 
+- ``PARM.FILE``: Interaction parameter file that should be read when executing LAMMPS CG-MD. 
 - ``out.psf``: Topology file of a target system in PSF format
 
-``DATA.FILE`` and ``PARM.FILE`` will be mandatory to run LAMMPS CG-MD with SPICA FF. They are specified in
-a LAMMPS simulation input file to launch simulations. Example inputs are distributed at 
-`lipid membrane tutorial <https://www.spica-ff.org/tutorial_lipid3.html>`_ in SPICA web.
-``out.psf`` is not needed in terms of running CG-MD, but it would be useful to visualize or analyze your 
-system because it has all topology information on bonds and angles of molecules included in the system.
+``DATA.FILE`` and ``PARM.FILE`` are required to run LAMMPS CG-MD with SPICA FF. 
+Specify them in the LAMMPS simulation input file to start the simulation. 
+Input examples are distributed in
+`lipid membrane tutorial <https://www.spica-ff.org/tutorial_lipid3.html>`_ on SPICA web.
+Although ``out.psf`` is not needed to run CG-MD, it will be useful to visualization and
+analysis of the system because it has all the topology information on the bonds and angles 
+of molecules included in the system.
 
 Example
 -------

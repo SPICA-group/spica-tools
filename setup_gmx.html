@@ -60,20 +60,20 @@ This program requires the following files as inputs:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">paramfile</span></code>: SPICA parameter file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">coordfile</span></code>: CG configuration file in PDB format</p></li>
 </ul>
-<p><code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with <code class="docutils literal notranslate"><span class="pre">json2top</span></code>, or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (only for proteins) commands.
-For details about them, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
-<code class="docutils literal notranslate"><span class="pre">nmol</span></code> is the number of <code class="docutils literal notranslate"><span class="pre">topfile</span></code> molecules included in your system.
-<strong>Note</strong> that one should be careful with the order of arguments. Especially, molecule
-topology and number should be the same as in the system configuration file.</p>
-<p>Unlike the <code class="docutils literal notranslate"><span class="pre">setup_lmp</span></code> command, this program normally does not require pdb
-configuration file because it generates input files that are needed just to execute
+<p>The <code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with the <code class="docutils literal notranslate"><span class="pre">json2top</span></code> or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (for proteins only) commands.
+For more details, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">nmol</span></code> is the number of <code class="docutils literal notranslate"><span class="pre">topfile</span></code> molecules in the system.
+It is sensitive to the order of arguments, so the molecule topology and number
+should be given in the same order as given in the prepared configuration file.</p>
+<p>Unlike the <code class="docutils literal notranslate"><span class="pre">setup_lmp</span></code> command, this program does not normally require a pdb
+configuration file, because it generates input files needed only to execute
 the <a class="reference external" href="https://manual.gromacs.org/current/onlinehelp/gmx-grompp.html">gmx grompp</a>
-command of GROMACS.
-The <code class="docutils literal notranslate"><span class="pre">-prot</span></code> option is used to setup systems including proteins because in SPICA
-the proteins’ equilibrium angle values are taken from the initial configuration.
-In this case, the configuration file in PDB format must be specified as the last
+command in GROMACS.
+Use the <code class="docutils literal notranslate"><span class="pre">-prot</span></code> option is used to set up systems containing proteins.
+This is because SPICA takes protein equilibrium angle values from the initial configuration.
+In this case, a configuration file in PDB format must be specified as the last
 argument of the program.</p>
-<p>Executing the program with proper input files, you can obtain the following outputs:</p>
+<p>Running the program with the appropriate input files yields the following outputs:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">SPICA.itp</span></code>: SPICA force field parameter</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">molecule.itp</span></code>: Molecule’s information, such as atom types/names, residue names, and topology.</p></li>
@@ -83,10 +83,10 @@ argument of the program.</p>
 </ul>
 <aside class="topic">
 <p class="topic-title">NOTE</p>
-<p>The standard GROMACS package does NOT support the SPICA angle and nonbonded interactions.
-To use SPICA with GROMACS, one must modify the package with a patch file found in
-<a class="reference external" href="https://github.com/SPICA-group/gromacs-SPICA">gromacs-SPICA</a> repository for
-the angle interaction, and apply tabulated potentials for the nonbonded interaction.</p>
+<p>The standard GROMACS package does NOT support the SPICA angle or nonbonded interactions.
+To use SPICA with GROMACS, the package must be modified with the patch file for the angular
+interaction in <a class="reference external" href="https://github.com/SPICA-group/gromacs-SPICA">gromacs-SPICA</a> repository,
+and the tabulated potentials for the nonbonded interaction must be applied.</p>
 </aside>
 </section>
 <section id="example">

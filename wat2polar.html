@@ -58,12 +58,13 @@
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">wat2polar</span></code> converts SPICA CG water to pSPICA polar CG water.
 SPICA CG ions are also converted to pSPICA’s. This program recognizes
-resname <strong>WAT</strong> or <strong>TIP3</strong> as SPICA CG water, and resname <strong>SOD</strong> and
-<strong>CLA</strong> as SPICA CG ions in PDB formatted CG configuration files.
-The resname of SPICA water is converted to <strong>PWAT</strong> for pSPICA water.</p>
+the residue names <strong>WAT</strong> or <strong>TIP3</strong> as SPICA CG water,
+and the residue names <strong>SOD</strong> and <strong>CLA</strong> as SPICA CG ions,
+which are given in a CG configuration file in the PDB format.
+The residue name of SPICA CG water is converted to <strong>PWAT</strong> of pSPICA water.</p>
 <p>The pSPICA water is created by randomly adding a site at 1.1 A
-away from the center of SPICA water without energy minimization.
-The center and additional sites become the WO and WH segments of pSPICA
+away from the center of the SPICA water without energy minimization.
+The center and the added sites become the WO and WH segments of the pSPICA
 water, respectively.</p>
 </section>
 <section id="example">
