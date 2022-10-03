@@ -1168,7 +1168,10 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                               
-def run(inputs,Go):
+def run(args):
+    inputs = args.input_files
+    Go     = args.Go
+
     nargs = len(inputs)
     if nargs < 4:
        print("usage: setup_lmp [-Go] <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <paramfile> <coordfile>");
@@ -1308,4 +1311,4 @@ def run(inputs,Go):
 
 if __name__ == "__main__":
     args = get_option()
-    run(args.input_files)
+    run(args)

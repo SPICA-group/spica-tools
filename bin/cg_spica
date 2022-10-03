@@ -83,8 +83,7 @@ def main():
         wat2polar.run()
     elif args.tool_name == "setup_lmp":
         args = setup_lmp.get_option_script(sub)
-        Go   = args.Go
-        setup_lmp.run(args.input_files,Go)
+        setup_lmp.run(args)
     elif args.tool_name == "setup_gmx":
         args = setup_gmx.get_option_script(sub)
         setup_gmx.run(args)
