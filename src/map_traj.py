@@ -25,10 +25,10 @@ def get_option():
                             help='input json file name (default: spica_top.json).')
     argparser.add_argument('-begin', type=int,
                             default=0,
-                            help='begining frame of mappin (default: 0).')
+                            help='first frame in mapping (default: 0).')
     argparser.add_argument('-last', type=int,
                             default=-1,
-                            help='last frame of mapping (default: -1).')
+                            help='last frame in mapping (default: -1).')
     argparser.add_argument('-nodelwat', action='store_true',
                             help='not delete excess water due to CG ion mapping (default: off).')
     return argparser.parse_args()
@@ -52,10 +52,10 @@ def get_option_script(argv):
                             help='input json file name (default: spica_top.json).')
     argparser.add_argument('-begin', type=int,
                             default=0,
-                            help='begining frame of mappin (default: 0).')
+                            help='first frame in mapping (default: 0).')
     argparser.add_argument('-last', type=int,
                             default=-1,
-                            help='last frame of mapping (default: -1).')
+                            help='last frame in mapping (default: -1).')
     argparser.add_argument('-nodelwat', action='store_true',
                             help='not delete excess water due to CG ion mapping (default: off).')
     return argparser.parse_args(argv)

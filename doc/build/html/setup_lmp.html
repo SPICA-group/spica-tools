@@ -1,0 +1,184 @@
+
+
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>setup_lmp &#8212; spica-tools 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="setup_gmx" href="setup_gmx.html" />
+    <link rel="prev" title="wat2polar" href="wat2polar.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="setup_gmx.html" title="setup_gmx"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="wat2polar.html" title="wat2polar"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">setup_lmp</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="setup-lmp">
+<h1>setup_lmp<a class="headerlink" href="#setup-lmp" title="Permalink to this heading">¶</a></h1>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<pre class="literal-block">cg_spica setup_lmp &lt;<strong>topfile 1</strong>&gt; &lt;<strong>nmol 1</strong>&gt; [&lt;<strong>topfile 2</strong>&gt; &lt;<strong>nmol 2</strong>&gt; ... &lt;<strong>topfile n</strong>&gt; &lt;<strong>nmol n</strong>&gt;]
+                   &lt;<strong>paramfile</strong>&gt; &lt;<strong>coordfile</strong>&gt;</pre>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">setup_lmp</span></code> generates simulation input files for CG-MD with SPICA using LAMMPS.
+This program requires the following files as inputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">topfile</span></code>: SPICA topology file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">paramfile</span></code>: SPICA parameter file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coordfile</span></code>: CG configuration file in PDB format</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with <code class="docutils literal notranslate"><span class="pre">json2top</span></code>, or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (for proteins only) commands.
+For more information on these, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
+The <code class="docutils literal notranslate"><span class="pre">nmol</span></code> is the number of <code class="docutils literal notranslate"><span class="pre">topfile</span></code> molecules included in your system.
+It is sensitive to the order of arguments, so the molecule topology and number
+should be given in the same order as given in the prepared configuration file in the PDB file.</p>
+<p>Running the program with the appropriate input files yields the following outputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DATA.FILE</span></code>: LAMMPS DATA file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code>: Interaction parameter file that should be read when executing LAMMPS CG-MD.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out.psf</span></code>: Topology file of a target system in PSF format</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">DATA.FILE</span></code> and <code class="docutils literal notranslate"><span class="pre">PARM.FILE</span></code> are required to run LAMMPS CG-MD with SPICA FF.
+Specify them in the LAMMPS simulation input file to start the simulation.
+Input examples are distributed in
+<a class="reference external" href="https://www.spica-ff.org/tutorial_lipid3.html">lipid membrane tutorial</a> on SPICA web.
+Although <code class="docutils literal notranslate"><span class="pre">out.psf</span></code> is not needed to run CG-MD, it will be useful to visualization and
+analysis of the system because it has all the topology information on the bonds and angles
+of molecules included in the system.</p>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">setup_lmp</span> <span class="pre">DOPC.top</span> <span class="pre">128</span> <span class="pre">WAT.top</span> <span class="pre">1408</span> <span class="pre">spica_db.prm</span> <span class="pre">dopc.cg.pdb</span></code></p>
+<p><a class="reference download internal" download="" href="_downloads/c2b106deaf88869d08cfdf2eb3bbd605/DOPC.top"><code class="xref download docutils literal notranslate"><span class="pre">DOPC.top</span></code></a>
+<a class="reference download internal" download="" href="_downloads/25310e5143479c4b4d54a57887abd994/WAT.top"><code class="xref download docutils literal notranslate"><span class="pre">WAT.top</span></code></a>
+<a class="reference download internal" download="" href="_downloads/013e4c01db335200cc2735253f1ccb43/spica_db.prm"><code class="xref download docutils literal notranslate"><span class="pre">spica_db.prm</span></code></a>
+<a class="reference download internal" download="" href="_downloads/1a260e983dc98e6f15d47fe2d2b549e8/dopc.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">dopc.cg.pdb</span></code></a></p>
+<p><a class="reference download internal" download="" href="_downloads/f5f5af490d7d980a588120e4bd0d510b/DATA.FILE"><code class="xref download docutils literal notranslate"><span class="pre">DATA.FILE</span></code></a>
+<a class="reference download internal" download="" href="_downloads/01ea96c3cf4c97e1eb79bb03b1658e35/PARM.FILE"><code class="xref download docutils literal notranslate"><span class="pre">PARM.FILE</span></code></a>
+<a class="reference download internal" download="" href="_downloads/14022ce587619f9f48d2aeea539f8b70/out.psf"><code class="xref download docutils literal notranslate"><span class="pre">out.psf</span></code></a></p>
+</section>
+<section id="positional-args">
+<h2>Positional args<a class="headerlink" href="#positional-args" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">topfile</span></code> &lt;topology&gt;</dt><dd><p>topology file of a molecule</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">nmol</span></code> &lt;int&gt;</dt><dd><p>number of molecules</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">paramfile</span></code> &lt;parameter&gt;</dt><dd><p>SPICA force field parameter file</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">coordfile</span></code> &lt;.pdb&gt;</dt><dd><p>CG configuration file</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">setup_lmp</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#positional-args">Positional args</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="wat2polar.html"
+                          title="previous chapter">wat2polar</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="setup_gmx.html"
+                          title="next chapter">setup_gmx</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/setup_lmp.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="setup_gmx.html" title="setup_gmx"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="wat2polar.html" title="wat2polar"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">setup_lmp</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Yusuke Miyazaki.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

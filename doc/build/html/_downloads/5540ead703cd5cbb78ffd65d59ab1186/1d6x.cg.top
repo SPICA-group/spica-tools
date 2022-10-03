@@ -1,0 +1,160 @@
+atom     1   VAL   GBT   GBT  56.0385     0.1118  P
+atom     2   VAL   VAL   VAL  43.0883     0.0000  P
+atom     3   ARG   GBM   GBM  56.0385     0.0000  P
+atom     4   ARG   AR1   AR1  42.0804     0.0000  P
+atom     5   ARG   AR2   AR2  59.0706     0.1118  P
+atom     6   ARG   GBM   GBM  56.0385     0.0000  P
+atom     7   ARG   AR1   AR1  42.0804     0.0000  P
+atom     8   ARG   AR2   AR2  59.0706     0.1118  P
+atom     9   PHE   GBM   GBM  56.0385     0.0000  P
+atom    10   PHE   PH1   XYR  33.5575     0.0000  P
+atom    11   PHE   PH2   BER  19.5275     0.0000  P
+atom    12   PHE   PH3   BER  19.5275     0.0000  P
+atom    13   PHE   PH4   BER  19.5275     0.0000  P
+atom    14   PRO   GBM   GBM  56.0385     0.0000  P
+atom    15   PRO   PRO   PRO  42.0804     0.0000  P
+atom    16   TRP   GBM   GBM  56.0385     0.0000  P
+atom    17   TRP   TR1   TR1  39.0567     0.0000  P
+atom    18   TRP   TR2   TR2  38.0488     0.0000  P
+atom    19   TRP   TR3   TR3  53.0634     0.0000  P
+atom    20   TRP   GBM   GBM  56.0385     0.0000  P
+atom    21   TRP   TR1   TR1  39.0567     0.0000  P
+atom    22   TRP   TR2   TR2  38.0488     0.0000  P
+atom    23   TRP   TR3   TR3  53.0634     0.0000  P
+atom    24   TRP   GBM   GBM  56.0385     0.0000  P
+atom    25   TRP   TR1   TR1  39.0567     0.0000  P
+atom    26   TRP   TR2   TR2  38.0488     0.0000  P
+atom    27   TRP   TR3   TR3  53.0634     0.0000  P
+atom    28   PRO   GBM   GBM  56.0385     0.0000  P
+atom    29   PRO   PRO   PRO  42.0804     0.0000  P
+atom    30   PHE   GBM   GBM  56.0385     0.0000  P
+atom    31   PHE   PH1   XYR  33.5575     0.0000  P
+atom    32   PHE   PH2   BER  19.5275     0.0000  P
+atom    33   PHE   PH3   BER  19.5275     0.0000  P
+atom    34   PHE   PH4   BER  19.5275     0.0000  P
+atom    35   LEU   GBM   GBM  56.0385     0.0000  P
+atom    36   LEU   LEU   LEU  57.1151     0.0000  P
+atom    37   ARG   GBM   GBM  56.0385     0.0000  P
+atom    38   ARG   AR1   AR1  42.0804     0.0000  P
+atom    39   ARG   AR2   AR2  59.0706     0.1118  P
+atom    40   ARG   GBT   GBT  56.0385    -0.1118  P
+atom    41   ARG   AR1   AR1  42.0804     0.0000  P
+atom    42   ARG   AR2   AR2  59.0706     0.1118  P
+
+bondparam     3    14   1.195000 8.852091 # GBM-GBM
+bondparam     9    20   1.195000 8.033982 # GBM-GBM
+bondparam     9    24   1.195000 6.143027 # GBM-GBM
+bondparam     9    28   1.195000 8.296321 # GBM-GBM
+bondparam    14    24   1.195000 5.591216 # GBM-GBM
+bondparam    14    28   1.195000 8.286037 # GBM-GBM
+bondparam    16    28   1.195000 7.142779 # GBM-GBM
+bondparam    20    30   1.195000 6.609866 # GBM-GBM
+bondparam    20    35   1.195000 7.822891 # GBM-GBM
+bondparam    24    35   1.195000 4.991932 # GBM-GBM
+bondparam    24    37   1.195000 7.611431 # GBM-GBM
+bondparam    28    37   1.195000 7.537287 # GBM-GBM
+
+bond     1     3 # GBM-GBM
+bond     3     6 # GBM-GBM
+bond     6     9 # GBM-GBM
+bond     9    14 # GBM-GBM
+bond    14    16 # GBM-GBM
+bond    16    20 # GBM-GBM
+bond    20    24 # GBM-GBM
+bond    24    28 # GBM-GBM
+bond    28    30 # GBM-GBM
+bond    30    35 # GBM-GBM
+bond    35    37 # GBM-GBM
+bond    37    40 # GBM-GBM
+
+bond     1     2 # GBM-VAL
+bond     3     4 # GBM-AR1
+bond     4     5 # AR1-AR2
+bond     6     7 # GBM-AR1
+bond     7     8 # AR1-AR2
+bond     9    10 # GBM-PH1
+bond    10    11 # PH1-PH2
+bond    11    12 # PH2-PH3
+bond    12    13 # PH3-PH4
+bond    13    10 # PH4-PH1
+bond    14    15 # GBM-PRO
+bond    16    17 # GBM-TR1
+bond    17    18 # TR1-TR2
+bond    17    19 # TR1-TR3
+bond    18    19 # TR2-TR3
+bond    20    21 # GBM-TR1
+bond    21    22 # TR1-TR2
+bond    21    23 # TR1-TR3
+bond    22    23 # TR2-TR3
+bond    24    25 # GBM-TR1
+bond    25    26 # TR1-TR2
+bond    25    27 # TR1-TR3
+bond    26    27 # TR2-TR3
+bond    28    29 # GBM-PRO
+bond    30    31 # GBM-PH1
+bond    31    32 # PH1-PH2
+bond    32    33 # PH2-PH3
+bond    33    34 # PH3-PH4
+bond    34    31 # PH4-PH1
+bond    35    36 # GBM-LEU
+bond    37    38 # GBM-AR1
+bond    38    39 # AR1-AR2
+bond    40    41 # GBM-AR1
+bond    41    42 # AR1-AR2
+
+angle     1     3     6 # GBM GBM GBM
+angle     3     1     2 # GBM GBM VAL
+angle     1     3     4 # GBM GBM AR1
+angle     3     6     9 # GBM GBM GBM
+angle     6     3     4 # GBM GBM AR1
+angle     3     6     7 # GBM GBM AR1
+angle     6     9    14 # GBM GBM GBM
+angle     9     6     7 # GBM GBM AR1
+angle     6     9    10 # GBM GBM PH1
+angle     9    14    16 # GBM GBM GBM
+angle    14     9    10 # GBM GBM PH1
+angle     9    14    15 # GBM GBM PRO
+angle    14    16    20 # GBM GBM GBM
+angle    16    14    15 # GBM GBM PRO
+angle    14    16    17 # GBM GBM TR1
+angle    16    20    24 # GBM GBM GBM
+angle    20    16    17 # GBM GBM TR1
+angle    16    20    21 # GBM GBM TR1
+angle    20    24    28 # GBM GBM GBM
+angle    24    20    21 # GBM GBM TR1
+angle    20    24    25 # GBM GBM TR1
+angle    24    28    30 # GBM GBM GBM
+angle    28    24    25 # GBM GBM TR1
+angle    24    28    29 # GBM GBM PRO
+angle    28    30    35 # GBM GBM GBM
+angle    30    28    29 # GBM GBM PRO
+angle    28    30    31 # GBM GBM PH1
+angle    30    35    37 # GBM GBM GBM
+angle    35    30    31 # GBM GBM PH1
+angle    30    35    36 # GBM GBM LEU
+angle    35    37    40 # GBM GBM GBM
+angle    37    35    36 # GBM GBM LEU
+angle    35    37    38 # GBM GBM AR1
+angle    40    37    38 # GBM GBM AR1
+angle    37    40    41 # GBM GBM AR1
+angle     3     4     5 # GBM AR1 AR2
+angle     6     7     8 # GBM AR1 AR2
+angle     9    10    11 # GBM PH1 PH2
+angle     9    10    13 # GBM PH1 PH4
+angle    10    11    12 # PH1 PH2 PH3
+angle    12    13    10 # PH3 PH4 PH1
+angle    16    17    18 # GBM TR1 TR2
+angle    16    17    19 # GBM TR1 TR3
+angle    20    21    22 # GBM TR1 TR2
+angle    20    21    23 # GBM TR1 TR3
+angle    24    25    26 # GBM TR1 TR2
+angle    24    25    27 # GBM TR1 TR3
+angle    30    31    32 # GBM PH1 PH2
+angle    30    31    34 # GBM PH1 PH4
+angle    31    32    33 # PH1 PH2 PH3
+angle    33    34    31 # PH3 PH4 PH1
+angle    37    38    39 # GBM AR1 AR2
+angle    40    41    42 # GBM AR1 AR2
+
+dihedralparam     10    11    12    13   50.0 1 180 0.0 # PH1-PH2-PH3-PH4
+dihedralparam     31    32    33    34   50.0 1 180 0.0 # PH1-PH2-PH3-PH4
