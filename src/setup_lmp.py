@@ -307,9 +307,9 @@ def get_unique(database, topdat, sysdat):
     if sysdat.total_improps > 0:
         print("improper_style  harmonic", file=fout)
     if sysdat.ischarged:
-        print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+        print("special_bonds   lj/coul 0.0 0.0 1.0 angle yes", file=fout)
     else:
-        print("special_bonds   lj 0.0 0.0 1.0", file=fout)
+        print("special_bonds   lj 0.0 0.0 1.0 angle yes", file=fout)
     print(file=fout)
     for idx in range(sysdat.ntops):
         for jdx in range(topdat[idx].nat):
