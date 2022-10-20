@@ -483,7 +483,7 @@ class gen_top_ENM:
                         self.resid.append(float(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
-                        if j == "PH2" or j == "TY2" or j == "PH4" or j == "TY4":
+                        if j == "PH2" or j == "TY2" or j == "PH3" or j == "TY3" or j == "PH4" or j == "TY4":
                             self.bPH1TY1.append(1)
                         else :
                             self.bPH1TY1.append(0)
@@ -496,7 +496,7 @@ class gen_top_ENM:
                         self.resid.append(float(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
-                        if j == "AD2" or j == "GU2" or j == "AD4" or j == "GU4":
+                        if j == "AD2" or j == "GU2" or j == "AD3" or j == "GU3" or j == "AD4" or j == "GU4":
                             self.bPH1TY1.append(1)
                         else :
                             self.bPH1TY1.append(0)
@@ -633,7 +633,7 @@ class gen_top_ENM:
                                     tmp_ndx += 1
                                 bndx2 = tmp_ndx
                         print ("bond %5d %5d # %s-%s" \
-                            %(bndx1+1, bndx2+1, self.name[bndx1], self.name[bndx2]), file=ftop)
+                                %(bndx1+1, bndx2+1, self.name[bndx1], self.name[bndx2]), file=ftop)
                         self.total_bonds += 1
                         self.bond_index1.append(bndx1)
                         self.bond_index2.append(bndx2)
@@ -671,29 +671,45 @@ class gen_top_ENM:
                     # SC-PH1-SC is non zero.
                     # SC-SC-SC is zero.
                     if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        print ("angle %5d %5d %5d # %s %s %s" \
-                            %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                            print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            print ("angle %5d %5d %5d # %s %s %s" \
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                 elif bond_index1[i1] == bond_index2[i2]:
                     andx1 = bond_index2[i1]
                     andx2 = bond_index1[i1]
                     andx3 = bond_index1[i2]
                     if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        print ("angle %5d %5d %5d # %s %s %s" \
-                            %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                            print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            print ("angle %5d %5d %5d # %s %s %s" \
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                 elif bond_index2[i1] == bond_index1[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
                     andx3 = bond_index2[i2]
                     if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        print ("angle %5d %5d %5d # %s %s %s" \
-                            %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                            print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            print ("angle %5d %5d %5d # %s %s %s" \
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                 elif bond_index2[i1] == bond_index2[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
                     andx3 = bond_index1[i2]
                     if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        print ("angle %5d %5d %5d # %s %s %s" \
-                            %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                            print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            print ("angle %5d %5d %5d # %s %s %s" \
+                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
         print ("", file=ftop)
 
     ######################################

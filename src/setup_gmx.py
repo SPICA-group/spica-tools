@@ -163,7 +163,14 @@ def read_coords(database, topdat, sysdat):
                 print("[ angles ]",file=fout)
                 print(file=fout)
                 for jdx in range(topdat[idx].nang):
-                    if topdat[idx].angpset[jdx] == False:
+                    if topdat[idx].angpset[jdx] == True:
+                        tmpcalca = topdat[idx].angeq[jdx]
+                        tmpcalcb = topdat[idx].angfk[jdx]*4.184*2.0
+                        print("{:5d} {:5d} {:5d}    1  {:8.4f} {:8.4f} ; {:>6s} {:>6s} {:>6s}".format(
+                                topdat[idx].angndx1[jdx], topdat[idx].angndx2[jdx], topdat[idx].angndx3[jdx],tmpcalca, tmpcalcb,
+                                topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
+                                topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                    else:
                         # now compare to the database
                         for kdx in range(database.nangtype):
                             if cmp_wc(database.angtype2[kdx], topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]):
@@ -230,19 +237,32 @@ def read_coords(database, topdat, sysdat):
                             topdat[idx].impropfk[jdx]*4.184*2.0,topdat[idx].impropeq[jdx]), file=fout)
 
             # Remove non-native vdw interaction between protein backbone beads forming native contact
-            if topdat[idx].ngo > 0:
+            if True in topdat[idx].bndpset or topdat[idx].ngo > 0:
                 print(file=fout)
                 print("[ exclusions ]", file=fout)
-                print(file=fout)
-                for jdx in range(topdat[idx].ngo):
-                    if jdx == 0:
-                        print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
-                    elif topdat[idx].gondx1[jdx] != topdat[idx].gondx1[jdx-1]:
-                        print(file=fout)
-                        print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
-                    else:
-                        print("{:4d} ".format(topdat[idx].gondx2[jdx]), end='', file=fout)
-                print(file=fout)
+                if topdat[idx].ngo > 0:
+                    print(file=fout)
+                    for jdx in range(topdat[idx].ngo):
+                        if jdx == 0:
+                            print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
+                        elif topdat[idx].gondx1[jdx] != topdat[idx].gondx1[jdx-1]:
+                            print(file=fout)
+                            print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
+                        else:
+                            print("{:4d} ".format(topdat[idx].gondx2[jdx]), end='', file=fout)
+                if True in topdat[idx].bndpset:
+                    tmp_bndndx1 = 0
+                    for jdx in range(topdat[idx].nbnd):
+                        if topdat[idx].bndpset[jdx] == True:
+                            if topdat[idx].bndndx1[jdx] != tmp_bndndx1:
+                                tmp_bndndx1 = topdat[idx].bndndx1[jdx]
+                                print(file=fout)
+                                print("{:4d} {:4d} ".format(topdat[idx].bndndx1[jdx],topdat[idx].bndndx2[jdx]), end='', file=fout)
+                            else:
+                                print("{:4d} ".format(topdat[idx].bndndx2[jdx]), end='', file=fout)
+            print(file=fout)
+
+
 
 def write_psf(database, topdat, sysdat):
     with open("out.psf", "w") as fout:
@@ -532,41 +552,6 @@ def get_unique(database, topdat, sysdat):
                                             database.angtype2[ang_params[ uniq_angs-1]],
                                             database.angtype3[ang_params[ uniq_angs-1]],
                                             tmpcalca, tmpcalcb, sig, eps), file=fout)
-                    else:
-                        # This param was set in the top file
-                        # still need vdw stuff
-                        # RHD Get the VDW for the CG angles
-                        ifound = 0
-                        for kdx in range(database.nvdwtype):
-                            f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1] 
-                            f2 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                            f3 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1] 
-                            f4 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                            if f1 and f2:
-                                ifound = 1
-                                vdwtmp = kdx
-                                break
-                            elif f3 and f4:
-                                ifound = 1
-                                vdwtmp = kdx
-                                break
-                        if ifound == 0:
-                            print("*********************")
-                            print("ERROR: No params for VDW interaction between {} and {} for angle (topfile)".format(topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
-                                     topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]))
-                            print("UPDATE DATABASE.")
-                            sys.exit(1)
-                        # end VDW for CG angles
-                        topdat[idx].angtype[jdx] = uniq_angs
-                        uniq_angs += 1
-                        eps = database.eps[vdwtmp]*4.184
-                        sig = database.sig[vdwtmp]/10.0
-                        tmpcalca = topdat[idx].angeq[jdx]
-                        tmpcalcb = topdat[idx].angfk[jdx]*4.184*2.0
-                        if tmpcalca > 0:
-                             print("{:>6s} {:>6s} {:>6s}    4  {:8.4f} {:8.4f} {:8.4f} {:8.4f} ; FROM TOP ".format(
-                                     topdat[i].type[topdat[i].angndx1[j]-1],topdat[i].type[topdat[i].angndx2[j]-1],
-		                             topdat[i].type[topdat[i].angndx3[j]-1], tmpcalca, tmpcalcb,sig,eps), file=fout)
         
         sysdat.uniq_nangs = uniq_angs
         

@@ -310,9 +310,9 @@ def get_unique(database, topdat, sysdat):
     if sysdat.total_improps > 0:
         print("improper_style  harmonic", file=fout)
     if sysdat.ischarged:
-        print("special_bonds   lj/coul 0.0 0.0 1.0", file=fout)
+        print("special_bonds   lj/coul 0.0 0.0 1.0 angle yes", file=fout)
     else:
-        print("special_bonds   lj 0.0 0.0 1.0", file=fout)
+        print("special_bonds   lj 0.0 0.0 1.0 angle yes", file=fout)
     print(file=fout)
     for idx in range(sysdat.ntops):
         for jdx in range(topdat[idx].nat):
@@ -575,9 +575,9 @@ def get_unique(database, topdat, sysdat):
                                        database.angtype2[ang_params[uniq_angs-1]],
                                        database.angtype3[ang_params[uniq_angs-1]]), file=fout)
                 else:
-                    # THIS PARAM WAS SET IN THE TOP FILE
-                    # still need vdw stuff
-                    # RHD Get the VDW for the CG angles
+                     #THIS PARAM WAS SET IN THE TOP FILE
+                     #still need vdw stuff
+                     #RHD Get the VDW for the CG angles
                     ifound = 0
                     for kdx in range(database.nvdwtype):
                         f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1] 
@@ -598,26 +598,28 @@ def get_unique(database, topdat, sysdat):
                                topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]))
                         print("UPDATE DATABASE.")
                         sys.exit(1)
-                    # end VDW for CG angles
-                    topdat[idx].angtype[jdx] = uniq_angs
+                     #end VDW for CG angles
+                    topdat[idx].angtype.append(uniq_angs)
                     uniq_angs += 1
-                    if database.angsdk[ang_params[uniq_angs-1]]:
-                        print("angle_coeff {:<10}      sdk  {:8.4f} {:8.4f} {} {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
-                        topdat[idx].angfk[jdx],
-                        topdat[idx].angeq[jdx],
-                        database.vdwstyle[vdwtmp],
-                        database.eps[vdwtmp],
-                        database.sig[vdwtmp],
-                        topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
-                    else:
-                        print("angle_coeff {:<10} harmonic  {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
-                        topdat[idx].angfk[jdx],
-                        topdat[idx].angeq[jdx],
-                        topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                    ang_params.append(-1)
+                    ang_vdw.append(vdwtmp)
+                    #if database.angsdk[ang_params[uniq_angs-1]]:
+                    #    print("angle_coeff {:<10}      sdk  {:8.4f} {:8.4f} {} {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
+                    #    topdat[idx].angfk[jdx],
+                    #    topdat[idx].angeq[jdx],
+                    #    database.vdwstyle[vdwtmp],
+                    #    database.eps[vdwtmp],
+                    #    database.sig[vdwtmp],
+                    #    topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
+                    #    topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
+                    #    topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                    #else:
+                    print("angle_coeff {:<10} harmonic  {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
+                    topdat[idx].angfk[jdx],
+                    topdat[idx].angeq[jdx],
+                    topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
+                    topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
+                    topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
 
             index0 += topdat[idx].nat*topdat[idx].nmol;
     sysdat.uniq_nangs = uniq_angs
