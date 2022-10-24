@@ -10,7 +10,7 @@
 # WILL DUMP BACKBONE TORSIONS IF WANTED
 ################################################################################
 #
-# USAGE: gen_elastic_network.py <cg.pdb filename> < cg.top filename (output)>
+# USAGE: gen_top_Go.py <cg.pdb filename> < cg.top filename (output)>
 #
 #################################################################################
 # CAN HANDLE MULTIPLE CHAINS
@@ -36,43 +36,24 @@
 import sys, math
 from argparse import ArgumentParser
 
+
 def get_option():
-    # maximum bond length 
-    MAXdr = 9.0
-    # force constant for elastic network model 
-    kENM  = 1.195
     argparser = ArgumentParser()
     argparser.add_argument('input', type=str,
                             help='Specify input CG PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
-    argparser.add_argument('-maxr', type=float,
-                            default=MAXdr,
-                            help='Cutoff length of ENM (default: 9.0 A).')
-    argparser.add_argument('-kENM', type=float,
-                            default=kENM,
-                            help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
     return argparser.parse_args()
 
 def get_option_script(argv):
-    # maximum bond length 
-    MAXdr = 9.0
-    # force constant for elastic network model 
-    kENM  = 1.195
-    argparser = ArgumentParser(usage='ENM [-h] [-maxr MAXR] [-kENM KENM] [-pspica] input output',
-                               prog ="ENM")
+    argparser = ArgumentParser(usage='Go [-h] [-pspica] input output',
+                               prog ="Go")
     argparser.add_argument('input', type=str,
                             help='Specify input CG PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
-    argparser.add_argument('-maxr', type=float,
-                            default=MAXdr,
-                            help='Cutoff length of ENM (default: 9.0 A).')
-    argparser.add_argument('-kENM', type=float,
-                            default=kENM,
-                            help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
     return argparser.parse_args(argv)
@@ -418,13 +399,14 @@ def open_file(outfile):
         sys.exit(0)
     return fout
 
-class gen_top_ENM:
-    def __init__(self, infile, outfile, kENM, MAXdr, pspica):
+class gen_top_Go:
+    def __init__(self, infile, outfile, pspica):
         self.infile  = infile
         self.outfile = outfile
-        self.kENM    = kENM
-        self.MAXdr   = MAXdr
         self.pspica  = pspica
+        self.eps_tm  = 2.5   # eps for transmembrane proteins
+        self.eps_wp  = 1.494 # eps for water soluble and peripheral proteins
+        self.cutoff  = 9.0
         self.nat     = 0
         self.nbb     = 0
         self.bbndx   = []
@@ -553,17 +535,18 @@ class gen_top_ENM:
     ##########################
     
     #######################################
-    # Elastic network model for Backbone
+    # Go model for Backbone
     ########################################
-    def write_ENM(self):
+    def write_Go(self):
         ftop  = self.ftop
-        MAXdr = self.MAXdr
-        MINdr = 0.0
-        kENM  = self.kENM
+        cutoff = self.cutoff
+        eps_tm  = self.eps_tm
+        eps_wp  = self.eps_wp
         print ()
-        print ("******** Elastic network info ********")
-        print ("Cutoff distance ... ", MAXdr, "A")
-        print ("Force constant ... ", kENM, "kcal/A^2")
+        print ("******** Go model info ********")
+        print ("Cutoff distance ... ", cutoff, "A")
+        print ("Go model epsilon for transmembrane ... ",eps_tm, "kcal/mol")
+        print ("Go model epsilon for water soluble and peripheral ... ",eps_wp, "kcal/mol")
         print ("**************************************")
         print ()
         nat = self.nat
@@ -576,9 +559,10 @@ class gen_top_ENM:
                     dy = self.coord[i1][1] - self.coord[i2][1]
                     dz = self.coord[i1][2] - self.coord[i2][2]
                     dr = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    if dr < MAXdr and dr > MINdr and self.resid[i2] - self.resid[i1] >= 3:
-                        print ("bondparam %5d %5d   %f %f # %s-%s" \
-                            %(I1, I2, kENM, dr, self.name[i1], self.name[i2]), file=ftop)
+                    if dr < cutoff and self.resid[i2] - self.resid[i1] >= 3:
+                        sig = dr/1.122462048
+                        print ("goparam %5d %5d  lj12_6 %f %f # %s-%s" \
+                            %(I1, I2, eps_wp, sig, self.name[i1], self.name[i2]), file=ftop)
         print ("", file=ftop)
 
     #######################################
@@ -746,7 +730,7 @@ class gen_top_ENM:
 
     def run(self):
         self.write_atom()
-        self.write_ENM()
+        self.write_Go()
         self.write_bond_BB()
         self.write_bond_SC()
         self.write_angle()
@@ -761,9 +745,7 @@ if __name__ == "__main__":
     args = get_option()
     infile  = args.input
     outfile = args.output
-    kENM    = args.kENM
-    MAXdr   = args.maxr
     pspica  = args.pspica
 
-    gen = gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
+    gen = gen_top_Go(infile, outfile, pspica)
     gen.run()

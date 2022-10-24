@@ -36,7 +36,7 @@ def get_option():
 def get_option_script(argv):
     json   = Path(__file__).parents[0] / "spica_top.json"
     outpdb = "fin.cg.pdb"
-    argparser = ArgumentParser(usage='maptraj [-h] [-outpdb OUTPDB] [-json JSON] [-begin BEGIN] [-last LAST] [-nodelwat] inputPDB inputTRAJ outputTRAJ',
+    argparser = ArgumentParser(usage='maptraj [-h] [-outpdb OUTPDB] [-json JSON] [-begin BEGIN] [-last LAST] [-nodelwat] inputAAPDB inputAATRAJ outputCGTRAJ',
                                prog ="maptraj")
     argparser.add_argument('inputAAPDB', type=str,
                             help='Specify input AA PDB file name.')
