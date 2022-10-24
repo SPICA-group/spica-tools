@@ -52,6 +52,7 @@ You can create the documentation on your machine with the following commands:
   * `map2cg`    : map AA configuration to CG, available only in PDB format
   * `maptraj`   : map AA MD trajectories to CG, requires `MDAnalysis` module (https://www.mdanalysis.org)
   * `ENM`       : generate top files of protein with elastic networks
+  * `Go`       : generate top files of protein with Go model
   * `wat2polar` : convert SPICA CG water to pSPICA polar CG water
   * `setup_lmp` : generate input files to run CG-MD with LAMMPS (https://www.lammps.org)
   * `setup_gmx` : generate input files to run CG-MD with GROMACS (https://www.gromacs.org).   
