@@ -1,4 +1,4 @@
-# spica-tools-devel
+# spica-tools  
 This repository provides tools to set up coarse-grained (CG) molecular dynamics (MD) simulation 
 using the SPICA force field and tools to support SPICA CG parametrization.
 The tools are basically written in Python and can be invoked with the commands described below.  
@@ -10,11 +10,11 @@ The command to invoke the tools in the src/ directory is `cg_spica` and requires
 **Python 3** environment. You will need a bash environment to execute the tools using the commands in a console. 
 You can download this repository, including the setup file to use the command, with the following command:  
 
-    git clone git@github.com:SPICA-group/spica-tools-devel.git  
+    git clone git@github.com:SPICA-group/spica-tools.git  
     
 Then, change the current directory to the top directory of the repository:  
 
-    cd spica-tools-devel/  
+    cd spica-tools/  
     
 There is a bash script `set.sh` to add the path to use the command, and run it with the following 
 command:  
@@ -38,7 +38,7 @@ in the top directory and can be installed using `pip` with the following command
     
 ## Documentation  
 
-The above spica-tools documentation can be found at https://spica-group.github.io/spica-tools-devel.  
+The above spica-tools documentation can be found at https://spica-group.github.io/spica-tools.  
 You can create the documentation on your machine with the following commands:  
 
     cd doc/  
