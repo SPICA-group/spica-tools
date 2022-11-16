@@ -21,7 +21,7 @@ command:
 
     source set.sh  
     
-The path to cg_spica has been added to the `PATH` environmental variable. Adding the above line to a  
+The path to cg_spica has been added to the `PATH` environmental variable. Adding the above line to a 
 configuration file such as `.bash_profile` may be useful if you need to use the spica-tools frequently. 
 To verify that the commands to integrate python codes in the src/ directory is available in the console, 
 run the following commands:
