@@ -18,7 +18,7 @@ that can be read by this library. For installation instructions, see the officia
 page about `MDAnalysis Installation <https://www.mdanalysis.org/pages/installation_quick_start>`_.
 
 The program requires a json formatted file with CG mapping information
-contained in the ``spica-tools-devel/src`` directory. 
+contained in the ``spica-tools/src`` directory. 
 The option ``-json`` enables to select other json files to used for mapping.
 The option ``-begin`` and ``-last`` can be used to select the frames of the
 mapped trajectory.
