@@ -38,7 +38,7 @@ in the top directory and can be installed using `pip` with the following command
     
 ## Documentation  
 
-The above spica-tools documentation can be found at https://spica-group.github.io/spica-tools.  
+The above spica-tools documentation can be found at https://spica-group.github.io/spica-tools. 
 You can create the documentation on your machine with the following commands:  
 
     cd doc/  
