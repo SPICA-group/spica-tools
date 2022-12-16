@@ -692,7 +692,7 @@ class gen_top_ENM:
                             print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print ("angle      %5d %5d %5d               # %s %s %s" \
+                            print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
@@ -710,7 +710,7 @@ class gen_top_ENM:
                             print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print ("angle      %5d %5d %5d               # %s %s %s" \
+                            print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
@@ -728,7 +728,7 @@ class gen_top_ENM:
                             print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print ("angle      %5d %5d %5d               # %s %s %s" \
+                            print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
@@ -746,7 +746,7 @@ class gen_top_ENM:
                             print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print ("angle      %5d %5d %5d               # %s %s %s" \
+                            print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
