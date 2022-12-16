@@ -658,6 +658,20 @@ def get_unique(database, topdat, sysdat):
                      #THIS PARAM WAS SET IN THE TOP FILE
                      #still need vdw stuff
                      #RHD Get the VDW for the CG angles
+                    if topdat[idx].angfk[jdx] == -1:
+                        for kdx in range(database.nangtype):
+                            if cmp_wc(database.angtype2[kdx], topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]):
+                                f1 = cmp_wc(database.angtype1[kdx], topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1])
+                                f2 = cmp_wc(database.angtype3[kdx], topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1])
+                                if f1 and f2:
+                                    topdat[idx].angfk[jdx] = database.fang[kdx]
+                                    break
+                                f1 = cmp_wc(database.angtype3[kdx], topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1])
+                                f2 = cmp_wc(database.angtype1[kdx], topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1])
+                                if f1 and f2:
+                                    topdat[idx].angfk[jdx] = database.fang[kdx]
+                                    break
+
                     ifound = 0
                     for kdx in range(database.nvdwtype):
                         f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1] 
