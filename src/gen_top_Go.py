@@ -507,22 +507,37 @@ class gen_top_Go:
                 if self.bbndx[0] == i:
                     # backbone N-terminal
                     thischrg = charge["GBT"]
-                    #print ("charge of terminal is",thischrg)
                     if resname_i == "ALA":
-                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                            %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                        if self.pspica and thischrg > 0:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"ABTP","ABTP",mass,thischrg), file=ftop)
+                        else:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
                     else :
-                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                            %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                        if self.pspica and thischrg > 0:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"GBTP","GBTP",mass,thischrg), file=ftop)
+                        else:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
                 elif self.bbndx[self.nbb-1] == i:
                     # backbone C-terminal
                     thischrg = -1*charge["GBT"]
                     if resname_i == "ALA":
-                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                            %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                        if self.pspica and thischrg < 0:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"ABTN","ABTN",mass,thischrg), file=ftop)
+                        else:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
                     else :
-                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                            %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                        if self.pspica and thischrg < 0:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"GBTN","GBTN",mass,thischrg), file=ftop)
+                        else:
+                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
                 else :
                     print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                         %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
