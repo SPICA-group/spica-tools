@@ -164,6 +164,19 @@ def read_coords(database, topdat, sysdat):
                 print(file=fout)
                 for jdx in range(topdat[idx].nang):
                     if topdat[idx].angpset[jdx] == True:
+                        if topdat[idx].angfk[jdx] == -1:
+                            for kdx in range(database.nangtype):
+                                if cmp_wc(database.angtype2[kdx], topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]):
+                                    f1 = cmp_wc(database.angtype1[kdx], topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1])
+                                    f2 = cmp_wc(database.angtype3[kdx], topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1])
+                                    if f1 and f2:
+                                        topdat[idx].angfk[jdx] = database.fang[kdx]
+                                        break
+                                    f1 = cmp_wc(database.angtype3[kdx], topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1])
+                                    f2 = cmp_wc(database.angtype1[kdx], topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1])
+                                    if f1 and f2:
+                                        topdat[idx].angfk[jdx] = database.fang[kdx]
+                                        break
                         tmpcalca = topdat[idx].angeq[jdx]
                         tmpcalcb = topdat[idx].angfk[jdx]*4.184*2.0
                         print("{:5d} {:5d} {:5d}    1  {:8.4f} {:8.4f} ; {:>6s} {:>6s} {:>6s}".format(
@@ -313,7 +326,9 @@ def write_psf(database, topdat, sysdat):
         print(file=fout)
         print(file=fout)
         print("{:<7} !NPHI: dihedrals".format(sysdat.total_diheds),    file=fout)
+        print(file=fout)
         print("{:<7} !NIMPHI: impropers".format(sysdat.total_improps), file=fout)
+        print(file=fout)
         print("       0 !NDON: donors", file=fout)
         print(file=fout)
         print("       0 !NACC: acceptors", file=fout)

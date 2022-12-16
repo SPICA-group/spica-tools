@@ -12,7 +12,7 @@ Description
 The output is ``(RESNAME).top``, where ``RESNAME`` is a mandatory argument to run
 the program. 
 This command requires a file in json format with CG mapping information,
-contained in ``spica-tools-devel/src`` directory. 
+contained in ``spica-tools/src`` directory. 
 ``-json`` can specify other json files to be used to generate topology files.
 Angle indices in generated topology files are created based on bond information decribed
 in the json file. By default, for cyclic molecules, duplicated angle indices are 

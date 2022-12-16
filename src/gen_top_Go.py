@@ -34,7 +34,9 @@
 #################################################################################
 
 import sys, math
+import numpy as np
 from argparse import ArgumentParser
+from setup_lmp import get_angle  
 
 
 def get_option():
@@ -460,7 +462,7 @@ class gen_top_Go:
                 if tmp_resname not in ["GLY", "ALA", "ADE", "GUA", "CYT", "THY", "URA"]:
                     for j in res_map[tmp_resname]:
                         self.name.append(j)
-                        self.coord.append([None, None, None])
+                        self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
                         self.resid.append(float(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
@@ -473,7 +475,7 @@ class gen_top_Go:
                 if tmp_name in ["RB2", "DB2"]:
                     for j in res_map[tmp_resname]:
                         self.name.append(j)
-                        self.coord.append([None, None, None])
+                        self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
                         self.resid.append(float(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
@@ -658,9 +660,16 @@ class gen_top_Go:
                         if name[andx2] in ["PH3","TY3","AD3","GU3"]:
                             print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
+                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print ("angle %5d %5d %5d # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            r1 = np.array(self.coord[andx1])
+                            r2 = np.array(self.coord[andx2])
+                            r3 = np.array(self.coord[andx3])
+                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                            print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index1[i1] == bond_index2[i2]:
                     andx1 = bond_index2[i1]
                     andx2 = bond_index1[i1]
@@ -669,9 +678,16 @@ class gen_top_Go:
                         if name[andx2] in ["PH3","TY3","AD3","GU3"]:
                             print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
+                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print ("angle %5d %5d %5d # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            r1 = np.array(self.coord[andx1])
+                            r2 = np.array(self.coord[andx2])
+                            r3 = np.array(self.coord[andx3])
+                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                            print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index2[i1] == bond_index1[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
@@ -680,9 +696,16 @@ class gen_top_Go:
                         if name[andx2] in ["PH3","TY3","AD3","GU3"]:
                             print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
+                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print ("angle %5d %5d %5d # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            r1 = np.array(self.coord[andx1])
+                            r2 = np.array(self.coord[andx2])
+                            r3 = np.array(self.coord[andx3])
+                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                            print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index2[i1] == bond_index2[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
@@ -691,9 +714,16 @@ class gen_top_Go:
                         if name[andx2] in ["PH3","TY3","AD3","GU3"]:
                             print("angleparam %5d %5d %5d  0.0 90.0 # %s %s %s"\
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
+                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print ("angle %5d %5d %5d # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        else:
+                            r1 = np.array(self.coord[andx1])
+                            r2 = np.array(self.coord[andx2])
+                            r3 = np.array(self.coord[andx3])
+                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                            print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
         print ("", file=ftop)
 
     ######################################
