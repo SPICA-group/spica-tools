@@ -669,7 +669,7 @@ class gen_top_Go:
                             r3 = np.array(self.coord[andx3])
                             angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
                             print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index1[i1] == bond_index2[i2]:
                     andx1 = bond_index2[i1]
                     andx2 = bond_index1[i1]
@@ -687,7 +687,7 @@ class gen_top_Go:
                             r3 = np.array(self.coord[andx3])
                             angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
                             print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index2[i1] == bond_index1[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
@@ -705,7 +705,7 @@ class gen_top_Go:
                             r3 = np.array(self.coord[andx3])
                             angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
                             print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                 elif bond_index2[i1] == bond_index2[i2]:
                     andx1 = bond_index1[i1]
                     andx2 = bond_index2[i1]
@@ -723,7 +723,7 @@ class gen_top_Go:
                             r3 = np.array(self.coord[andx3])
                             angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
                             print("angleparam %5d %5d %5d  -1 %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name [andx1],name[andx2],name[andx3]),file=ftop)
+                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
         print ("", file=ftop)
 
     ######################################
