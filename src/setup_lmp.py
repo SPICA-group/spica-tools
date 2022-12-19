@@ -498,6 +498,24 @@ def get_unique(database, topdat, sysdat):
         uniq_angs = index0 = 0
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].nang):
+                if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4]
+                elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3]
+                else:
+                    tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
+                if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:4]
+                elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:3]
+                else:
+                    tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]
+                if topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type3 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4]
+                elif topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type3 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3]
+                else:
+                    tmp_type3 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
                 datndx = -1
                 # AT THIS POINT WE WILL CHECK TO SEE IF THE PARAMS WERE GIVEN */
                 # IN THE TOP FILE....IF SO WE WILL SKIP A LOT OF THIS AND ADD */
@@ -518,21 +536,9 @@ def get_unique(database, topdat, sysdat):
                                 break
                     ifound = 0
                     for kdx in range(database.nvdwtype):
-                        if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4]
-                        elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3]
-                        else:
-                            tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                        if topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:4]
-                        elif topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1][0:3]
-                        else:
-                            tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
                         f1 = database.vdwtype1[kdx] == tmp_type1
-                        f2 = database.vdwtype2[kdx] == tmp_type2
-                        f3 = database.vdwtype1[kdx] == tmp_type2
+                        f2 = database.vdwtype2[kdx] == tmp_type3
+                        f3 = database.vdwtype1[kdx] == tmp_type3
                         f4 = database.vdwtype2[kdx] == tmp_type1
                         if f1 and f2:
                             ifound = 1
@@ -674,10 +680,10 @@ def get_unique(database, topdat, sysdat):
 
                     ifound = 0
                     for kdx in range(database.nvdwtype):
-                        f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1] 
-                        f2 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                        f3 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1] 
-                        f4 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
+                        f1 = database.vdwtype1[kdx] == tmp_type1 
+                        f2 = database.vdwtype2[kdx] == tmp_type3
+                        f3 = database.vdwtype1[kdx] == tmp_type3 
+                        f4 = database.vdwtype2[kdx] == tmp_type1
                         if f1 and f2:
                             ifound = 1
                             vdwtmp = kdx
@@ -712,16 +718,12 @@ def get_unique(database, topdat, sysdat):
                         print("angle_coeff {:<10} harmonic  {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
                         topdat[idx].angfk[jdx],
                         topdat[idx].angeq[jdx],
-                        topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                        tmp_type1,tmp_type2,tmp_type3), file=fout)
                     else:
                         print("angle_coeff {:<10} {:8.4f} {:8.4f} # {} {} {} FROM TOP".format(uniq_angs,
                         topdat[idx].angfk[jdx],
                         topdat[idx].angeq[jdx],
-                        topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
-                        topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                        tmp_type1,tmp_type2,tmp_type3), file=fout)
 
 
             index0 += topdat[idx].nat*topdat[idx].nmol;
