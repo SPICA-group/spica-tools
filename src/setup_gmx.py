@@ -354,7 +354,7 @@ def cmp_wc(s1, s2):
         return s1[:idx] == s2[:idx]
     elif s2[-1] == "*":
         idx = s2.find("*")
-        return s1[:-1] == s2[:-1]       
+        return s1[:idx] == s2[:idx]       
     else:
         return s1 == s2
 
