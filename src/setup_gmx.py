@@ -342,12 +342,6 @@ def write_psf(database, topdat, sysdat):
         print("       0 !NACC: acceptors", file=fout)
         print(file=fout)
 
-#def cmp_wc(s1, s2):
-#    if s1[-1] == "*" or s2[-1] == "*":
-#        return s1[:-1] == s2[:-1]       
-#    else:
-#        return s1 == s2
-
 def cmp_wc(s1, s2):
     if s1[-1] == "*":
         idx = s1.find("*")
