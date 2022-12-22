@@ -125,7 +125,10 @@ def read_coords(database, topdat, sysdat):
             print(file=fout)
             print("[ moleculetype ]", file=fout)
             print("; name nrexcl", file=fout)
-            print("{}      2".format(topdat[idx].resname[0]), file=fout)
+            if topdat[idx].resname[0] in ["PWAT", "PSOD", "PCLA"]: 
+                print("{}      1".format(topdat[idx].resname[0]), file=fout)
+            else:
+                print("{}      2".format(topdat[idx].resname[0]), file=fout)
             print(file=fout)
             print("[ atoms ]", file=fout)
             print("; nr    type    resnr    residu   atom   cgnr   charge  mass", file=fout);
@@ -145,6 +148,11 @@ def read_coords(database, topdat, sysdat):
                                 topdat[idx].bndndx2[jdx],tmpcalca,tmpcalcb), file=fout)
                     else :
                         print("{:5d} {:5d}    1".format(topdat[idx].bndndx1[jdx],topdat[idx].bndndx2[jdx]), file=fout)
+                if topdat[idx].resname[0] in ["PWAT", "PSOD", "PCLA"]:
+                    print(file=fout)
+                    print("[ constraints ]", file=fout)
+                    print(file=fout)
+                    print("{:5d} {:5d}    1  0.11".format(topdat[idx].bndndx1[0],topdat[idx].bndndx2[0]), file=fout)
             # Go model for protein backbones
             if topdat[idx].ngo > 0:
                 print(file=fout)
@@ -334,8 +342,18 @@ def write_psf(database, topdat, sysdat):
         print("       0 !NACC: acceptors", file=fout)
         print(file=fout)
 
+#def cmp_wc(s1, s2):
+#    if s1[-1] == "*" or s2[-1] == "*":
+#        return s1[:-1] == s2[:-1]       
+#    else:
+#        return s1 == s2
+
 def cmp_wc(s1, s2):
-    if s1[-1] == "*" or s2[-1] == "*":
+    if s1[-1] == "*":
+        idx = s1.find("*")
+        return s1[:idx] == s2[:idx]
+    elif s2[-1] == "*":
+        idx = s2.find("*")
         return s1[:-1] == s2[:-1]       
     else:
         return s1 == s2
