@@ -156,11 +156,11 @@ def read_coords(fname, database, topdat, sysdat):
         print("{:8.3f} {:8.3f} ylo yhi".format(-0.5*sysdat.boxy, 0.5*sysdat.boxy), file=fout)
         print("{:8.3f} {:8.3f} zlo zhi".format(-0.5*sysdat.boxz, 0.5*sysdat.boxz), file=fout)
         print(file=fout)
+        print("{:<7} {:<7} {:<7} {:>7} {:>9} {:>9} {:>9} # {}".format(
+               "#AtmID", "MolID", "AtmType", "Charge", "x", "y", "z", "Name"), file=fout)
         print("Atoms", file=fout)
         print(file=fout)
         atidx = molidx = 0
-        print("{:<7} {:<7} {:<7} {:>7} {:>9} {:>9} {:>9} # {}".format(
-               "#AtmID", "MolID", "AtmType", "Charge", "x", "y", "z", "Name"), file=fout)
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].nmol):
                 molidx += 1
@@ -171,10 +171,10 @@ def read_coords(fname, database, topdat, sysdat):
                            topdat[idx].atomtype[kdx]), file=fout)
         if sysdat.total_bnds > 0:
             print(file=fout)
-            print("Bonds", file=fout)
-            print(file=fout)
             print("{:<8} {:<8} {:<8} {:<8} # {} {}".format(
                    "#BndID", "BndType", "AtmType1", "AtmType2", "Name1", "Name2"), file=fout)
+            print("Bonds", file=fout)
+            print(file=fout)
             bondidx = 0
             offset  = 0
             for idx in range(sysdat.ntops):
@@ -188,11 +188,11 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_angs > 0:
             print(file=fout);
-            print("Angles", file=fout);
-            print(file=fout);
             print("{:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {}".format(
                    "#AngID", "AngType", "AtmType1", "AtmType2", "AtmType3", 
                    "Name1", "Name2", "Name3"), file=fout)
+            print("Angles", file=fout);
+            print(file=fout);
             angleidx = 0
             offset   = 0
             for idx in range(sysdat.ntops):
@@ -207,11 +207,11 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_dihs > 0:
             print(file=fout)
-            print("Dihedrals", file=fout)
-            print(file=fout)
             print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {} {}".format(
                    "#DihID", "DihType", "AtmType1", "AtmType2", "AtmType3", "AtmType4", 
                    "Name1", "Name2", "Name3", "Name4"), file=fout)
+            print("Dihedrals", file=fout)
+            print(file=fout)
             dihedidx = 0
             offset   = 0
             for idx in range(sysdat.ntops):
@@ -228,11 +228,11 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_imps > 0:
             print(file=fout)
-            print("Impropers", file=fout)
-            print(file=fout)
             print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {} {}".format(
                    "#ImpID", "ImpType", "AtmType1", "AtmType2", "AtmType3", "AtmType4", 
                    "Name1", "Name2", "Name3", "Name4"), file=fout)
+            print("Impropers", file=fout)
+            print(file=fout)
             impropidx = 0
             offset    = 0
             for idx in range(sysdat.ntops):
@@ -824,10 +824,10 @@ def get_unique(database, topdat, sysdat):
                         for kdx in range(len(datndx)):
                             uniq_dihs += 1
                             if database.dihd[datndx[kdx]] != -1:
-                                print("dihedral_coeff {:<8} {:8.4f} {:<3} {:5.1f} {:2.1f} # {} {} {} {}".format(uniq_dihs,
+                                print("dihedral_coeff {:<8} {:8.4f} {:3} {:5} {:2.1f} # {} {} {} {}".format(uniq_dihs,
                                        database.fdih[dih_params[didx-1][kdx]],
                                        database.dihn[dih_params[didx-1][kdx]],
-                                       database.dihd[dih_params[didx-1][kdx]],
+                                       int(database.dihd[dih_params[didx-1][kdx]]),
                                        0.0,
                                        database.dihtype1[dih_params[didx-1][kdx]],
                                        database.dihtype2[dih_params[didx-1][kdx]],
@@ -847,10 +847,10 @@ def get_unique(database, topdat, sysdat):
                                     idihedral_in_pdb = int(dihedral_in_pdb + 0.5)
                                 else:
                                     idihedral_in_pdb = int(dihedral_in_pdb - 0.5)
-                                print("dihedral_coeff {:<8} {:8.4f} {:<3} {:5.1f} {:2.1f} # {} {} {} {}".format(uniq_dihs,
+                                print("dihedral_coeff {:<8} {:8.4f} {:3} {:5} {:2.1f} # {} {} {} {}".format(uniq_dihs,
                                        topdat[idx].dihedfk[jdx],
                                        topdat[idx].dihedn[jdx],
-                                       topdat[idx].dihedeq[jdx],
+                                       int(topdat[idx].dihedeq[jdx]),
                                        topdat[idx].dihedof[jdx],
                                        topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1],
                                        topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1],
@@ -873,10 +873,10 @@ def get_unique(database, topdat, sysdat):
                         idihedral_in_pdb = int(dihedral_in_pdb + 0.5)
                     else:
                         idihedral_in_pdb = int(dihedral_in_pdb - 0.5)
-                    print("dihedral_coeff {:<8} {:8.4f} {:<3} {:5.1f} {:2.1f} # {} {} {} {} FROM TOP".format(uniq_dihs,
+                    print("dihedral_coeff {:<8} {:8.4f} {:3} {:5} {:2.1f} # {} {} {} {} FROM TOP".format(uniq_dihs,
                            topdat[idx].dihedfk[jdx],
                            topdat[idx].dihedn[jdx],
-                           topdat[idx].dihedeq[jdx],
+                           int(topdat[idx].dihedeq[jdx]),
                            topdat[idx].dihedof[jdx],
                            topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1],
                            topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1],
