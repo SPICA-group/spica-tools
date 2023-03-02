@@ -88,6 +88,7 @@ class Database:
      vdwtype1, vdwtype2, vdwstyle = [], [], []
      bndtype1, bndtype2 = [], []
      angtype1, angtype2, angtype3 = [], [], []
+     loop_pair = []
 
 def read_pdb(fname, sysdat):
     col = 30
@@ -390,6 +391,7 @@ def get_unique(database, topdat, sysdat):
                         topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
                         topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
                 Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
+    bb_loop = ['GBML','GBBL','ABBL']
     for idx in range(uniq_nats):
         if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
             tmp_type1 = uniq_atype[idx][0:4]
@@ -400,7 +402,11 @@ def get_unique(database, topdat, sysdat):
         for jdx in range(idx, uniq_nats):
             if Go[idx][jdx] == 1:
                 continue
-            if uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+            if (uniq_atype[idx][0:4] in bb_loop and uniq_atype[jdx] in database.loop_pair) \
+                or (uniq_atype[jdx][0:4] in bb_loop and uniq_atype[idx] in database.loop_pair):
+                tmp_type1 = uniq_atype[idx]
+                tmp_type2 = uniq_atype[jdx]
+            elif uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
                 tmp_type2 = uniq_atype[jdx][0:4]
             elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
                 tmp_type2 = uniq_atype[jdx][0:3]
@@ -819,6 +825,10 @@ def read_database(fname, database):
                         database.eps.append(eps)
                         database.sig.append(sig)
                         nvdw += 1
+                if vdwtype1 == 'GBML':
+                    database.loop_pair.append(vdwtype2)
+                elif vdwtype2 == 'GBML':
+                    database.loop_pair.append(vdwtype1)
             if items[0] == "bond":
                 ikeep = 1
                 bndtype1 = items[1]
