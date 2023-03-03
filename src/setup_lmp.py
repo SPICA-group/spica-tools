@@ -253,77 +253,81 @@ def write_psf(fname, database, topdat, sysdat):
                            topdat[idx].resname[kdx], topdat[idx].atomname[kdx],topdat[idx].atomtype[kdx], 
                            topdat[idx].charge[kdx], topdat[idx].mass[kdx]), file=fout)
         print(file=fout)
-        print("{:8} !NBOND: bonds".format(sysdat.total_bnds), file=fout)
-        bondidx = offset  = 0
-        for idx in range(sysdat.ntops):
-            for jdx in range(topdat[idx].nmol):
-                for kdx in range(topdat[idx].nbnd):
-                    bondidx += 1
-                    print("{:>8}{:>8}".format(topdat[idx].bndndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                              topdat[idx].bndndx2[kdx]+(jdx*topdat[idx].nat)+offset),
-                           file=fout, end="")
-                    if bondidx % 4 == 0:
-                        print(file=fout)
-            offset += topdat[idx].nmol*topdat[idx].nat
-        print(file=fout)
-        print(file=fout)
-        print("{:8} !NTHETA: angles".format(sysdat.total_angs),       file=fout)
-        angleidx = offset = 0;
-        for idx in range(sysdat.ntops):
-            for jdx in range(topdat[idx].nmol):
-                for kdx in range(topdat[idx].nang):
-                    angleidx += 1
-                    print("{:>8}{:>8}{:>8}".format(topdat[idx].angndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                   topdat[idx].angndx2[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                   topdat[idx].angndx3[kdx]+(jdx*topdat[idx].nat)+offset),
-                           file=fout, end="")
-                    if angleidx % 3 ==0:
-                        print(file=fout)
-            offset += topdat[idx].nmol*topdat[idx].nat
-        print(file=fout)
-        print(file=fout)
-        print("{:8} !NPHI: dihedrals".format(sysdat.total_dihs),    file=fout)
-        dihedidx = offset = 0;
-        dihs_lst = []
-        for idx in range(sysdat.ntops):
-            for jdx in range(topdat[idx].nmol):
-                for kdx in range(topdat[idx].ndih):
-                    dihedidx += 1
-                    d1 = topdat[idx].dihndx1[kdx]+(jdx*topdat[idx].nat)+offset
-                    d2 = topdat[idx].dihndx2[kdx]+(jdx*topdat[idx].nat)+offset
-                    d3 = topdat[idx].dihndx3[kdx]+(jdx*topdat[idx].nat)+offset
-                    d4 = topdat[idx].dihndx4[kdx]+(jdx*topdat[idx].nat)+offset
-                    dihs_tmp = [ d1, d2, d3, d4 ]
-                    if dihs_tmp in dihs_lst:
-                        continue
-                    dihs_lst.append(dihs_tmp)
-                    print("{:>8}{:>8}{:>8}{:>8}".format(d1, d2, d3, d4),
-                           file=fout, end="")
-                    if dihedidx % 2 ==0:
-                        print(file=fout)
-            offset += topdat[idx].nmol*topdat[idx].nat
-        print(file=fout)
-        print(file=fout)
-        print("{:8} !NIMPHI: impropers".format(sysdat.total_imps), file=fout)
-        improidx = offset = 0;
-        for idx in range(sysdat.ntops):
-            for jdx in range(topdat[idx].nmol):
-                for kdx in range(topdat[idx].nimp):
-                    improidx += 1
-                    print("{:>8}{:>8}{:>8}{:>8}".format(topdat[idx].impndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx2[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx3[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx4[kdx]+(jdx*topdat[idx].nat)+offset),
-                           file=fout, end="")
-                    if improidx % 2 ==0:
-                        print(file=fout)
-            offset += topdat[idx].nmol*topdat[idx].nat
-        print(file=fout)
-        print(file=fout)
-        print("       0 !NDON: donors", file=fout)
-        print(file=fout)
-        print("       0 !NACC: acceptors", file=fout)
-        print(file=fout)
+        if sysdat.total_bnds > 0:
+            print("{:8} !NBOND: bonds".format(sysdat.total_bnds), file=fout)
+            bondidx = offset  = 0
+            for idx in range(sysdat.ntops):
+                for jdx in range(topdat[idx].nmol):
+                    for kdx in range(topdat[idx].nbnd):
+                        bondidx += 1
+                        print("{:>8}{:>8}".format(topdat[idx].bndndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                  topdat[idx].bndndx2[kdx]+(jdx*topdat[idx].nat)+offset),
+                               file=fout, end="")
+                        if bondidx % 4 == 0:
+                            print(file=fout)
+                offset += topdat[idx].nmol*topdat[idx].nat
+            print(file=fout)
+            print(file=fout)
+        if sysdat.total_angs > 0:
+            print("{:8} !NTHETA: angles".format(sysdat.total_angs),       file=fout)
+            angleidx = offset = 0;
+            for idx in range(sysdat.ntops):
+                for jdx in range(topdat[idx].nmol):
+                    for kdx in range(topdat[idx].nang):
+                        angleidx += 1
+                        print("{:>8}{:>8}{:>8}".format(topdat[idx].angndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                       topdat[idx].angndx2[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                       topdat[idx].angndx3[kdx]+(jdx*topdat[idx].nat)+offset),
+                               file=fout, end="")
+                        if angleidx % 3 ==0:
+                            print(file=fout)
+                offset += topdat[idx].nmol*topdat[idx].nat
+            print(file=fout)
+            print(file=fout)
+        if sysdat.total_dihs > 0:
+            print("{:8} !NPHI: dihedrals".format(sysdat.total_dihs),    file=fout)
+            dihedidx = offset = 0;
+            dihs_lst = []
+            for idx in range(sysdat.ntops):
+                for jdx in range(topdat[idx].nmol):
+                    for kdx in range(topdat[idx].ndih):
+                        dihedidx += 1
+                        d1 = topdat[idx].dihndx1[kdx]+(jdx*topdat[idx].nat)+offset
+                        d2 = topdat[idx].dihndx2[kdx]+(jdx*topdat[idx].nat)+offset
+                        d3 = topdat[idx].dihndx3[kdx]+(jdx*topdat[idx].nat)+offset
+                        d4 = topdat[idx].dihndx4[kdx]+(jdx*topdat[idx].nat)+offset
+                        dihs_tmp = [ d1, d2, d3, d4 ]
+                        if dihs_tmp in dihs_lst:
+                            continue
+                        dihs_lst.append(dihs_tmp)
+                        print("{:>8}{:>8}{:>8}{:>8}".format(d1, d2, d3, d4),
+                               file=fout, end="")
+                        if dihedidx % 2 ==0:
+                            print(file=fout)
+                offset += topdat[idx].nmol*topdat[idx].nat
+            print(file=fout)
+            print(file=fout)
+        if sysdat.total_imps > 0:
+            print("{:8} !NIMPHI: impropers".format(sysdat.total_imps), file=fout)
+            improidx = offset = 0;
+            for idx in range(sysdat.ntops):
+                for jdx in range(topdat[idx].nmol):
+                    for kdx in range(topdat[idx].nimp):
+                        improidx += 1
+                        print("{:>8}{:>8}{:>8}{:>8}".format(topdat[idx].impndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                            topdat[idx].impndx2[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                            topdat[idx].impndx3[kdx]+(jdx*topdat[idx].nat)+offset,
+                                                            topdat[idx].impndx4[kdx]+(jdx*topdat[idx].nat)+offset),
+                               file=fout, end="")
+                        if improidx % 2 ==0:
+                            print(file=fout)
+                offset += topdat[idx].nmol*topdat[idx].nat
+            print(file=fout)
+            print(file=fout)
+        #print("       0 !NDON: donors", file=fout)
+        #print(file=fout)
+        #print("       0 !NACC: acceptors", file=fout)
+        #print(file=fout)
         
 def cmp_wc(s1, s2):
     if s1[-1] == "*":
