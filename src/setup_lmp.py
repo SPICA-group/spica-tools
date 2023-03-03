@@ -156,8 +156,6 @@ def read_coords(fname, database, topdat, sysdat):
         print("{:8.3f} {:8.3f} ylo yhi".format(-0.5*sysdat.boxy, 0.5*sysdat.boxy), file=fout)
         print("{:8.3f} {:8.3f} zlo zhi".format(-0.5*sysdat.boxz, 0.5*sysdat.boxz), file=fout)
         print(file=fout)
-        print("{:<7} {:<7} {:<7} {:>7} {:>9} {:>9} {:>9} # {}".format(
-               "#AtmID", "MolID", "AtmType", "Charge", "x", "y", "z", "Name"), file=fout)
         print("Atoms", file=fout)
         print(file=fout)
         atidx = molidx = 0
@@ -171,8 +169,6 @@ def read_coords(fname, database, topdat, sysdat):
                            topdat[idx].atomtype[kdx]), file=fout)
         if sysdat.total_bnds > 0:
             print(file=fout)
-            print("{:<8} {:<8} {:<8} {:<8} # {} {}".format(
-                   "#BndID", "BndType", "AtmType1", "AtmType2", "Name1", "Name2"), file=fout)
             print("Bonds", file=fout)
             print(file=fout)
             bondidx = 0
@@ -188,9 +184,6 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_angs > 0:
             print(file=fout);
-            print("{:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {}".format(
-                   "#AngID", "AngType", "AtmType1", "AtmType2", "AtmType3", 
-                   "Name1", "Name2", "Name3"), file=fout)
             print("Angles", file=fout);
             print(file=fout);
             angleidx = 0
@@ -207,9 +200,6 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_dihs > 0:
             print(file=fout)
-            print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {} {}".format(
-                   "#DihID", "DihType", "AtmType1", "AtmType2", "AtmType3", "AtmType4", 
-                   "Name1", "Name2", "Name3", "Name4"), file=fout)
             print("Dihedrals", file=fout)
             print(file=fout)
             dihedidx = 0
@@ -228,9 +218,6 @@ def read_coords(fname, database, topdat, sysdat):
                 offset += topdat[idx].nmol*topdat[idx].nat
         if sysdat.total_imps > 0:
             print(file=fout)
-            print("{:<8} {:<8} {:<8} {:<8} {:<8} {:<8} # {} {} {} {}".format(
-                   "#ImpID", "ImpType", "AtmType1", "AtmType2", "AtmType3", "AtmType4", 
-                   "Name1", "Name2", "Name3", "Name4"), file=fout)
             print("Impropers", file=fout)
             print(file=fout)
             impropidx = 0
