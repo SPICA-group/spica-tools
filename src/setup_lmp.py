@@ -138,7 +138,8 @@ def read_coords(fname, database, topdat, sysdat):
         if sysdat.nangs  > 0:
             print("{:<7} angles".format(sysdat.total_angs), file=fout)
         if sysdat.total_dihs > 0:
-            print("{:<7} dihedrals".format(sysdat.uniq_ndihs + sysdat.keep_ndihs), file=fout)
+            print("{:<7} dihedrals".format(sysdat.total_dihs), file=fout)
+            #print("{:<7} dihedrals".format(sysdat.uniq_ndihs + sysdat.keep_ndihs), file=fout)
         if sysdat.total_imps > 0:
             print("{:<7} impropers".format(sysdat.total_imps), file=fout)
         print(file=fout)
