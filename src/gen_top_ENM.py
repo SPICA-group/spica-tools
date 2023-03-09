@@ -36,6 +36,7 @@
 import sys, math
 import numpy as np
 from argparse import ArgumentParser
+import subprocess
 from setup_lmp import get_angle  
 
 def get_option():
@@ -44,8 +45,10 @@ def get_option():
     # force constant for elastic network model 
     kENM  = 1.195
     argparser = ArgumentParser()
-    argparser.add_argument('input', type=str,
+    argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
+    argparser.add_argument('aapdb', type=str,
+                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
     argparser.add_argument('-maxr', type=float,
@@ -56,6 +59,9 @@ def get_option():
                             help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-dssp', type=str,
+                            default='dssp',
+                            help='Specify path to dssp binary')
     return argparser.parse_args()
 
 def get_option_script(argv):
@@ -63,10 +69,12 @@ def get_option_script(argv):
     MAXdr = 9.0
     # force constant for elastic network model 
     kENM  = 1.195
-    argparser = ArgumentParser(usage='ENM [-h] [-maxr MAXR] [-kENM KENM] [-pspica] input output',
+    argparser = ArgumentParser(usage='ENM [-h] [-maxr MAXR] [-kENM KENM] [-pspica] [-dssp dssp] cgpdb aapdb output',
                                prog ="ENM")
-    argparser.add_argument('input', type=str,
+    argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
+    argparser.add_argument('aapdb', type=str,
+                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
     argparser.add_argument('-maxr', type=float,
@@ -77,6 +85,9 @@ def get_option_script(argv):
                             help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-dssp', type=str,
+                            default='dssp',
+                            help='Specify path to dssp binary')
     return argparser.parse_args(argv)
 
 ncomp = 7
@@ -376,12 +387,12 @@ bd_mass["HI1"] = 26.0378
 bd_mass["HI2"] = 27.0256
 bd_mass["HI3"] = 28.0335
 
-def read_pdb(infile, pdb_list, cryst, ters):
+def read_pdb(cgpdb, pdb_list, cryst, ters):
     natom = 0
     try:
-        f = open(infile,"r")
+        f = open(cgpdb,"r")
     except:
-        print ("ERROR: FILE",infile,"IS NOT FOUND")
+        print ("ERROR: FILE",cgpdb,"IS NOT FOUND")
         sys.exit(0)
     line = f.readline()
     while line:
@@ -421,12 +432,14 @@ def open_file(outfile):
     return fout
 
 class gen_top_ENM:
-    def __init__(self, infile, outfile, kENM, MAXdr, pspica):
-        self.infile  = infile
+    def __init__(self, cgpdb, aapdb, outfile, kENM, MAXdr, pspica, dssp):
+        self.cgpdb  = cgpdb
+        self.aapdb  = aapdb
         self.outfile = outfile
         self.kENM    = kENM
         self.MAXdr   = MAXdr
         self.pspica  = pspica
+        self.dssp    = dssp
         self.nat     = 0
         self.nbb     = 0
         self.bbndx   = []
@@ -440,11 +453,17 @@ class gen_top_ENM:
         self.coord     = []
         self.pdb_data  = []
         self.ters      = []
+        self.structure = []
+        self.bb = ['GBM','GBB','GBT','ABB','ABT']
+        self.helix  = ['H','G','I']
+        self.sheet  = ['B','E','T']
+        self.loop = ['S','C']
         cryst    = []
-        self.natom = read_pdb(infile, self.pdb_data, cryst, self.ters)
+        self.natom = read_pdb(cgpdb, self.pdb_data, cryst, self.ters)
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
+        self.read_dssp()
 
     def _charge_mod(self):
         if self.pspica:
@@ -503,6 +522,28 @@ class gen_top_ENM:
                         else :
                             self.bPH1TY1.append(0)
                         self.nat += 1
+        resid_0 = self.resid[0]
+        for i in range(len(self.resid)):
+            self.resid[i] = self.resid[i] - resid_0
+            print(self.resid[i])
+
+    def read_dssp(self):
+        aapdb = self.aapdb
+        dssp = self.dssp
+        cmd = f"{dssp} {aapdb} dssp.out"
+        runcmd = subprocess.call(cmd.split())
+        if runcmd != 0:
+            print ("ERROR: CANNOT MAKE DSSP FILE")
+            sys.exit(0)
+        f = open('dssp.out','r')
+        lines = f.readlines()
+        f.close()
+        for line in lines[28:]:
+            if line[16] == ' ':
+                self.structure.append('C')
+            else:
+                self.structure.append(line[16])
+        self.structure.append('C')
 
     ######################################################
     #########        PRINT OUT TOP FILE      #############
@@ -804,11 +845,12 @@ class gen_top_ENM:
 ########################################################
 if __name__ == "__main__":
     args = get_option()
-    infile  = args.input
+    cgpdb   = args.cgpdb
+    aapdb   = args.aapdb
     outfile = args.output
     kENM    = args.kENM
     MAXdr   = args.maxr
     pspica  = args.pspica
 
-    gen = gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
+    gen = gen_top_ENM(cgpdb, aapdb, outfile, kENM, MAXdr, pspica)
     gen.run()

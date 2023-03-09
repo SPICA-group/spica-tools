@@ -32,12 +32,14 @@ def main():
     args, sub = ap.parse_known_args()
     if args.tool_name == "ENM":
         args    = gen_top_ENM.get_option_script(sub)
-        infile  = args.input
+        cgpdb   = args.cgpdb
+        aapdb   = args.aapdb
         outfile = args.output
         kENM    = args.kENM
         MAXdr   = args.maxr
         pspica  = args.pspica
-        gen     = gen_top_ENM.gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
+        dssp    = args.dssp
+        gen     = gen_top_ENM.gen_top_ENM(cgpdb, aapdb, outfile, kENM, MAXdr, pspica, dssp)
         gen.run()
     elif args.tool_name == "Go":
         args    = gen_top_Go.get_option_script(sub)
