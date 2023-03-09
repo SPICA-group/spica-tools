@@ -391,7 +391,7 @@ def get_unique(database, topdat, sysdat):
                         topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
                         topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
                 Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
-    bb_loop = ['GBML','GBBL','ABBL']
+    bb_sec = ['GBML','GBBL','ABBL','GBMS','GBBS','ABBS']
     for idx in range(uniq_nats):
         if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
             tmp_type1 = uniq_atype[idx][0:4]
@@ -402,10 +402,10 @@ def get_unique(database, topdat, sysdat):
         for jdx in range(idx, uniq_nats):
             if Go[idx][jdx] == 1:
                 continue
-            if (uniq_atype[idx][0:4] in bb_loop and uniq_atype[jdx] in database.loop_pair) \
-                or (uniq_atype[jdx][0:4] in bb_loop and uniq_atype[idx] in database.loop_pair):
-                tmp_type1 = uniq_atype[idx]
-                tmp_type2 = uniq_atype[jdx]
+            if (uniq_atype[idx][0:4] in bb_sec and uniq_atype[jdx] in database.loop_pair) \
+                or (uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair):
+                tmp_type1 = uniq_atype[idx][0:4]
+                tmp_type2 = uniq_atype[jdx][0:4]
             elif uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
                 tmp_type2 = uniq_atype[jdx][0:4]
             elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
