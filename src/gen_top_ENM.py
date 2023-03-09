@@ -490,7 +490,7 @@ class gen_top_ENM:
                 self.bbtype.append(tmp_resname)
                 self.resname.append(tmp_resname)
                 self.bbndx.append(self.nat)
-                self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                 self.coord.append([self.pdb_data[i][PDB_POSX], self.pdb_data[i][PDB_POSY], self.pdb_data[i][PDB_POSZ]])
                 self.iat2ibb.append(self.nbb)
                 self.bBackbone.append(1)
@@ -501,7 +501,7 @@ class gen_top_ENM:
                         self.name.append(j)
                         self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
-                        self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                        self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
                         if j == "PH2" or j == "TY2" or j == "PH3" or j == "TY3" or j == "PH4" or j == "TY4":
@@ -514,7 +514,7 @@ class gen_top_ENM:
                         self.name.append(j)
                         self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
-                        self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                        self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
                         if j == "AD2" or j == "GU2" or j == "AD3" or j == "GU3" or j == "AD4" or j == "GU4":
@@ -525,7 +525,6 @@ class gen_top_ENM:
         resid_0 = self.resid[0]
         for i in range(len(self.resid)):
             self.resid[i] = self.resid[i] - resid_0
-            print(self.resid[i])
 
     def read_dssp(self):
         aapdb = self.aapdb
@@ -550,6 +549,10 @@ class gen_top_ENM:
     ######################################################
     def write_atom(self):
         ftop = self.ftop
+        structure = self.structure
+        helix = self.helix
+        sheet = self.sheet
+        resid = self.resid
         for i in range(self.nat):
             name_i    = self.name[i]
             resname_i = self.resname[i]
@@ -597,6 +600,18 @@ class gen_top_ENM:
                         else:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                elif wtype in ['GBM','GBB','ABB']:
+                    if structure[resid[i]] in helix:
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
+                    elif structure[resid[i]] in sheet:
+                        wtype = wtype + "S"
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,wtype,wtype,mass,thischrg), file=ftop)
+                    else:
+                        wtype = wtype + "L"
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,wtype,wtype,mass,thischrg), file=ftop)
                 else :
                     print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                         %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
@@ -716,6 +731,10 @@ class gen_top_ENM:
         bond_index2 = self.bond_index2
         bBackbone   = self.bBackbone
         bPH1TY1     = self.bPH1TY1
+        bb          = self.bb
+        resid       = self.resid
+        loop        = self.loop
+        structure   = self.structure
         for i1 in range(self.total_bonds):
             for i2 in range(i1 + 1, self.total_bonds):
                 if bond_index1[i1] == bond_index1[i2]:
@@ -735,6 +754,20 @@ class gen_top_ENM:
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
+                            resid1 = resid[andx1]
+                            resid2 = resid[andx2]
+                            resid3 = resid[andx3]
+                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
+                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                            else:
+                                r1 = np.array(self.coord[andx1])
+                                r2 = np.array(self.coord[andx2])
+                                r3 = np.array(self.coord[andx3])
+                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
                             r2 = np.array(self.coord[andx2])
@@ -753,6 +786,20 @@ class gen_top_ENM:
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
+                            resid1 = resid[andx1]
+                            resid2 = resid[andx2]
+                            resid3 = resid[andx3]
+                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
+                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                            else:
+                                r1 = np.array(self.coord[andx1])
+                                r2 = np.array(self.coord[andx2])
+                                r3 = np.array(self.coord[andx3])
+                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
                             r2 = np.array(self.coord[andx2])
@@ -771,6 +818,20 @@ class gen_top_ENM:
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
+                            resid1 = resid[andx1]
+                            resid2 = resid[andx2]
+                            resid3 = resid[andx3]
+                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
+                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                            else:
+                                r1 = np.array(self.coord[andx1])
+                                r2 = np.array(self.coord[andx2])
+                                r3 = np.array(self.coord[andx3])
+                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
                             r2 = np.array(self.coord[andx2])
@@ -789,6 +850,20 @@ class gen_top_ENM:
                         elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
                             print("angle      %5d %5d %5d               # %s %s %s" \
                                 %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
+                            resid1 = resid[andx1]
+                            resid2 = resid[andx2]
+                            resid3 = resid[andx3]
+                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
+                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+                            else:
+                                r1 = np.array(self.coord[andx1])
+                                r2 = np.array(self.coord[andx2])
+                                r3 = np.array(self.coord[andx3])
+                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
                         else:
                             r1 = np.array(self.coord[andx1])
                             r2 = np.array(self.coord[andx2])
