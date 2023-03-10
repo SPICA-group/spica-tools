@@ -821,6 +821,7 @@ if __name__ == "__main__":
     kENM    = args.kENM
     MAXdr   = args.maxr
     pspica  = args.pspica
+    dssp    = args.dssp
 
-    gen = gen_top_ENM(cgpdb, aapdb, outfile, kENM, MAXdr, pspica)
+    gen = gen_top_ENM(cgpdb, aapdb, outfile, kENM, MAXdr, pspica, dssp)
     gen.run()
