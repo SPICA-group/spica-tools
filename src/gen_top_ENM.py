@@ -37,6 +37,7 @@ import sys, math
 import numpy as np
 from argparse import ArgumentParser
 import subprocess
+import shutil
 from setup_lmp import get_angle  
 
 def get_option():
@@ -387,6 +388,12 @@ bd_mass["HI1"] = 26.0378
 bd_mass["HI2"] = 27.0256
 bd_mass["HI3"] = 28.0335
 
+# For assignment of BB particle type from DSSP
+bb = ['GBM','GBB','GBT','ABB','ABT']
+helix  = ['H','G','I']
+sheet  = ['B','E','T']
+loop = ['S','C']
+
 def read_pdb(cgpdb, pdb_list, cryst, ters):
     natom = 0
     try:
@@ -454,10 +461,6 @@ class gen_top_ENM:
         self.pdb_data  = []
         self.ters      = []
         self.structure = []
-        self.bb = ['GBM','GBB','GBT','ABB','ABT']
-        self.helix  = ['H','G','I']
-        self.sheet  = ['B','E','T']
-        self.loop = ['S','C']
         cryst    = []
         self.natom = read_pdb(cgpdb, self.pdb_data, cryst, self.ters)
         self.ftop = open_file(outfile)
@@ -529,11 +532,11 @@ class gen_top_ENM:
     def read_dssp(self):
         aapdb = self.aapdb
         dssp = self.dssp
+        cmdis = shutil.which(dssp)
+        if cmdis == None:
+            sys.exit("ERROR: DSSP binary was not found")
         cmd = f"{dssp} {aapdb} dssp.out"
-        runcmd = subprocess.call(cmd.split())
-        if runcmd != 0:
-            print ("ERROR: CANNOT MAKE DSSP FILE")
-            sys.exit(0)
+        subprocess.call(cmd.split())
         f = open('dssp.out','r')
         lines = f.readlines()
         f.close()
@@ -550,8 +553,6 @@ class gen_top_ENM:
     def write_atom(self):
         ftop = self.ftop
         structure = self.structure
-        helix = self.helix
-        sheet = self.sheet
         resid = self.resid
         for i in range(self.nat):
             name_i    = self.name[i]
@@ -724,153 +725,47 @@ class gen_top_ENM:
     # BOND LIST UNLESS SOME ARE NOT SPECIFIED 
     # ON THE COMMAND LINE.
     #########################################
-    def write_angle(self):
+    def _write_angle(self,andx1,andx2,andx3):
         ftop  = self.ftop
         name        = self.name
-        bond_index1 = self.bond_index1
-        bond_index2 = self.bond_index2
         bBackbone   = self.bBackbone
         bPH1TY1     = self.bPH1TY1
-        bb          = self.bb
         resid       = self.resid
-        loop        = self.loop
         structure   = self.structure
+        if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
+            isallbb = name[andx1] in bb and name[andx2] in bb and name[andx3] in bb
+            isallloop = structure[resid[andx1]] in loop and structure[resid[andx2]] in loop and structure[resid[andx3]] in loop
+            if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
+                print("angle      %5d %5d %5d               # %s %s %s" \
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            elif isallbb and isallloop:
+                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            else:
+                r1 = np.array(self.coord[andx1])
+                r2 = np.array(self.coord[andx2])
+                r3 = np.array(self.coord[andx3])
+                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+
+    def write_angle(self):
+        ftop  = self.ftop
+        bond_index1 = self.bond_index1
+        bond_index2 = self.bond_index2
         for i1 in range(self.total_bonds):
             for i2 in range(i1 + 1, self.total_bonds):
                 if bond_index1[i1] == bond_index1[i2]:
-                    andx1 = bond_index2[i1]
-                    andx2 = bond_index1[i1]
-                    andx3 = bond_index2[i2]
-                    # GB-GB-GB is non zero.
-                    # GB-GB-SC is non zero.
-                    # GB-SC-SC is non zero.
-                    # SC-TY1-SC is non zero.
-                    # SC-PH1-SC is non zero.
-                    # SC-SC-SC is zero.
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
-                            resid1 = resid[andx1]
-                            resid2 = resid[andx2]
-                            resid3 = resid[andx3]
-                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
-                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                            else:
-                                r1 = np.array(self.coord[andx1])
-                                r2 = np.array(self.coord[andx2])
-                                r3 = np.array(self.coord[andx3])
-                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index2[i1],bond_index1[i1],bond_index2[i2])
                 elif bond_index1[i1] == bond_index2[i2]:
-                    andx1 = bond_index2[i1]
-                    andx2 = bond_index1[i1]
-                    andx3 = bond_index1[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
-                            resid1 = resid[andx1]
-                            resid2 = resid[andx2]
-                            resid3 = resid[andx3]
-                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
-                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                            else:
-                                r1 = np.array(self.coord[andx1])
-                                r2 = np.array(self.coord[andx2])
-                                r3 = np.array(self.coord[andx3])
-                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index2[i1],bond_index1[i1],bond_index1[i2])
                 elif bond_index2[i1] == bond_index1[i2]:
-                    andx1 = bond_index1[i1]
-                    andx2 = bond_index2[i1]
-                    andx3 = bond_index2[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
-                            resid1 = resid[andx1]
-                            resid2 = resid[andx2]
-                            resid3 = resid[andx3]
-                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
-                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                            else:
-                                r1 = np.array(self.coord[andx1])
-                                r2 = np.array(self.coord[andx2])
-                                r3 = np.array(self.coord[andx3])
-                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index1[i1],bond_index2[i1],bond_index2[i2])
                 elif bond_index2[i1] == bond_index2[i2]:
-                    andx1 = bond_index1[i1]
-                    andx2 = bond_index2[i1]
-                    andx3 = bond_index1[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx1] in bb and name[andx2] in bb and name[andx3] in bb:
-                            resid1 = resid[andx1]
-                            resid2 = resid[andx2]
-                            resid3 = resid[andx3]
-                            if structure[resid1] in loop and structure[resid2] in loop and structure[resid3] in loop:
-                                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                            else:
-                                r1 = np.array(self.coord[andx1])
-                                r2 = np.array(self.coord[andx2])
-                                r3 = np.array(self.coord[andx3])
-                                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index1[i1],bond_index2[i1],bond_index1[i2])
         print ("", file=ftop)
 
     ######################################
