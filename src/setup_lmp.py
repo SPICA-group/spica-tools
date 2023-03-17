@@ -1099,7 +1099,6 @@ def read_database(fname, database):
         database.nangtype = nang
         database.ndihtype = ndih
         database.nimptype = nimp
-        print(database.loop_pair)
         
 # count the number of things in the topology files so we can allocate
 def count_atoms(fname, topdat, ntop):
