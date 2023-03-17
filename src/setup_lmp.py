@@ -438,12 +438,6 @@ def get_unique(database, topdat, sysdat):
                 Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
     bb_sec = ['GBML','GBBL','ABBL','GBMS','GBBS','ABBS']
     for idx in range(uniq_nats):
-        if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-            tmp_type1 = uniq_atype[idx][0:4]
-        elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-            tmp_type1 = uniq_atype[idx][0:3]
-        else:
-            tmp_type1 = uniq_atype[idx]
         for jdx in range(idx, uniq_nats):
             if Go[idx][jdx] == 1:
                 continue
@@ -451,12 +445,19 @@ def get_unique(database, topdat, sysdat):
                 or (uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair):
                 tmp_type1 = uniq_atype[idx][0:4]
                 tmp_type2 = uniq_atype[jdx][0:4]
-            elif uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-                tmp_type2 = uniq_atype[jdx][0:4]
-            elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-                tmp_type2 = uniq_atype[jdx][0:3]
             else:
-                tmp_type2 = uniq_atype[jdx]
+                if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type1 = uniq_atype[idx][0:4]
+                elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type1 = uniq_atype[idx][0:3]
+                else:
+                    tmp_type1 = uniq_atype[idx]
+                if uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type2 = uniq_atype[jdx][0:4]
+                elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type2 = uniq_atype[jdx][0:3]
+                else:
+                    tmp_type2 = uniq_atype[jdx]
             ifound=0;
             for kdx in range(database.nvdwtype):
                 if database.vdwtype1[kdx] == tmp_type1 and database.vdwtype2[kdx] == tmp_type2:
@@ -1098,6 +1099,7 @@ def read_database(fname, database):
         database.nangtype = nang
         database.ndihtype = ndih
         database.nimptype = nimp
+        print(database.loop_pair)
         
 # count the number of things in the topology files so we can allocate
 def count_atoms(fname, topdat, ntop):
