@@ -533,6 +533,7 @@ class gen_top_ENM:
         aapdb = self.aapdb
         dssp = self.dssp
         cmdis = shutil.which(dssp)
+        resid = self.resid
         if cmdis == None:
             sys.exit("ERROR: DSSP binary was not found")
         cmd = f"{dssp} {aapdb} dssp.out"
@@ -545,7 +546,16 @@ class gen_top_ENM:
                 self.structure.append('C')
             else:
                 self.structure.append(line[16])
-        self.structure.append('C')
+        if resid[-1] != len(self.structure) - 1:
+            self.structure.append('C')
+        if self.structure[1] in helix:
+            self.structure[0] = 'H'
+        elif self.structure[1] in sheet:
+            self.structure[0] = 'E'
+        if self.structure[-2] in helix:
+            self.structure[-1] = 'H'
+        elif self.structure[-2] in sheet:
+            self.structure[-1] = 'E'
 
     ######################################################
     #########        PRINT OUT TOP FILE      #############
@@ -575,15 +585,29 @@ class gen_top_ENM:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"ABTP","ABTP",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTS","ABTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTL","ABTL",mass,thischrg), file=ftop)
                     else :
                         if self.pspica and thischrg > 0:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"GBTP","GBTP",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTS","GBTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTL","GBTL",mass,thischrg), file=ftop)
                 elif self.bbndx[self.nbb-1] == i:
                     # backbone C-terminal
                     thischrg = -1*charge["GBT"]
@@ -592,15 +616,29 @@ class gen_top_ENM:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"ABTN","ABTN",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTS","ABTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTL","ABTL",mass,thischrg), file=ftop)
                     else :
                         if self.pspica and thischrg < 0:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"GBTN","GBTN",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTS","GBTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTL","GBTL",mass,thischrg), file=ftop)
                 elif wtype in ['GBM','GBB','ABB']:
                     if structure[resid[i]] in helix:
                         print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \

@@ -436,7 +436,7 @@ def get_unique(database, topdat, sysdat):
                         topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
                         topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
                 Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
-    bb_sec = ['GBML','GBBL','ABBL','GBMS','GBBS','ABBS']
+    bb_sec = ['GBML','GBBL','ABBL','GBTL','ABTL','GBMS','GBBS','ABBS','GBTS','ABTS']
     for idx in range(uniq_nats):
         for jdx in range(idx, uniq_nats):
             if Go[idx][jdx] == 1:
@@ -1284,7 +1284,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
     print("##### READING {}".format(fname))
 
     # Count Number of GBM GBB GBT ABB ABT GBTP GBTN ABTP ABTN 
-    nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+    nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBTL':0,'ABTL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTS':0,'ABTS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
     with open(fname, "r") as fin:
         lines = fin.readlines()
         for line in lines:
@@ -1539,7 +1539,7 @@ def run(args):
     database  = Database() 
     sysdat    = Sysdat()
     if Go:
-        bbind = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+        bbind = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBTL':0,'ABTL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTS':0,'ABTS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
         tmp_ntops = int((nargs-2)/2)
         print("Will read {} topology file(s).".format(tmp_ntops))
         print()
