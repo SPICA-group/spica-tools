@@ -238,7 +238,7 @@ def read_coords(database, topdat, sysdat):
                             if database.angsdk[datndx] == 0:
                                 print("{:5d} {:5d} {:5d}    1".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
                             else:
-                                print("{:5d} {:5d} {:5d}    4".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
+                                print("{:5d} {:5d} {:5d}    5".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
             if topdat[idx].ndihed > 0:
                 print(file=fout)
                 print("[ dihedrals ]",file=fout)

@@ -49,7 +49,7 @@ def read_pdb(infile,pdb_list):
             indicat  = line[16:17]
             resname =  line[17:21]
             chainid =  line[21:22]
-            resid   =  int(line[22:26])
+            resid   =  line[22:26]
             code    =  line[26:27]
             posX = float(line[30:38])
             posY = float(line[38:46])
@@ -96,7 +96,7 @@ def write_pdb(f,pdb_list,l):
         segid    = pdb_list[l][13]
         elesym   = pdb_list[l][14]
         #charge  = line[78:80]
-        print('%-6s%5s %4s%1s%4s%1s%4d%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%2s' \
+        print('%-6s%5s %4s%1s%4s%1s%4s%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%2s' \
                 %(recname,index[0:5],atmname,indicat,resname,chainid,resid,code,posX,posY,posZ,occup,Tfact,segid,elesym), file=f)
     elif recname == "END":
         print('END',file=f)
@@ -131,7 +131,7 @@ def write_pdb_tmp(f,pdb_list):
         segid    = pdb_list[13]
         elesym   = pdb_list[14]
         #charge  = line[78:80]
-        print('%-6s%5s %4s%1s%4s%1s%4d%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%-2s' \
+        print('%-6s%5s %4s%1s%4s%1s%4s%1s   %8.3f%8.3f%8.3f%6s%6s      %-4s%-2s' \
                 %(recname,index[0:5],atmname,indicat,resname,chainid,resid,code,posX,posY,posZ,occup,Tfact,segid,elesym), file=f)
     elif recname == "END":
         print('END',file=f)
