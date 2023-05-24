@@ -3,7 +3,7 @@ _cg_spica () {
   local c=${COMP_WORDS[COMP_CWORD]}
   local p=${COMP_WORDS[1]}
   if [ $COMP_CWORD -le 1 ] ;then
-      args="json2top map2cg maptraj wat2polar ENM Go setup_lmp setup_gmx"
+      args="json2top map2cg maptraj wat2polar ENM Go setup_lmp setup_gmx gen_lmpin"
       COMPREPLY=( `compgen -W "$args" -- $c`)
       return 0
   fi
@@ -23,6 +23,8 @@ _cg_spica () {
   setup_lmp )
       COMPREPLY=( `compgen -S ' ' -f -- $c; compgen -S '/' -d $c`);;
   setup_gmx )
+      COMPREPLY=( `compgen -S ' ' -f -- $c; compgen -S '/' -d $c`);;
+  gen_lmpin )
       COMPREPLY=( `compgen -S ' ' -f -- $c; compgen -S '/' -d $c`);;
   esac
 }
