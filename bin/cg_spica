@@ -4,7 +4,7 @@ import sys, textwrap
 from pathlib import Path
 sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
 import gen_top_ENM, gen_top_Go, json_to_top, map_to_cg, map_traj
-import wat_to_polar, setup_lmp, setup_gmx, gen_lmp_input
+import wat_to_polar, setup_lmp, setup_gmx, gen_lmp_input, gen_gmx_input
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 def get_option():
@@ -22,6 +22,7 @@ def get_option():
     setup_lmp : generate input files to run CG-MD with LAMMPS
     setup_gmx : generate input files to run CG-MD with GROMACS
     gen_lmpin : generate LAMMPS input file for SPICA or pSPICA
+    gen_gmxin : generate GROMACS input file for SPICA or pSPICA
     ----------------------------------------------------------------------
                                                  """))
     argparser.add_argument('tool_name', type=str,
@@ -93,9 +94,23 @@ def main():
         datafile = args.data
         parmfile = args.parm
         outfile = args.output
+        temp = args.T
+        press = args.P
+        GPU = args.GPU
         pspica = args.pspica
-        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, pspica)
+        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, temp, press, GPU, pspica)
         gen_lmpin.run()
+    elif args.tool_name == "gen_gmxin":
+        args = gen_gmx_input.get_option_script(sub)
+        conf = args.pdb
+        ndxf = args.ndx
+        outf = args.output
+        temp = args.T
+        press = args.P
+        pspica = args.pspica
+        em = args.em
+        gen_gmxin = gen_gmx_input.gen_gmx_inp(conf, ndxf, outf, temp, press, pspica, em)
+        gen_gmxin.run()
     else:
         sys.exit(f"ERROR: invalid tool name {args.tool_name}")
 
