@@ -62,6 +62,7 @@ def get_dihedral(r1, r2, r3, r4):
 class Sysdat:
     nats = ngo = nbnds = nangs = nimps = ndihs = ntops = 0 
     total_ats = total_go = total_bnds = total_angs = total_imps = total_dihs = 0
+    total_all_dihs = 0
     foundatoms = boxinfo = ischarged = 0
     uniq_nats = uniq_nbnds = uniq_nangs = uniq_nimps = uniq_ndihs = 0
     keep_ndihs = 0
@@ -71,14 +72,15 @@ class Sysdat:
 
 class Topdat:
     def __init__(self):
-        self.nat = self.nbnd = self.nang = self.nimp = self.nmol = self.ngo =  0
+        self.nat = self.nbnd = self.nang = self.ndih = self.nimp = self.nmol = self.ngo =  0
+        self.nalldih = 0
         self.gondx1, self.gondx2, self.gofunctype, self.eps, self.sig = [], [], [], [], []
         self.bndndx1, self.bndndx2, self.bndtype = [], [], []
         self.angndx1, self.angndx2, self.angndx3, self.angtype = [], [], [], []
         self.improp_func, self.impndx1, self.impndx2, self.impndx3, self.impndx4, self.imptype   = [], [], [], [], [], []
         self.dihed_func, self.dihndx1, self.dihndx2, self.dihndx3, self.dihndx4, self.dihtype, self.dihedn = [], [], [], [], [], [], []
         self.dihpset, self.imppset, self.bndpset, self.angpset = [], [], [], []
-        self.ind, self.parm_atomtype, self.ndih, self.dihedeq   = [], [], [], []
+        self.ind, self.parm_atomtype, self.dihedeq   = [], [], []
         self.dihedfk, self.dihedof = [], []
         self.mass, self.charge, self.bndfk, self.bndeq, self.angfk, self.angeq, self.impropfk, self.impropeq = [], [], [], [], [], [], [], []
         self.atomname, self.atomtype, self.segid, self.resname = [], [], [], []
@@ -138,8 +140,10 @@ def read_coords(fname, database, topdat, sysdat):
         if sysdat.nangs  > 0:
             print("{:<7} angles".format(sysdat.total_angs), file=fout)
         if sysdat.total_dihs > 0:
-            print("{:<7} dihedrals".format(sysdat.total_dihs), file=fout)
-            #print("{:<7} dihedrals".format(sysdat.uniq_ndihs + sysdat.keep_ndihs), file=fout)
+            all_dihs = 0
+            for idx in range(sysdat.ntops):
+                all_dihs += topdat[idx].nalldih*topdat[idx].nmol
+            print("{:<7} dihedrals".format(all_dihs), file=fout)
         if sysdat.total_imps > 0:
             print("{:<7} impropers".format(sysdat.total_imps), file=fout)
         print(file=fout)
@@ -270,7 +274,7 @@ def write_psf(fname, database, topdat, sysdat):
             print(file=fout)
             print(file=fout)
         if sysdat.total_angs > 0:
-            print("{:8} !NTHETA: angles".format(sysdat.total_angs),       file=fout)
+            print("{:8} !NTHETA: angles".format(sysdat.total_angs), file=fout)
             angleidx = offset = 0;
             for idx in range(sysdat.ntops):
                 for jdx in range(topdat[idx].nmol):
@@ -286,7 +290,7 @@ def write_psf(fname, database, topdat, sysdat):
             print(file=fout)
             print(file=fout)
         if sysdat.total_dihs > 0:
-            print("{:8} !NPHI: dihedrals".format(sysdat.total_dihs),    file=fout)
+            print("{:8} !NPHI: dihedrals".format(sysdat.total_dihs), file=fout)
             dihedidx = offset = 0;
             dihs_lst = []
             for idx in range(sysdat.ntops):
@@ -766,23 +770,40 @@ def get_unique(database, topdat, sysdat):
     print(file=fout)
     # DIHEDRAL
     if sysdat.ndihs > 0:
-        uniq_dihs = index0 = didx = 0
+        uniq_dihs = index0 = 0
         for idx in range(sysdat.ntops):
+            top_ndih = 0
             for jdx in range(topdat[idx].ndih):
                 datndx = []
                 if topdat[idx].dihpset[jdx] != 1:
                     # now compare to the database 
+                    top_atype1 = topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1]
+                    top_atype2 = topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1]
+                    top_atype3 = topdat[idx].atomtype[topdat[idx].dihndx3[jdx]-1]
+                    top_atype4 = topdat[idx].atomtype[topdat[idx].dihndx4[jdx]-1]
                     for kdx in range(database.ndihtype):
-                        if cmp_wc(database.dihtype2[kdx], topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1]):
-                            if cmp_wc(database.dihtype3[kdx], topdat[idx].atomtype[topdat[idx].dihndx3[jdx]-1]):
-                                f1 = cmp_wc(database.dihtype1[kdx], topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1]) 
-                                f2 = cmp_wc(database.dihtype4[kdx], topdat[idx].atomtype[topdat[idx].dihndx4[jdx]-1])
-                                if f1 and f2:
-                                    datndx.append(kdx)
-                        if cmp_wc(database.dihtype2[kdx], topdat[idx].atomtype[topdat[idx].dihndx3[jdx]-1]):
-                            if cmp_wc(database.dihtype3[kdx], topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1]):
-                                f1 = cmp_wc(database.dihtype1[kdx], topdat[idx].atomtype[topdat[idx].dihndx4[jdx]-1]) 
-                                f2 = cmp_wc(database.dihtype4[kdx], topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1])
+                        dat_dtype1 = database.dihtype1[kdx]
+                        dat_dtype2 = database.dihtype2[kdx]
+                        dat_dtype3 = database.dihtype3[kdx]
+                        dat_dtype4 = database.dihtype4[kdx]
+                        if cmp_wc(dat_dtype2, top_atype2):
+                            if cmp_wc(dat_dtype3, top_atype3):
+                                if top_atype2 == top_atype3:
+                                   f1 = cmp_wc(dat_dtype1, top_atype1)
+                                   f2 = cmp_wc(dat_dtype4, top_atype4) 
+                                   f3 = cmp_wc(dat_dtype1, top_atype4)
+                                   f4 = cmp_wc(dat_dtype4, top_atype1)
+                                   if f1 and f2 or f3 and f4:
+                                       datndx.append(kdx)
+                                else:
+                                   f1 = cmp_wc(dat_dtype1, top_atype1) 
+                                   f2 = cmp_wc(dat_dtype4, top_atype4)
+                                   if f1 and f2:
+                                       datndx.append(kdx)
+                        elif cmp_wc(dat_dtype2, top_atype3):
+                            if cmp_wc(dat_dtype3, top_atype2):
+                                f1 = cmp_wc(dat_dtype1, top_atype4) 
+                                f2 = cmp_wc(dat_dtype4, top_atype1)
                                 if f1 and f2:
                                     datndx.append(kdx)
                     if len(datndx) == 0:
@@ -791,40 +812,41 @@ def get_unique(database, topdat, sysdat):
                                     topdat[idx].dihndx2[jdx],
                                     topdat[idx].dihndx3[jdx],
                                     topdat[idx].dihndx4[jdx],
-                                    topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1],
-                                    topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1],
-                                    topdat[idx].atomtype[topdat[idx].dihndx3[jdx]-1],
-                                    topdat[idx].atomtype[topdat[idx].dihndx4[jdx]-1]))
+                                    top_atype1,
+                                    top_atype2,
+                                    top_atype3,
+                                    top_atype4))
                     # Now make sure we do not already know we have this interaction 
-                    ikeep = 1
+                    ikeep = True
                     keeps = []
                     for ldx in datndx:
                         if database.dihd[ldx] != -1:
-                            for mdx in dih_params:
-                                if ldx in mdx:
-                                    ikeep = 0 # found a replica
-                                    keeps.append(ldx)
+                            for kdx in range(uniq_dihs):
+                                if ldx ==  dih_params[kdx]:
+                                    ikeep = False # found a replica
+                                    keeps.append(kdx)
                                     keep_dihs +=1
-                    if ikeep == 0: 
+                                    top_ndih +=1
+                    if not ikeep: 
                         topdat[idx].dihtype.append([uniq_dihs, keeps])
-                    # ikeep = 1 if we found a new one
-                    if ikeep == 1:
-                        dih_params.append(datndx)
-                        sysdat.param_dihs.append(datndx)
-                        topdat[idx].dihtype.append([uniq_dihs, datndx])
-                        didx += 1
+                    # ikeep = True if we found a new one
+                    else:
+                        dih_params += datndx
+                        sysdat.param_dihs += datndx
+                        topdat[idx].dihtype.append([uniq_dihs, [uniq_dihs + x for x in range(len(datndx))]])
                         for kdx in range(len(datndx)):
                             uniq_dihs += 1
+                            top_ndih +=1
                             if database.dihd[datndx[kdx]] != -1:
                                 print("dihedral_coeff {:<8} {:8.4f} {:3} {:5} {:2.1f} # {} {} {} {}".format(uniq_dihs,
-                                       database.fdih[dih_params[didx-1][kdx]],
-                                       database.dihn[dih_params[didx-1][kdx]],
-                                       int(database.dihd[dih_params[didx-1][kdx]]),
+                                       database.fdih[dih_params[uniq_dihs-1]],
+                                       database.dihn[dih_params[uniq_dihs-1]],
+                                       int(database.dihd[dih_params[uniq_dihs-1]]),
                                        0.0,
-                                       database.dihtype1[dih_params[didx-1][kdx]],
-                                       database.dihtype2[dih_params[didx-1][kdx]],
-                                       database.dihtype3[dih_params[didx-1][kdx]],
-                                       database.dihtype4[dih_params[didx-1][kdx]]), file=fout)
+                                       database.dihtype1[dih_params[uniq_dihs-1]],
+                                       database.dihtype2[dih_params[uniq_dihs-1]],
+                                       database.dihtype3[dih_params[uniq_dihs-1]],
+                                       database.dihtype4[dih_params[uniq_dihs-1]]), file=fout)
                             else:
                                 i1 = topdat[idx].dihndx1[jdx]-1 + index0;
                                 i2 = topdat[idx].dihndx2[jdx]-1 + index0;
@@ -876,6 +898,7 @@ def get_unique(database, topdat, sysdat):
                            topdat[idx].atomtype[topdat[idx].dihndx4[jdx]-1]), file=fout)
             index0 += topdat[idx].nat*topdat[idx].nmol
         # FINISHED LOOPING OVER TOP FILES */
+            topdat[idx].nalldih = top_ndih
     sysdat.uniq_ndihs = uniq_dihs
     sysdat.keep_ndihs = keep_dihs
     print(file=fout)
@@ -1029,7 +1052,7 @@ def read_database(fname, database):
                     database.angsdk.append(angsdk)
                     nang += 1
             if items[0] == "dihedral":
-                ikeep = 1
+                ikeep = True
                 dihtype1 = items[1]
                 dihtype2 = items[2]
                 dihtype3 = items[3]
@@ -1042,13 +1065,13 @@ def read_database(fname, database):
                         if dihtype1 == database.dihtype1[idx] and dihtype4 == database.dihtype4[idx]:
                             if dihn == database.dihn[idx] and dihd == database.dihd[idx]:
                                 print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3, dihtype4))
-                                ikeep = 0
+                                ikeep = False
                     if dihtype2 == database.dihtype3[idx] and dihtype3 == database.dihtype2[idx]:
                         if dihtype1 == database.dihtype4[idx] and dihtype4 == database.dihtype1[idx]:
                             if dihn == database.dihn[idx] and dihd == database.dihd[idx]:
                                 print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3, dihtype4))
-                                ikeep = 0
-                if ikeep == 1:
+                                ikeep = False
+                if ikeep:
                     database.dihtype1.append(dihtype1)
                     database.dihtype2.append(dihtype2)
                     database.dihtype3.append(dihtype3)
