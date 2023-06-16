@@ -15,6 +15,14 @@ def get_option():
     argparser.add_argument('-output', type=str,
                             default=outf,
                             help='specify LAMMPS input file name (default: in.lammps).')
+    argparser.add_argument('-T', type=float,
+                            default=310.,
+                            help='system temperature [K] (default: 310.0).')
+    argparser.add_argument('-P', type=float,
+                            default=1.,
+                            help='system pressure [atm] (default: 1.0).')
+    argparser.add_argument('-GPU', action='store_true',
+                            help='use GPU option for LAMMPS simulation (default: off).')
     argparser.add_argument('-pspica', action='store_true',
                             help='generate LAMMPS input for pSPICA FF (default: for SPICA FF).')
     return argparser.parse_args()
@@ -23,8 +31,8 @@ def get_option_script(argv):
     data = "DATA.FILE"
     parm = "PARM.FILE"
     outf = "in.lammps"
-    argparser = ArgumentParser(usage='genlmpin [-h] [-data DATA] [-parm PARM] [-output OUTPUT]',
-                               prog ="genlmpin")
+    argparser = ArgumentParser(usage='gen_lmpin [-h] [-data DATA] [-parm PARM] [-output OUTPUT] [-pspica]',
+                               prog ="gen_lmpin")
     argparser.add_argument('-data', type=str,
                             default=data,
                             help='input LAMMPS data file name (default: DATA.FILE).')
@@ -34,15 +42,26 @@ def get_option_script(argv):
     argparser.add_argument('-output', type=str,
                             default=outf,
                             help='specify LAMMPS input file name (default: in.lammps).')
+    argparser.add_argument('-T', type=float,
+                            default=310.,
+                            help='system temperature [K] (default: 310.0).')
+    argparser.add_argument('-P', type=float,
+                            default=1.,
+                            help='system pressure [atm] (default: 1.0).')
+    argparser.add_argument('-GPU', action='store_true',
+                            help='use GPU option for LAMMPS simulation (default: off).')
     argparser.add_argument('-pspica', action='store_true',
                             help='generate LAMMPS input for pSPICA FF (default: for SPICA FF).')
     return argparser.parse_args(argv)
 
 class gen_lmp_inp:
-    def __init__(self, datafile, parmfile, outf, pspica):
+    def __init__(self, datafile, parmfile, outf, temp, press, GPU, pspica):
         self.datafile = datafile
         self.parmfile = parmfile
         self.outf = outf
+        self.temp = temp
+        self.press = press
+        self.GPU = GPU
         self.pspica = pspica
 
     def tune_mesh(self, boxl):
@@ -147,7 +166,10 @@ class gen_lmp_inp:
     
     def run(self):
         f = open(self.outf, "w")
-        print("##### Generate LAMMPS input file #####")
+        if self.pspica:
+            print("##### Generate LAMMPS input file for pSPICA #####")
+        else:
+            print("##### Generate LAMMPS input file for SPICA #####")
         print()
         if self.pspica:
             print("### LAMMPS input for pSPICA FF ###", file=f)
@@ -160,41 +182,18 @@ class gen_lmp_inp:
         print(f"variable       nlog  equal 1000", file=f)
         print(f"variable       ndump equal 10000", file=f)
         print(f"variable       nrest equal 50000", file=f)
-        print("-Specify system temperature [K]")
-        while True:
-            try:
-                inp = float(input())
-            except:
-                print("Input a proper value for system temperature.")
-            else:
-                print(f"variable       t equal {round(inp, 2)}", file=f)
-                break
-        print("-Specify System pressure [atm]")
-        while True:
-            try:
-                inp = float(input())
-            except:
-                print("Input a proper value for system pressure.")
-            else:
-                print(f"variable       p equal {round(inp, 3)}", file=f)
-                break
+        print(f"variable       t equal {round(self.temp, 2)}", file=f)
+        print(f"variable       p equal {round(self.press, 3)}", file=f)
         print(file=f)
         print("# Unit and data file style", file=f)
         print(f"units          real", file=f)
         print(f"atom_style     full", file=f)
-        print("-Use GPU option for your LAMMPS simulation, 'yes' or 'no'")
         print(file=f)
         print("# Set Newton's third law for interactions", file=f)
-        while True:
-            inp = input()
-            if inp != "yes" and inp != "no":
-                print("Input 'yes' or 'no'.")
-            else:
-               if inp == "yes":
-                   print(f"newton         off", file=f)
-               else:
-                   print(f"newton         on off", file=f)
-               break
+        if self.GPU:
+            print(f"newton         off", file=f)
+        else:
+            print(f"newton         on off", file=f)
         print(file=f)
         print("# Load data and parameter files", file=f)
         print(f"read_data      {self.datafile}", file=f)
@@ -242,7 +241,7 @@ class gen_lmp_inp:
             cpl = "semiisotropic"
         else:
             print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. drag 0.1", file=f)
-            cpl = "isotropic"
+            cpl = "anisotropic"
         print(file=f)
         print("# Output log information", file=f)
         print("thermo         ${nlog}", file=f)
@@ -261,9 +260,15 @@ class gen_lmp_inp:
         f.close()
         print(f"-Pressure coupling is predicted to be '{cpl}' from the simulation box symmetry")
         print()
-        print(f"##### LAMMPS input file '{self.outf}' has been generated! #####")
+        if self.pspica:
+            print(f"##### LAMMPS input file '{self.outf}' for pSPICA has been generated! #####")
+        else:
+            print(f"##### LAMMPS input file '{self.outf}' for SPICA has been generated! #####")
         print()
-        print(f"NOTE: '{self.outf}' is just to run 100 ns LAMMPS MD with NPT using SPICA or pSPICA.")
+        if self.pspica:
+            print(f"NOTE: '{self.outf}' is just to run 100 ns LAMMPS MD with NPT using pSPICA.")
+        else:
+            print(f"NOTE: '{self.outf}' is just to run 100 ns LAMMPS MD with NPT using SPICA.")
         print(f"NOTE: Please check and modify the input for your simulation purpose.")
         print("NOTE: When using GPU, please add '-sf gpu -pk gpu {#ofGPU}' option on command line.")
 
@@ -272,6 +277,9 @@ if __name__ == "__main__":
     datafile = args.data
     parmfile = args.parm
     outf = args.output
+    temp = args.T     
+    press = args.P     
+    GPU = args.GPU   
     pspica = args.pspica
-    obj = gen_lmp_inp(datafile, parmfile, outf, pspica)
+    obj = gen_lmp_inp(datafile, parmfile, outf, temp, press, GPU, pspica)
     obj.run()
