@@ -874,6 +874,7 @@ def get_unique(database, topdat, sysdat):
                     # THE PARAMS WERE GIVEN IN THE TOP FILE SO LETS ADD IT TO THE PARAM FILE */
                     topdat[idx].dihtype.append([uniq_dihs, [uniq_dihs]]) 
                     uniq_dihs += 1
+                    top_ndih += 1
                     i1 = topdat[idx].dihndx1[jdx]-1 + index0;
                     i2 = topdat[idx].dihndx2[jdx]-1 + index0;
                     i3 = topdat[idx].dihndx3[jdx]-1 + index0;
