@@ -45,10 +45,14 @@ def main():
         gen.run()
     elif args.tool_name == "Go":
         args    = gen_top_Go.get_option_script(sub)
-        infile  = args.input
+        cgpdb   = args.cgpdb
+        aapdb   = args.aapdb
         outfile = args.output
+        eps     = args.eps
+        MAXdr   = args.maxr
         pspica  = args.pspica
-        gen     = gen_top_Go.gen_top_Go(infile, outfile, pspica)
+        dssp    = args.dssp
+        gen     = gen_top_Go.gen_top_Go(cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp)
         gen.run()
     elif args.tool_name == "json2top":
         args  = json_to_top.get_option_script(sub)

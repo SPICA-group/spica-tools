@@ -10,7 +10,7 @@
 # WILL DUMP BACKBONE TORSIONS IF WANTED
 ################################################################################
 #
-# USAGE: gen_top_Go.py <cg.pdb filename> < cg.top filename (output)>
+# USAGE: python gen_top_Go.py <cg.pdb filename> <aa.pdb filename> < cg.top filename (output)>
 #
 #################################################################################
 # CAN HANDLE MULTIPLE CHAINS
@@ -36,28 +36,59 @@
 import sys, math
 import numpy as np
 from argparse import ArgumentParser
+import subprocess
+import shutil
 from setup_lmp import get_angle  
 
-
 def get_option():
+    # maximum bond length 
+    MAXdr = 9.0
+    # force constant for Go model 
+    eps  = 1.5
     argparser = ArgumentParser()
-    argparser.add_argument('input', type=str,
+    argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
+    argparser.add_argument('aapdb', type=str,
+                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
+    argparser.add_argument('-maxr', type=float,
+                            default=MAXdr,
+                            help='Cutoff length of Go model (default: 9.0 A).')
+    argparser.add_argument('-eps', type=float,
+                            default=eps,
+                            help='epsilon for Go model (default: 1.5 kcal/mol).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-dssp', type=str,
+                            default='dssp',
+                            help='Specify path to dssp binary')
     return argparser.parse_args()
 
 def get_option_script(argv):
-    argparser = ArgumentParser(usage='Go [-h] [-pspica] input output',
+    # maximum bond length 
+    MAXdr = 9.0
+    # force constant for Go model 
+    eps  = 1.5
+    argparser = ArgumentParser(usage='Go [-h] [-maxr MAXR] [-eps eps] [-pspica] [-dssp dssp] cgpdb aapdb output',
                                prog ="Go")
-    argparser.add_argument('input', type=str,
+    argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
+    argparser.add_argument('aapdb', type=str,
+                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
+    argparser.add_argument('-maxr', type=float,
+                            default=MAXdr,
+                            help='Cutoff length of Go model (default: 9.0 A).')
+    argparser.add_argument('-eps', type=float,
+                            default=eps,
+                            help='epsilon for Go model (default: 1.5 kcal/mol).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-dssp', type=str,
+                            default='dssp',
+                            help='Specify path to dssp binary')
     return argparser.parse_args(argv)
 
 ncomp = 7
@@ -357,12 +388,18 @@ bd_mass["HI1"] = 26.0378
 bd_mass["HI2"] = 27.0256
 bd_mass["HI3"] = 28.0335
 
-def read_pdb(infile, pdb_list, cryst, ters):
+# For assignment of BB particle type from DSSP
+bb = ['GBM','GBB','GBT','ABB','ABT']
+helix  = ['H','G','I']
+sheet  = ['B','E','T']
+loop = ['S','C']
+
+def read_pdb(cgpdb, pdb_list, cryst, ters):
     natom = 0
     try:
-        f = open(infile,"r")
+        f = open(cgpdb,"r")
     except:
-        print ("ERROR: FILE",infile,"IS NOT FOUND")
+        print ("ERROR: FILE",cgpdb,"IS NOT FOUND")
         sys.exit(0)
     line = f.readline()
     while line:
@@ -402,13 +439,14 @@ def open_file(outfile):
     return fout
 
 class gen_top_Go:
-    def __init__(self, infile, outfile, pspica):
-        self.infile  = infile
+    def __init__(self, cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp):
+        self.cgpdb  = cgpdb
+        self.aapdb  = aapdb
         self.outfile = outfile
+        self.eps    = eps
+        self.MAXdr   = MAXdr
         self.pspica  = pspica
-        self.eps_tm  = 2.5   # eps for transmembrane proteins
-        self.eps_wp  = 1.494 # eps for water soluble and peripheral proteins
-        self.cutoff  = 9.0
+        self.dssp    = dssp
         self.nat     = 0
         self.nbb     = 0
         self.bbndx   = []
@@ -422,11 +460,13 @@ class gen_top_Go:
         self.coord     = []
         self.pdb_data  = []
         self.ters      = []
+        self.structure = []
         cryst    = []
-        self.natom = read_pdb(infile, self.pdb_data, cryst, self.ters)
+        self.natom = read_pdb(cgpdb, self.pdb_data, cryst, self.ters)
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
+        self.read_dssp()
 
     def _charge_mod(self):
         if self.pspica:
@@ -453,7 +493,7 @@ class gen_top_Go:
                 self.bbtype.append(tmp_resname)
                 self.resname.append(tmp_resname)
                 self.bbndx.append(self.nat)
-                self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                 self.coord.append([self.pdb_data[i][PDB_POSX], self.pdb_data[i][PDB_POSY], self.pdb_data[i][PDB_POSZ]])
                 self.iat2ibb.append(self.nbb)
                 self.bBackbone.append(1)
@@ -464,7 +504,7 @@ class gen_top_Go:
                         self.name.append(j)
                         self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
-                        self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                        self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
                         if j == "PH2" or j == "TY2" or j == "PH3" or j == "TY3" or j == "PH4" or j == "TY4":
@@ -477,7 +517,7 @@ class gen_top_Go:
                         self.name.append(j)
                         self.coord.append([self.pdb_data[self.nat][PDB_POSX], self.pdb_data[self.nat][PDB_POSY], self.pdb_data[self.nat][PDB_POSZ]])
                         self.resname.append(tmp_resname)
-                        self.resid.append(float(self.pdb_data[i][PDB_RESID]))
+                        self.resid.append(int(self.pdb_data[i][PDB_RESID]))
                         self.iat2ibb.append(None)
                         self.bBackbone.append(0)
                         if j == "AD2" or j == "GU2" or j == "AD3" or j == "GU3" or j == "AD4" or j == "GU4":
@@ -485,12 +525,45 @@ class gen_top_Go:
                         else :
                             self.bPH1TY1.append(0)
                         self.nat += 1
+        resid_0 = self.resid[0]
+        for i in range(len(self.resid)):
+            self.resid[i] = self.resid[i] - resid_0
+
+    def read_dssp(self):
+        aapdb = self.aapdb
+        dssp = self.dssp
+        cmdis = shutil.which(dssp)
+        resid = self.resid
+        if cmdis == None:
+            sys.exit("ERROR: DSSP binary was not found")
+        cmd = f"{dssp} {aapdb} dssp.out"
+        subprocess.call(cmd.split())
+        f = open('dssp.out','r')
+        lines = f.readlines()
+        f.close()
+        for line in lines[28:]:
+            if line[16] == ' ':
+                self.structure.append('C')
+            else:
+                self.structure.append(line[16])
+        if resid[-1] != len(self.structure) - 1:
+            self.structure.append('C')
+        if self.structure[1] in helix:
+            self.structure[0] = 'H'
+        elif self.structure[1] in sheet:
+            self.structure[0] = 'E'
+        if self.structure[-2] in helix:
+            self.structure[-1] = 'H'
+        elif self.structure[-2] in sheet:
+            self.structure[-1] = 'E'
 
     ######################################################
     #########        PRINT OUT TOP FILE      #############
     ######################################################
     def write_atom(self):
         ftop = self.ftop
+        structure = self.structure
+        resid = self.resid
         for i in range(self.nat):
             name_i    = self.name[i]
             resname_i = self.resname[i]
@@ -512,15 +585,29 @@ class gen_top_Go:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"ABTP","ABTP",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTS","ABTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTL","ABTL",mass,thischrg), file=ftop)
                     else :
                         if self.pspica and thischrg > 0:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"GBTP","GBTP",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTS","GBTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTL","GBTL",mass,thischrg), file=ftop)
                 elif self.bbndx[self.nbb-1] == i:
                     # backbone C-terminal
                     thischrg = -1*charge["GBT"]
@@ -529,15 +616,41 @@ class gen_top_Go:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"ABTN","ABTN",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABT","ABT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTS","ABTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"ABTL","ABTL",mass,thischrg), file=ftop)
                     else :
                         if self.pspica and thischrg < 0:
                             print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                                 %(I,resname_i,"GBTN","GBTN",mass,thischrg), file=ftop)
                         else:
-                            print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
-                                %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            if structure[resid[i]] in helix:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBT","GBT",mass,thischrg), file=ftop)
+                            elif structure[resid[i]] in sheet:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTS","GBTS",mass,thischrg), file=ftop)
+                            else:
+                                print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                                    %(I,resname_i,"GBTL","GBTL",mass,thischrg), file=ftop)
+                elif wtype in ['GBM','GBB','ABB']:
+                    if structure[resid[i]] in helix:
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
+                    elif structure[resid[i]] in sheet:
+                        wtype = wtype + "S"
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,wtype,wtype,mass,thischrg), file=ftop)
+                    else:
+                        wtype = wtype + "L"
+                        print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
+                            %(I,resname_i,wtype,wtype,mass,thischrg), file=ftop)
                 else :
                     print ("atom %5d %5s %5s %5s %8.4f   %8.4f  P" \
                         %(I,resname_i,name_i,wtype,mass,thischrg), file=ftop)
@@ -556,14 +669,13 @@ class gen_top_Go:
     ########################################
     def write_Go(self):
         ftop  = self.ftop
-        cutoff = self.cutoff
-        eps_tm  = self.eps_tm
-        eps_wp  = self.eps_wp
+        MAXdr = self.MAXdr
+        MINdr = 0.0
+        eps  = self.eps
         print ()
         print ("******** Go model info ********")
-        print ("Cutoff distance ... ", cutoff, "A")
-        print ("Go model epsilon for transmembrane ... ",eps_tm, "kcal/mol")
-        print ("Go model epsilon for water soluble and peripheral ... ",eps_wp, "kcal/mol")
+        print ("Cutoff distance ... ", MAXdr, "A")
+        print ("epsilon  ... ", eps, "kcal/mol")
         print ("**************************************")
         print ()
         nat = self.nat
@@ -576,10 +688,10 @@ class gen_top_Go:
                     dy = self.coord[i1][1] - self.coord[i2][1]
                     dz = self.coord[i1][2] - self.coord[i2][2]
                     dr = math.sqrt(dx*dx + dy*dy + dz*dz)
-                    if dr < cutoff and self.resid[i2] - self.resid[i1] >= 3:
+                    if dr < MAXdr and dr > MINdr and self.resid[i2] - self.resid[i1] >= 3:
                         sig = dr/1.122462048
                         print ("goparam %5d %5d  lj12_6 %f %f # %s-%s" \
-                            %(I1, I2, eps_wp, sig, self.name[i1], self.name[i2]), file=ftop)
+                            %(I1, I2, eps, sig, self.name[i1], self.name[i2]), file=ftop)
         print ("", file=ftop)
 
     #######################################
@@ -652,93 +764,47 @@ class gen_top_Go:
     # BOND LIST UNLESS SOME ARE NOT SPECIFIED 
     # ON THE COMMAND LINE.
     #########################################
-    def write_angle(self):
+    def _write_angle(self,andx1,andx2,andx3):
         ftop  = self.ftop
         name        = self.name
-        bond_index1 = self.bond_index1
-        bond_index2 = self.bond_index2
         bBackbone   = self.bBackbone
         bPH1TY1     = self.bPH1TY1
+        resid       = self.resid
+        structure   = self.structure
+        if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
+            isallbb = name[andx1] in bb and name[andx2] in bb and name[andx3] in bb
+            isallloop = structure[resid[andx1]] in loop and structure[resid[andx2]] in loop and structure[resid[andx3]] in loop
+            if name[andx2] in ["PH3","TY3","AD3","GU3"]:
+                print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
+                print("angle      %5d %5d %5d               # %s %s %s" \
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            elif isallbb and isallloop:
+                print("angleparam %5d %5d %5d 10.0 130.0000 # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
+            else:
+                r1 = np.array(self.coord[andx1])
+                r2 = np.array(self.coord[andx2])
+                r3 = np.array(self.coord[andx3])
+                angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
+                print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
+                    %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+
+    def write_angle(self):
+        ftop  = self.ftop
+        bond_index1 = self.bond_index1
+        bond_index2 = self.bond_index2
         for i1 in range(self.total_bonds):
             for i2 in range(i1 + 1, self.total_bonds):
                 if bond_index1[i1] == bond_index1[i2]:
-                    andx1 = bond_index2[i1]
-                    andx2 = bond_index1[i1]
-                    andx3 = bond_index2[i2]
-                    # GB-GB-GB is non zero.
-                    # GB-GB-SC is non zero.
-                    # GB-SC-SC is non zero.
-                    # SC-TY1-SC is non zero.
-                    # SC-PH1-SC is non zero.
-                    # SC-SC-SC is zero.
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index2[i1],bond_index1[i1],bond_index2[i2])
                 elif bond_index1[i1] == bond_index2[i2]:
-                    andx1 = bond_index2[i1]
-                    andx2 = bond_index1[i1]
-                    andx3 = bond_index1[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index2[i1],bond_index1[i1],bond_index1[i2])
                 elif bond_index2[i1] == bond_index1[i2]:
-                    andx1 = bond_index1[i1]
-                    andx2 = bond_index2[i1]
-                    andx3 = bond_index2[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index1[i1],bond_index2[i1],bond_index2[i2])
                 elif bond_index2[i1] == bond_index2[i2]:
-                    andx1 = bond_index1[i1]
-                    andx2 = bond_index2[i1]
-                    andx3 = bond_index1[i2]
-                    if bBackbone[andx1] + bBackbone[andx2] + bBackbone[andx3] != 0 or bPH1TY1[andx2] == 1:
-                        if name[andx2] in ["PH3","TY3","AD3","GU3"]:
-                            print("angleparam %5d %5d %5d  0.0  90.0000 # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        elif name[andx2] in ["PH2","PH4","TY2","TY4"]:
-                            print("angle      %5d %5d %5d               # %s %s %s" \
-                                %(andx1+1,andx2+1,andx3+1,name[andx1],name[andx2],name[andx3]), file=ftop)
-                        else:
-                            r1 = np.array(self.coord[andx1])
-                            r2 = np.array(self.coord[andx2])
-                            r3 = np.array(self.coord[andx3])
-                            angle_in_pdb = 180.0/np.pi*get_angle(r1,r2,r3)
-                            print("angleparam %5d %5d %5d  -1  %8.4f # %s %s %s"\
-                                %(andx1+1,andx2+1,andx3+1,angle_in_pdb,name[andx1],name[andx2],name[andx3]),file=ftop)
+                    self._write_angle(bond_index1[i1],bond_index2[i1],bond_index1[i2])
         print ("", file=ftop)
 
     ######################################
@@ -788,9 +854,13 @@ class gen_top_Go:
 ########################################################
 if __name__ == "__main__":
     args = get_option()
-    infile  = args.input
+    cgpdb   = args.cgpdb
+    aapdb   = args.aapdb
     outfile = args.output
+    eps    = args.eps
+    MAXdr   = args.maxr
     pspica  = args.pspica
+    dssp    = args.dssp
 
-    gen = gen_top_Go(infile, outfile, pspica)
+    gen = gen_top_Go(cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp)
     gen.run()
