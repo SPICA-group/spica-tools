@@ -469,7 +469,7 @@ class gen_top_Go:
         self._charge_mod()
         self._set_array()
         if self.pspica:
-            self.structure = ['H' for i in range(self.resid[-1]+1)]
+            self.structure = ['H']*(self.resid[-1]+1)
         else:
             self.read_dssp()
 
