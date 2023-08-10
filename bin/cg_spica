@@ -35,24 +35,24 @@ def main():
     if args.tool_name == "ENM":
         args    = gen_top_ENM.get_option_script(sub)
         cgpdb   = args.cgpdb
-        aapdb   = args.aapdb
         outfile = args.output
         kENM    = args.kENM
         MAXdr   = args.maxr
         pspica  = args.pspica
         dssp    = args.dssp
-        gen     = gen_top_ENM.gen_top_ENM(cgpdb, aapdb, outfile, kENM, MAXdr, pspica, dssp)
+        aapdb   = args.aapdb
+        gen     = gen_top_ENM.gen_top_ENM(cgpdb, outfile, kENM, MAXdr, pspica, dssp, aapdb)
         gen.run()
     elif args.tool_name == "Go":
         args    = gen_top_Go.get_option_script(sub)
         cgpdb   = args.cgpdb
-        aapdb   = args.aapdb
         outfile = args.output
         eps     = args.eps
         MAXdr   = args.maxr
         pspica  = args.pspica
         dssp    = args.dssp
-        gen     = gen_top_Go.gen_top_Go(cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp)
+        aapdb   = args.aapdb
+        gen     = gen_top_Go.gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, dssp, aapdb)
         gen.run()
     elif args.tool_name == "json2top":
         args  = json_to_top.get_option_script(sub)

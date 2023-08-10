@@ -10,7 +10,7 @@
 # WILL DUMP BACKBONE TORSIONS IF WANTED
 ################################################################################
 #
-# USAGE: python gen_top_Go.py <cg.pdb filename> <aa.pdb filename> < cg.top filename (output)>
+# USAGE: python gen_top_Go.py <cg.pdb filename> <cg.top filename (output)>
 #
 #################################################################################
 # CAN HANDLE MULTIPLE CHAINS
@@ -48,8 +48,6 @@ def get_option():
     argparser = ArgumentParser()
     argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
-    argparser.add_argument('aapdb', type=str,
-                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
     argparser.add_argument('-maxr', type=float,
@@ -63,6 +61,9 @@ def get_option():
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
                             help='Specify path to dssp binary')
+    argparser.add_argument('-aapdb', type=str,
+                            default='None',
+                            help='Specify input AA PDB file name.')
     return argparser.parse_args()
 
 def get_option_script(argv):
@@ -70,12 +71,10 @@ def get_option_script(argv):
     MAXdr = 9.0
     # force constant for Go model 
     eps  = 1.5
-    argparser = ArgumentParser(usage='Go [-h] [-maxr MAXR] [-eps eps] [-pspica] [-dssp dssp] cgpdb aapdb output',
+    argparser = ArgumentParser(usage='Go [-h] [-maxr MAXR] [-eps eps] [-pspica] [-dssp dssp] [-aapdb aapdb] cgpdb output',
                                prog ="Go")
     argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
-    argparser.add_argument('aapdb', type=str,
-                            help='Specify input AA PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output topology file name.')
     argparser.add_argument('-maxr', type=float,
@@ -89,6 +88,9 @@ def get_option_script(argv):
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
                             help='Specify path to dssp binary')
+    argparser.add_argument('-aapdb', type=str,
+                            default='None',
+                            help='Specify input AA PDB file name.')
     return argparser.parse_args(argv)
 
 ncomp = 7
@@ -439,14 +441,14 @@ def open_file(outfile):
     return fout
 
 class gen_top_Go:
-    def __init__(self, cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp):
+    def __init__(self, cgpdb, outfile, eps, MAXdr, pspica, dssp, aapdb):
         self.cgpdb  = cgpdb
-        self.aapdb  = aapdb
         self.outfile = outfile
         self.eps    = eps
         self.MAXdr   = MAXdr
         self.pspica  = pspica
         self.dssp    = dssp
+        self.aapdb  = aapdb
         self.nat     = 0
         self.nbb     = 0
         self.bbndx   = []
@@ -466,7 +468,10 @@ class gen_top_Go:
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
-        self.read_dssp()
+        if self.pspica:
+            self.structure = ['H' for i in range(self.resid[-1]+1)]
+        else:
+            self.read_dssp()
 
     def _charge_mod(self):
         if self.pspica:
@@ -525,12 +530,18 @@ class gen_top_Go:
                         else :
                             self.bPH1TY1.append(0)
                         self.nat += 1
-        resid_0 = self.resid[0]
+        tmp_resid = self.resid[0]
+        j = 0
         for i in range(len(self.resid)):
-            self.resid[i] = self.resid[i] - resid_0
+            if self.resid[i] != tmp_resid:
+                tmp_resid = self.resid[i]
+                j += 1
+            self.resid[i] = j
 
     def read_dssp(self):
         aapdb = self.aapdb
+        if aapdb == 'None':
+            sys.exit("ERROR: Specify AA pdb file name by -aapdb option")
         dssp = self.dssp
         cmdis = shutil.which(dssp)
         resid = self.resid
@@ -542,7 +553,9 @@ class gen_top_Go:
         lines = f.readlines()
         f.close()
         for line in lines[28:]:
-            if line[16] == ' ':
+            if line[13] == '!':
+                continue
+            elif line[16] == ' ':
                 self.structure.append('C')
             else:
                 self.structure.append(line[16])
@@ -855,12 +868,12 @@ class gen_top_Go:
 if __name__ == "__main__":
     args = get_option()
     cgpdb   = args.cgpdb
-    aapdb   = args.aapdb
     outfile = args.output
     eps    = args.eps
     MAXdr   = args.maxr
     pspica  = args.pspica
     dssp    = args.dssp
+    aapdb   = args.aapdb
 
-    gen = gen_top_Go(cgpdb, aapdb, outfile, eps, MAXdr, pspica, dssp)
+    gen = gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, dssp, aapdb)
     gen.run()
