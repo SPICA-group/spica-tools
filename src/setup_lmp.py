@@ -1574,7 +1574,7 @@ def run(args):
             f = open(inputs[2*i], 'r')
             line = f.readline() 
             while line:
-                if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT','GBTS','ABTS','GBTL','ABTL']:
+                if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT','GBTS','ABTS','GBTL','ABTL','GBTP','ABTP']:
                     protein.append(True)
                     break
                 elif line.split()[0] == "atom":
