@@ -445,9 +445,11 @@ def get_unique(database, topdat, sysdat):
         for jdx in range(idx, uniq_nats):
             if Go_bool[idx][jdx]:
                 continue
-            if (uniq_atype[idx][0:4] in bb_sec and uniq_atype[jdx] in database.loop_pair) \
-                or (uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair):
+            if uniq_atype[idx][0:4] in bb_sec and uniq_atype[jdx] in database.loop_pair:
                 tmp_type1 = uniq_atype[idx][0:4]
+                tmp_type2 = uniq_atype[jdx]
+            elif uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair:
+                tmp_type1 = uniq_atype[idx]
                 tmp_type2 = uniq_atype[jdx][0:4]
             else:
                 if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
@@ -563,9 +565,9 @@ def get_unique(database, topdat, sysdat):
                     tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3]
                 else:
                     tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                if topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:4]
-                elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                elif topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:3]
                 else:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]
