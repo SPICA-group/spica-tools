@@ -429,7 +429,7 @@ def get_unique(database, topdat, sysdat):
     print(file=fout)
     # get pair interactions
     # Go model for protein backbone
-    Go = [[0 for i in range(uniq_nats)] for j in range(uniq_nats)]
+    Go_bool = [[False for i in range(uniq_nats)] for j in range(uniq_nats)]
     if sysdat.ngo > 0:
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].ngo):
@@ -439,11 +439,11 @@ def get_unique(database, topdat, sysdat):
                         Go_parm_atomtype1+1,Go_parm_atomtype2+1,
                         topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
                         topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
-                Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
+                Go_bool[Go_parm_atomtype1][Go_parm_atomtype2] = True
     bb_sec = ['GBML','GBBL','ABBL','GBTL','ABTL','GBMS','GBBS','ABBS','GBTS','ABTS']
     for idx in range(uniq_nats):
         for jdx in range(idx, uniq_nats):
-            if Go[idx][jdx] == 1:
+            if Go_bool[idx][jdx]:
                 continue
             if (uniq_atype[idx][0:4] in bb_sec and uniq_atype[jdx] in database.loop_pair) \
                 or (uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair):
