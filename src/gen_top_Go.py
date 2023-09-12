@@ -58,9 +58,11 @@ def get_option():
                             help='epsilon for Go model (default: 1.5 kcal/mol).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-v1', action='store_true',
+                            help='Make topology for SPICA ver1.')
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
-                            help='Specify path to dssp binary')
+                            help='Specify path to dssp binary.')
     argparser.add_argument('-aapdb', type=str,
                             default='None',
                             help='Specify input AA PDB file name.')
@@ -71,7 +73,7 @@ def get_option_script(argv):
     MAXdr = 9.0
     # force constant for Go model 
     eps  = 1.5
-    argparser = ArgumentParser(usage='Go [-h] [-maxr MAXR] [-eps eps] [-pspica] [-dssp dssp] [-aapdb aapdb] cgpdb output',
+    argparser = ArgumentParser(usage='Go [-h] [-maxr MAXR] [-eps eps] [-pspica] [-v1] [-dssp dssp] [-aapdb aapdb] cgpdb output',
                                prog ="Go")
     argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
@@ -85,9 +87,11 @@ def get_option_script(argv):
                             help='epsilon for Go model (default: 1.5 kcal/mol).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-v1', action='store_true',
+                            help='Make topology for SPICA ver1.')
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
-                            help='Specify path to dssp binary')
+                            help='Specify path to dssp binary.')
     argparser.add_argument('-aapdb', type=str,
                             default='None',
                             help='Specify input AA PDB file name.')
@@ -441,12 +445,13 @@ def open_file(outfile):
     return fout
 
 class gen_top_Go:
-    def __init__(self, cgpdb, outfile, eps, MAXdr, pspica, dssp, aapdb):
+    def __init__(self, cgpdb, outfile, eps, MAXdr, pspica, v1, dssp, aapdb):
         self.cgpdb  = cgpdb
         self.outfile = outfile
         self.eps    = eps
         self.MAXdr   = MAXdr
         self.pspica  = pspica
+        self.v1      = v1
         self.dssp    = dssp
         self.aapdb  = aapdb
         self.nat     = 0
@@ -468,7 +473,7 @@ class gen_top_Go:
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
-        if self.pspica:
+        if self.pspica or self.v1:
             self.structure = ['H']*(self.resid[-1]+1)
         else:
             self.read_dssp()
@@ -872,8 +877,9 @@ if __name__ == "__main__":
     eps    = args.eps
     MAXdr   = args.maxr
     pspica  = args.pspica
+    v1      = args.v1
     dssp    = args.dssp
     aapdb   = args.aapdb
 
-    gen = gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, dssp, aapdb)
+    gen = gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, v1, dssp, aapdb)
     gen.run()

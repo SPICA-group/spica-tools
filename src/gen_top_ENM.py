@@ -58,9 +58,11 @@ def get_option():
                             help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-v1', action='store_true',
+                            help='Make topology for SPICA ver1.')
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
-                            help='Specify path to dssp binary')
+                            help='Specify path to dssp binary.')
     argparser.add_argument('-aapdb', type=str,
                             default='None',
                             help='Specify input AA PDB file name.')
@@ -71,7 +73,7 @@ def get_option_script(argv):
     MAXdr = 9.0
     # force constant for elastic network model 
     kENM  = 1.195
-    argparser = ArgumentParser(usage='ENM [-h] [-maxr MAXR] [-kENM KENM] [-pspica] [-dssp dssp] [-aapdb aapdb] cgpdb output',
+    argparser = ArgumentParser(usage='ENM [-h] [-maxr MAXR] [-kENM KENM] [-pspica] [-v1] [-dssp dssp] [-aapdb aapdb] cgpdb output',
                                prog ="ENM")
     argparser.add_argument('cgpdb', type=str,
                             help='Specify input CG PDB file name.')
@@ -85,9 +87,11 @@ def get_option_script(argv):
                             help='Force constant for ENM (default: 1.195 kcal/A2).')
     argparser.add_argument('-pspica', action='store_true',
                             help='Assign partial charge (0.5990) for pSPICA FF (default: 0.1118, for SPICA FF).')
+    argparser.add_argument('-v1', action='store_true',
+                            help='Make topology for SPICA ver1.')
     argparser.add_argument('-dssp', type=str,
                             default='dssp',
-                            help='Specify path to dssp binary')
+                            help='Specify path to dssp binary.')
     argparser.add_argument('-aapdb', type=str,
                             default='None',
                             help='Specify input AA PDB file name.')
@@ -441,12 +445,13 @@ def open_file(outfile):
     return fout
 
 class gen_top_ENM:
-    def __init__(self, cgpdb, outfile, kENM, MAXdr, pspica, dssp, aapdb):
+    def __init__(self, cgpdb, outfile, kENM, MAXdr, pspica, v1, dssp, aapdb):
         self.cgpdb  = cgpdb
         self.outfile = outfile
         self.kENM    = kENM
         self.MAXdr   = MAXdr
         self.pspica  = pspica
+        self.v1      = v1
         self.dssp    = dssp
         self.aapdb  = aapdb
         self.nat     = 0
@@ -468,7 +473,7 @@ class gen_top_ENM:
         self.ftop = open_file(outfile)
         self._charge_mod()
         self._set_array()
-        if self.pspica:
+        if self.pspica or self.v1:
             self.structure = ['H']*(self.resid[-1]+1)
         else:
             self.read_dssp()
@@ -871,8 +876,9 @@ if __name__ == "__main__":
     kENM    = args.kENM
     MAXdr   = args.maxr
     pspica  = args.pspica
+    v1      = args.v1
     dssp    = args.dssp
     aapdb   = args.aapdb
 
-    gen = gen_top_ENM(cgpdb, outfile, kENM, MAXdr, pspica, dssp, aapdb)
+    gen = gen_top_ENM(cgpdb, outfile, kENM, MAXdr, pspica, v1, dssp, aapdb)
     gen.run()
