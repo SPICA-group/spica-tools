@@ -94,6 +94,7 @@ class Database:
      angtype1, angtype2, angtype3 = [], [], []
      dihtype1, dihtype2, dihtype3, dihtype4 = [], [], [], []
      imptype1, imptype2, imptype3, imptype4 = [], [], [], []
+     loop_pair = []
 
 def read_pdb(fname, sysdat):
     col = 30
@@ -428,7 +429,7 @@ def get_unique(database, topdat, sysdat):
     print(file=fout)
     # get pair interactions
     # Go model for protein backbone
-    Go = [[0 for i in range(uniq_nats)] for j in range(uniq_nats)]
+    Go_bool = [[False for i in range(uniq_nats)] for j in range(uniq_nats)]
     if sysdat.ngo > 0:
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].ngo):
@@ -438,23 +439,31 @@ def get_unique(database, topdat, sysdat):
                         Go_parm_atomtype1+1,Go_parm_atomtype2+1,
                         topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx],
                         topdat[idx].atomtype[topdat[idx].gondx1[jdx]-1],topdat[idx].atomtype[topdat[idx].gondx2[jdx]-1]), file=fout)
-                Go[Go_parm_atomtype1][Go_parm_atomtype2] = 1
+                Go_bool[Go_parm_atomtype1][Go_parm_atomtype2] = True
+    bb_sec = ['GBML','GBBL','ABBL','GBTL','ABTL','GBMS','GBBS','ABBS','GBTS','ABTS']
     for idx in range(uniq_nats):
-        if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-            tmp_type1 = uniq_atype[idx][0:4]
-        elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-            tmp_type1 = uniq_atype[idx][0:3]
-        else:
-            tmp_type1 = uniq_atype[idx]
         for jdx in range(idx, uniq_nats):
-            if Go[idx][jdx] == 1:
+            if Go_bool[idx][jdx]:
                 continue
-            if uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
-                tmp_type2 = uniq_atype[jdx][0:4]
-            elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
-                tmp_type2 = uniq_atype[jdx][0:3]
-            else:
+            if uniq_atype[idx][0:4] in bb_sec and uniq_atype[jdx] in database.loop_pair:
+                tmp_type1 = uniq_atype[idx][0:4]
                 tmp_type2 = uniq_atype[jdx]
+            elif uniq_atype[jdx][0:4] in bb_sec and uniq_atype[idx] in database.loop_pair:
+                tmp_type1 = uniq_atype[idx]
+                tmp_type2 = uniq_atype[jdx][0:4]
+            else:
+                if uniq_atype[idx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type1 = uniq_atype[idx][0:4]
+                elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type1 = uniq_atype[idx][0:3]
+                else:
+                    tmp_type1 = uniq_atype[idx]
+                if uniq_atype[jdx][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                    tmp_type2 = uniq_atype[jdx][0:4]
+                elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                    tmp_type2 = uniq_atype[jdx][0:3]
+                else:
+                    tmp_type2 = uniq_atype[jdx]
             ifound=0;
             for kdx in range(database.nvdwtype):
                 if database.vdwtype1[kdx] == tmp_type1 and database.vdwtype2[kdx] == tmp_type2:
@@ -556,9 +565,9 @@ def get_unique(database, topdat, sysdat):
                     tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3]
                 else:
                     tmp_type1 = topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                if topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
+                if topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:4] in ['GBTP','GBTN','ABTP','ABTN']:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:4]
-                elif topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                elif topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1][0:3]
                 else:
                     tmp_type2 = topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]
@@ -1006,6 +1015,10 @@ def read_database(fname, database):
                         database.eps.append(eps)
                         database.sig.append(sig)
                         nvdw += 1
+                if vdwtype1 == 'GBML':
+                    database.loop_pair.append(vdwtype2)
+                elif vdwtype2 == 'GBML':
+                    database.loop_pair.append(vdwtype1)
             if items[0] == "bond":
                 ikeep = 1
                 bndtype1 = items[1]
@@ -1297,7 +1310,7 @@ def read_top_Go(fname, sysdat, topdat, ntop, ndup, bbind):
     print("##### READING {}".format(fname))
 
     # Count Number of GBM GBB GBT ABB ABT GBTP GBTN ABTP ABTN 
-    nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+    nbb = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBTL':0,'ABTL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTS':0,'ABTS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
     with open(fname, "r") as fin:
         lines = fin.readlines()
         for line in lines:
@@ -1552,7 +1565,7 @@ def run(args):
     database  = Database() 
     sysdat    = Sysdat()
     if Go:
-        bbind = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
+        bbind = {'GBM':0,'GBB':0,'GBT':0,'ABB':0,'ABT':0,'GBML':0,'GBBL':0,'ABBL':0,'GBTL':0,'ABTL':0,'GBMS':0,'GBBS':0,'ABBS':0,'GBTS':0,'ABTS':0,'GBTP':0,'GBTN':0,'ABTP':0,'ABTN':0}
         tmp_ntops = int((nargs-2)/2)
         print("Will read {} topology file(s).".format(tmp_ntops))
         print()
@@ -1563,7 +1576,7 @@ def run(args):
             f = open(inputs[2*i], 'r')
             line = f.readline() 
             while line:
-                if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT']:
+                if line.split()[0] == "atom" and line.split()[3] in ['GBT','ABT','GBTS','ABTS','GBTL','ABTL','GBTP','ABTP']:
                     protein.append(True)
                     break
                 elif line.split()[0] == "atom":

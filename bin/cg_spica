@@ -34,19 +34,27 @@ def main():
     args, sub = ap.parse_known_args()
     if args.tool_name == "ENM":
         args    = gen_top_ENM.get_option_script(sub)
-        infile  = args.input
+        cgpdb   = args.cgpdb
         outfile = args.output
         kENM    = args.kENM
         MAXdr   = args.maxr
         pspica  = args.pspica
-        gen     = gen_top_ENM.gen_top_ENM(infile, outfile, kENM, MAXdr, pspica)
+        v1      = args.v1
+        dssp    = args.dssp
+        aapdb   = args.aapdb
+        gen     = gen_top_ENM.gen_top_ENM(cgpdb, outfile, kENM, MAXdr, pspica, v1, dssp, aapdb)
         gen.run()
     elif args.tool_name == "Go":
         args    = gen_top_Go.get_option_script(sub)
-        infile  = args.input
+        cgpdb   = args.cgpdb
         outfile = args.output
+        eps     = args.eps
+        MAXdr   = args.maxr
         pspica  = args.pspica
-        gen     = gen_top_Go.gen_top_Go(infile, outfile, pspica)
+        v1      = args.v1
+        dssp    = args.dssp
+        aapdb   = args.aapdb
+        gen     = gen_top_Go.gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, v1, dssp, aapdb)
         gen.run()
     elif args.tool_name == "json2top":
         args  = json_to_top.get_option_script(sub)
