@@ -91,6 +91,7 @@ class Database:
      vdwtype1, vdwtype2, vdwstyle = [], [], []
      bndtype1, bndtype2 = [], []
      angtype1, angtype2, angtype3 = [], [], []
+     loop_pair = []
 
 def read_pdb(fname, sysdat):
     col = 30
@@ -390,17 +391,36 @@ def get_unique(database, topdat, sysdat):
         print(file=fout)
 
         # get pair interactions
+        bb_sec = ['GBML','GBBL','ABBL','GBTL','ABTL','GBMS','GBBS','ABBS','GBTS','ABTS']
         print("[ nonbond_params ]", file=fout);
         print("; i     j    func   C    A", file=fout);
         for idx in range(uniq_nats):
             for jdx in range(idx, uniq_nats):
+                if (uniq_atype[idx] in bb_sec and uniq_atype[jdx] in database.loop_pair) \
+                    or (uniq_atype[jdx] in bb_sec and uniq_atype[idx] in database.loop_pair):
+                    tmp_type1 = uniq_atype[idx]
+                    tmp_type2 = uniq_atype[jdx]
+                else:
+                    if uniq_atype[idx] in ['GBTP','GBTN','ABTP','ABTN']:
+                        tmp_type1 = uniq_atype[idx]
+                    elif uniq_atype[idx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                        tmp_type1 = uniq_atype[idx][0:3]
+                    else:
+                        tmp_type1 = uniq_atype[idx]
+                    if uniq_atype[jdx] in ['GBTP','GBTN','ABTP','ABTN']:
+                        tmp_type2 = uniq_atype[jdx]
+                    elif uniq_atype[jdx][0:3] in ['GBM','GBB','GBT','ABB','ABT']:
+                        tmp_type2 = uniq_atype[jdx][0:3]
+                    else:
+                        tmp_type2 = uniq_atype[jdx]
+
                 ifound=0;
                 for kdx in range(database.nvdwtype):
-                    if database.vdwtype1[kdx] == uniq_atype[idx] and database.vdwtype2[kdx] == uniq_atype[jdx]:
+                    if database.vdwtype1[kdx] == tmp_type1 and database.vdwtype2[kdx] == tmp_type2:
                         ifound = 1
                         vdwtmp = kdx
                         break
-                    elif database.vdwtype2[kdx] == uniq_atype[idx] and database.vdwtype1[kdx] == uniq_atype[jdx]:
+                    elif database.vdwtype2[kdx] == tmp_type1 and database.vdwtype1[kdx] == tmp_type2:
                         ifound = 1
                         vdwtmp = kdx
                         break
@@ -435,7 +455,7 @@ def get_unique(database, topdat, sysdat):
                         sys.exit(0)
 
                     print("{:>6s} {:>6s}    1  {:14.5e} {:14.5e} ;  {} {:5.6f} {:5.6f}".format
-                            (database.vdwtype1[vdwtmp], database.vdwtype2[vdwtmp], disp, repul,database.vdwstyle[vdwtmp],eps,sig), file=fout)
+                            (uniq_atype[idx], uniq_atype[jdx], disp, repul,database.vdwstyle[vdwtmp],eps,sig), file=fout)
         
         # get bond interactions
         print(file=fout)
@@ -619,6 +639,10 @@ def read_database(fname, database):
                         database.eps.append(eps)
                         database.sig.append(sig)
                         nvdw += 1
+                if vdwtype1 == 'GBML':
+                    database.loop_pair.append(vdwtype2)
+                elif vdwtype2 == 'GBML':
+                    database.loop_pair.append(vdwtype1)
             if items[0] == "bond":
                 ikeep = 1
                 bndtype1 = items[1]
