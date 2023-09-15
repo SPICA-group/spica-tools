@@ -879,7 +879,7 @@ def make_ndx(database,topdat,sysdat):
             ljtypes[vt1] = "psol"
         elif vt1 in sols or vt1 in psolsp:
             ljtypes[vt2] = database.vdwstyle[kdx]
-        elif vt2 == sols or vt2 in psolsp:
+        elif vt2 in sols or vt2 in psolsp:
             ljtypes[vt1] = database.vdwstyle[kdx]
 
     with open("CGindex.ndx", "w") as fpind:
