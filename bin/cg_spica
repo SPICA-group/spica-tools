@@ -116,9 +116,8 @@ def main():
         outfile = args.output
         temp = args.T
         press = args.P
-        GPU = args.GPU
         pspica = args.pspica
-        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, temp, press, GPU, pspica)
+        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, temp, press, pspica)
         gen_lmpin.run()
     elif args.tool_name == "gen_gmxin":
         args = gen_gmx_input.get_option_script(sub)
