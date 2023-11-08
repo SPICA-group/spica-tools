@@ -34,7 +34,7 @@ def get_option_script(argv):
     argparser.add_argument('-conc', type=float,
                             default=0.15,
                             help='NaCl concentration [M] (defualt 0.15).')
-    argparser.add_argument('-soluq', type=str,
+    argparser.add_argument('-soluq', type=int,
                             default=0,
                             help='total charge of solute molecules [e] (default: 0).')
     argparser.add_argument('-pspica', action='store_true',
