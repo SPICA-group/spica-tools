@@ -947,28 +947,24 @@ def get_unique(database, topdat, sysdat):
                                     topdat[idx].atomtype[topdat[idx].impndx4[jdx]-1]))
                     # Now make sure we do not already know we have this interaction 
                     ikeep = 1
-                    if database.impe[datndx] > 0:
-                        for kdx in range(uniq_imps):
-                            if datndx == imp_params[kdx]:
-                                ikeep = 0 # found a replica
-                                topdat[idx].imptype.append(kdx)
-                                break # kill the for loop
+                    for kdx in range(uniq_imps):
+                        if datndx == imp_params[kdx]:
+                            ikeep = 0 # found a replica
+                            topdat[idx].imptype.append(kdx)
+                            break # kill the for loop
                     # ikeep = 1 if we found a new one
                     if ikeep == 1:
                         imp_params.append(datndx)
                         sysdat.param_imps.append(datndx)
                         topdat[idx].imptype.append(uniq_imps)
                         uniq_imps += 1
-                        if database.impe[datndx] > 0:
-                            print("improper_coeff {:<8} {:8.4f} {:8.4f} # {} {} {} {}".format(uniq_imps,
-                                   database.fimp[imp_params[uniq_imps-1]],
-                                   database.impe[imp_params[uniq_imps-1]],
-                                   database.imptype1[imp_params[uniq_imps-1]],
-                                   database.imptype2[imp_params[uniq_imps-1]],
-                                   database.imptype3[imp_params[uniq_imps-1]],
-                                   database.imptype4[imp_params[uniq_imps-1]]), file=fout)
-                        else:
-                            sys.exit("ERROR")
+                        print("improper_coeff {:<8} {:8.4f} {:8.4f} # {} {} {} {}".format(uniq_imps,
+                               database.fimp[imp_params[uniq_imps-1]],
+                               database.impe[imp_params[uniq_imps-1]],
+                               database.imptype1[imp_params[uniq_imps-1]],
+                               database.imptype2[imp_params[uniq_imps-1]],
+                               database.imptype3[imp_params[uniq_imps-1]],
+                               database.imptype4[imp_params[uniq_imps-1]]), file=fout)
                 else:
                     # THE PARAMS WERE GIVEN IN THE TOP FILE SO LETS ADD IT TO THE PARAM FILE */
                     topdat[idx].imptype.append(uniq_imps)
