@@ -239,13 +239,13 @@ class gen_lmp_inp:
                 print(f"fix            0 all shake 1.0e-5 10 0 b {polarbond}", file=f)
         print(f"fix            1 all momentum 1 linear 1 1 1", file=f)
         if len(set(boxl)) == 1:
-            print(f"fix            2 all npt temp $t $t 500. iso $p $p 5000. drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. iso $p $p 5000.", file=f)
             cpl = "isotropic"
         elif boxl[0] == boxl[1] and boxl[0] != boxl[2]:
-            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. couple xy drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. couple xy", file=f)
             cpl = "semiisotropic"
         else:
-            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000.", file=f)
             cpl = "anisotropic"
         print(file=f)
         print("# Output log information", file=f)
