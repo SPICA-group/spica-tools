@@ -21,8 +21,6 @@ def get_option():
     argparser.add_argument('-P', type=float,
                             default=1.,
                             help='system pressure [atm] (default: 1.0).')
-    argparser.add_argument('-GPU', action='store_true',
-                            help='use GPU option for LAMMPS simulation (default: off).')
     argparser.add_argument('-pspica', action='store_true',
                             help='generate LAMMPS input for pSPICA FF (default: for SPICA FF).')
     return argparser.parse_args()
@@ -48,20 +46,17 @@ def get_option_script(argv):
     argparser.add_argument('-P', type=float,
                             default=1.,
                             help='system pressure [atm] (default: 1.0).')
-    argparser.add_argument('-GPU', action='store_true',
-                            help='use GPU option for LAMMPS simulation (default: off).')
     argparser.add_argument('-pspica', action='store_true',
                             help='generate LAMMPS input for pSPICA FF (default: for SPICA FF).')
     return argparser.parse_args(argv)
 
 class gen_lmp_inp:
-    def __init__(self, datafile, parmfile, outf, temp, press, GPU, pspica):
+    def __init__(self, datafile, parmfile, outf, temp, press, pspica):
         self.datafile = datafile
         self.parmfile = parmfile
         self.outf = outf
         self.temp = temp
         self.press = press
-        self.GPU = GPU
         self.pspica = pspica
 
     def tune_mesh(self, boxl):
@@ -168,61 +163,71 @@ class gen_lmp_inp:
         f = open(self.outf, "w")
         if self.pspica:
             print("##### Generate LAMMPS input file for pSPICA #####")
+            print("### LAMMPS input for pSPICA FF ###", file=f)
+            gs = 2
         else:
             print("##### Generate LAMMPS input file for SPICA #####")
-        print()
-        if self.pspica:
-            print("### LAMMPS input for pSPICA FF ###", file=f)
-        else:
             print("### LAMMPS input for SPICA FF ###", file=f)
-        print(file=f)
+            gs = 5
+        print()
         print("# Define variables", file=f)
-        print(f"variable       op string run_00", file=f)
-        print(f"variable       nstep equal 1000000", file=f)
-        print(f"variable       nlog  equal 1000", file=f)
-        print(f"variable       ndump equal 10000", file=f)
-        print(f"variable       nrest equal 50000", file=f)
-        print(f"variable       t equal {round(self.temp, 2)}", file=f)
-        print(f"variable       p equal {round(self.press, 3)}", file=f)
+        print(f"variable       t     equal {round(self.temp, 2)}", file=f)
+        print(f"variable       p     equal {round(self.press, 3)}", file=f)
+        print(f"variable       ip    index none", file=f)
+        print(f"variable       op    index run_00", file=f)
+        print(f"variable       min   index no", file=f)
+        print(f"variable       nstep index 100000", file=f)
+        print(f"variable       nlog  index 1000", file=f)
+        print(f"variable       ndump index 10000", file=f)
+        print(f"variable       nrest index 50000", file=f)
         print(file=f)
         print("# Unit and data file style", file=f)
         print(f"units          real", file=f)
         print(f"atom_style     full", file=f)
         print(file=f)
         print("# Set Newton's third law for interactions", file=f)
-        if self.GPU:
-            print(f"newton         off", file=f)
-        else:
-            print(f"newton         on off", file=f)
+        print(f'if "$(is_active(package,gpu))" then &', file=f)
+        print(f'"newton         off" &', file=f)
+        print(f'else &', file=f)
+        print(f'"newton         on off"', file=f)
         print(file=f)
         print("# Load data and parameter files", file=f)
-        print(f"read_data      {self.datafile}", file=f)
+        print('if "${ip} == none" then &', file=f)
+        print(f'"read_data      {self.datafile}" &', file=f)
+        print(f'else &', file=f)
+        print('"read_restart   ${ip}.rest"', file=f)
+
         print(f"include        {self.parmfile}", file=f)
         print(file=f)
         boxl = self.read_box()
         if self.check_coul():
             print("# Coulomb interaction", file=f)
+            print(f"variable       gs equal {gs}", file=f)
+            print("variable       nx equal round(lx/${gs})", file=f)
+            print("variable       ny equal round(ly/${gs})", file=f)
+            print("variable       nz equal round(lz/${gs})", file=f)
             if self.pspica:
-                print(f"kspace_style   pppm 1.0e-5", file=f)
+                print("kspace_style   pppm 1.0e-5", file=f)
             else:
-                print(f"kspace_style   pppm/cg 1.0e-5", file=f)
-            mesh = self.tune_mesh(boxl)
+                print("kspace_style   pppm/cg 1.0e-5", file=f)
+            #mesh = self.tune_mesh(boxl)
             if self.pspica:
-                print(f"kspace_modify  mesh {mesh[0]} {mesh[1]} {mesh[2]} order 5", file=f)
+                print("kspace_modify  mesh ${nx} ${ny} ${nz}", file=f)
             else:
-                print(f"kspace_modify  mesh {mesh[0]} {mesh[1]} {mesh[2]} order 3", file=f)
+                print("kspace_modify  mesh ${nx} ${ny} ${nz} order 3", file=f)
         print(file=f)
         print("# Neighbor list setup", file=f)
         print(f"neighbor       2.0 bin", file=f)
-        print(f"neigh_modify   delay 5", file=f)
+        print(f"neigh_modify   delay 4", file=f)
         print(file=f)
         print("# Minimization", file=f)
-        print(f"min_style      cg", file=f)
-        print(f"minimize       1.0e-4 1.0e-6 100 1000", file=f)
+        print('if "${min} == yes" then &', file=f)
+        print('"min_style      cg" &', file=f)
+        print('"minimize       1.0e-4 1.0e-6 100 1000" &', file=f)
+        print('"velocity       all create $t 12345 dist gaussian rot yes"', file=f)
         print(file=f)
-        print("# Zero timestep and assign initial velocity", file=f)
+        print("# Zero timestep", file=f)
         print(f"reset_timestep 0", file=f)
-        print(f"velocity       all create $t 12345 mom yes rot yes dist gaussian", file=f)
         print(file=f)
         print("# Timestep for integration [fs]", file=f)
         print(f"timestep       10", file=f)
@@ -234,13 +239,13 @@ class gen_lmp_inp:
                 print(f"fix            0 all shake 1.0e-5 10 0 b {polarbond}", file=f)
         print(f"fix            1 all momentum 1 linear 1 1 1", file=f)
         if len(set(boxl)) == 1:
-            print(f"fix            2 all npt temp $t $t 500. iso $p $p 5000. drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. iso $p $p 5000.", file=f)
             cpl = "isotropic"
         elif boxl[0] == boxl[1] and boxl[0] != boxl[2]:
-            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. couple xy drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. couple xy", file=f)
             cpl = "semiisotropic"
         else:
-            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000. drag 0.1", file=f)
+            print(f"fix            2 all npt temp $t $t 500. aniso $p $p 5000.", file=f)
             cpl = "anisotropic"
         print(file=f)
         print("# Output log information", file=f)
@@ -257,20 +262,23 @@ class gen_lmp_inp:
         print("# Number of steps to integrate and Perform MD", file=f)
         print("run            ${nstep}", file=f)
         print(file=f)
+        print("# Output the final snapshot", file=f)
+        print("write_dump     all xtc ${op}.fin.xtc modify unwrap yes", file=f)
+        print(file=f)
         f.close()
         print(f"-Pressure coupling is predicted to be '{cpl}' from the simulation box symmetry")
         print()
         if self.pspica:
             print(f"##### LAMMPS input file '{self.outf}' for pSPICA has been generated! #####")
+            print(f"NOTE: '{self.outf}' is just to run 1 ns LAMMPS MD with NPT using pSPICA.")
         else:
             print(f"##### LAMMPS input file '{self.outf}' for SPICA has been generated! #####")
-        print()
-        if self.pspica:
-            print(f"NOTE: '{self.outf}' is just to run 100 ns LAMMPS MD with NPT using pSPICA.")
-        else:
-            print(f"NOTE: '{self.outf}' is just to run 100 ns LAMMPS MD with NPT using SPICA.")
-        print(f"NOTE: Please check and modify the input for your simulation purpose.")
-        print("NOTE: When using GPU, please add '-sf gpu -pk gpu {#ofGPU}' option on command line.")
+            print(f"NOTE: '{self.outf}' is just to run 1 ns LAMMPS MD with NPT using SPICA.")
+        print("NOTE: Please check and modify the input for your simulation purpose.")
+        print("NOTE: Please check and modify the input for your simulation purpose.")
+        print("Command-line Example:")
+        print(f"$ lmp_mpi -in {self.outf} -v min yes -v op npt_00 -v nstep 50000 -sf gpu -pk gpu 2")
+        print(f"$ lmp_mpi -in {self.outf} -v ip npt_00 -v op npt_01 -v nstep 100000 -v -nlog 5000")
 
 if __name__ == "__main__":
     args  = get_option()
@@ -279,7 +287,6 @@ if __name__ == "__main__":
     outf = args.output
     temp = args.T     
     press = args.P     
-    GPU = args.GPU   
     pspica = args.pspica
-    obj = gen_lmp_inp(datafile, parmfile, outf, temp, press, GPU, pspica)
+    obj = gen_lmp_inp(datafile, parmfile, outf, temp, press, pspica)
     obj.run()

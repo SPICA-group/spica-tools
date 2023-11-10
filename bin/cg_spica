@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.append( str(Path(__file__).resolve().parents[1] / "src") )
 import gen_top_ENM, gen_top_Go, json_to_top, map_to_cg, map_traj
 import wat_to_polar, setup_lmp, setup_gmx, gen_lmp_input, gen_gmx_input
+import mod_ion
 from argparse import ArgumentParser, RawTextHelpFormatter
 
 def get_option():
@@ -16,6 +17,7 @@ def get_option():
     json2top  : make top file from json file  
     map2cg    : map AA configuration to CG (only PDB format)
     maptraj   : map AA MD trajectory to CG (MDAnalysis module is required)
+    modion    : adjust NaCl salt concentration in CG configuration
     ENM       : generate top file of protein with elastic network
     Go        : generate top file of protein with Go model
     wat2polar : convert SPICA CG water to pSPICA polar CG water
@@ -91,6 +93,16 @@ def main():
         outfile  = args.output
         wat2polar = wat_to_polar.wat_to_polar(infile, outfile)
         wat2polar.run()
+    elif args.tool_name == "modion":
+        args     = mod_ion.get_option_script(sub)
+        infile   = args.input
+        outfile  = args.output
+        conc     = args.conc
+        soluq    = args.soluq
+        pspica   = args.pspica
+        verbose  = args.verbose
+        modion   = mod_ion.mod_ion(infile, outfile, conc, soluq, pspica, verbose)
+        modion.run()
     elif args.tool_name == "setup_lmp":
         args = setup_lmp.get_option_script(sub)
         setup_lmp.run(args)
@@ -104,9 +116,8 @@ def main():
         outfile = args.output
         temp = args.T
         press = args.P
-        GPU = args.GPU
         pspica = args.pspica
-        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, temp, press, GPU, pspica)
+        gen_lmpin = gen_lmp_input.gen_lmp_inp(datafile, parmfile, outfile, temp, press, pspica)
         gen_lmpin.run()
     elif args.tool_name == "gen_gmxin":
         args = gen_gmx_input.get_option_script(sub)
