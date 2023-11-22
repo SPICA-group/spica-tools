@@ -73,11 +73,13 @@ class gen_gmx_inp:
            for i in range(1, nbin):
                r = dr*i
                r0 = round(r,5)
-               r1 = round(-1./r**m, 10)
-               r2 = round(-m/r**(m+1), 10)
-               r3 = round(1./r**n, 10)
-               r4 = round(n/r**(n+1), 10)
-               print(f"{r0:.5f} 0.0 0.0 {r1:.10e} {r2:.10e} {r3:.10e} {r4:.10e}", file=f)
+               r1 = round(1./r,5)
+               r2 = round(1./r**2,5)
+               r3 = round(-1./r**m, 10)
+               r4 = round(-m/r**(m+1), 10)
+               r5 = round(1./r**n, 10)
+               r6 = round(n/r**(n+1), 10)
+               print(f"{r0:.5f} {r1:.10e} {r2:.10e} {r3:.10e} {r4:.10e} {r5:.10e} {r6:.10e}", file=f)
 
     def energy_grps(self):
         ref_grp = ["LJ124W", "LJ96W", "SOLW", "PSOLW"]
