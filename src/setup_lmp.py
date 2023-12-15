@@ -831,6 +831,7 @@ def get_unique(database, topdat, sysdat):
                     for ldx in datndx:
                         if database.dihd[ldx] != -1:
                             for kdx in range(uniq_dihs):
+                                #print(kdx, len(dih_params), dih_params, uniq_dihs)
                                 if ldx ==  dih_params[kdx]:
                                     ikeep = False # found a replica
                                     keeps.append(kdx)
@@ -883,6 +884,7 @@ def get_unique(database, topdat, sysdat):
                     # THE PARAMS WERE GIVEN IN THE TOP FILE SO LETS ADD IT TO THE PARAM FILE */
                     topdat[idx].dihtype.append([uniq_dihs, [uniq_dihs]]) 
                     uniq_dihs += 1
+                    dih_params += [-1]
                     top_ndih += 1
                     i1 = topdat[idx].dihndx1[jdx]-1 + index0;
                     i2 = topdat[idx].dihndx2[jdx]-1 + index0;
@@ -969,6 +971,7 @@ def get_unique(database, topdat, sysdat):
                     # THE PARAMS WERE GIVEN IN THE TOP FILE SO LETS ADD IT TO THE PARAM FILE */
                     topdat[idx].imptype.append(uniq_imps)
                     uniq_imps += 1
+                    imp_params.append(-1)
                     print("improper_coeff {:<8} {:8.4f} {:8.4f} # {} {} {} {} FROM TOP".format(uniq_imps,
                            topdat[idx].impropfk[jdx],
                            topdat[idx].impropeq[jdx],
