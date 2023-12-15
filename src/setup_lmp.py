@@ -797,18 +797,16 @@ def get_unique(database, topdat, sysdat):
                         dat_dtype4 = database.dihtype4[kdx]
                         if cmp_wc(dat_dtype2, top_atype2):
                             if cmp_wc(dat_dtype3, top_atype3):
+                                f1 = cmp_wc(dat_dtype1, top_atype1)
+                                f2 = cmp_wc(dat_dtype4, top_atype4) 
                                 if top_atype2 == top_atype3:
-                                   f1 = cmp_wc(dat_dtype1, top_atype1)
-                                   f2 = cmp_wc(dat_dtype4, top_atype4) 
-                                   f3 = cmp_wc(dat_dtype1, top_atype4)
-                                   f4 = cmp_wc(dat_dtype4, top_atype1)
-                                   if f1 and f2 or f3 and f4:
-                                       datndx.append(kdx)
+                                    f3 = cmp_wc(dat_dtype1, top_atype4)
+                                    f4 = cmp_wc(dat_dtype4, top_atype1)
+                                    if f1 and f2 or f3 and f4:
+                                        datndx.append(kdx)
                                 else:
-                                   f1 = cmp_wc(dat_dtype1, top_atype1) 
-                                   f2 = cmp_wc(dat_dtype4, top_atype4)
-                                   if f1 and f2:
-                                       datndx.append(kdx)
+                                    if f1 and f2:
+                                        datndx.append(kdx)
                         elif cmp_wc(dat_dtype2, top_atype3):
                             if cmp_wc(dat_dtype3, top_atype2):
                                 f1 = cmp_wc(dat_dtype1, top_atype4) 
@@ -816,7 +814,7 @@ def get_unique(database, topdat, sysdat):
                                 if f1 and f2:
                                     datndx.append(kdx)
                     if len(datndx) == 0:
-                            sys.exit("ERROR: Did not find dihedral parameters in database {} {} {} {} {} {} {} {}".format(
+                            sys.exit("ERROR: Did not find dihedral parameters in database {} {} {} {} ({} {} {} {})".format(
                                     topdat[idx].dihndx1[jdx],
                                     topdat[idx].dihndx2[jdx],
                                     topdat[idx].dihndx3[jdx],
@@ -831,7 +829,6 @@ def get_unique(database, topdat, sysdat):
                     for ldx in datndx:
                         if database.dihd[ldx] != -1:
                             for kdx in range(uniq_dihs):
-                                #print(kdx, len(dih_params), dih_params, uniq_dihs)
                                 if ldx ==  dih_params[kdx]:
                                     ikeep = False # found a replica
                                     keeps.append(kdx)
@@ -938,7 +935,7 @@ def get_unique(database, topdat, sysdat):
                                     datndx = kdx
                                     break
                     if datndx == -1:
-                            sys.exit("ERROR: Did not find improper parameters in database {} {} {} {} {} {} {} {}".format(
+                            sys.exit("ERROR: Did not find improper parameters in database {} {} {} {} ({} {} {} {})".format(
                                     topdat[idx].impndx1[jdx],
                                     topdat[idx].impndx2[jdx],
                                     topdat[idx].impndx3[jdx],
