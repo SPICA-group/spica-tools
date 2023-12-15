@@ -275,7 +275,6 @@ class gen_lmp_inp:
             print(f"##### LAMMPS input file '{self.outf}' for SPICA has been generated! #####")
             print(f"NOTE: '{self.outf}' is just to run 1 ns LAMMPS MD with NPT using SPICA.")
         print("NOTE: Please check and modify the input for your simulation purpose.")
-        print("NOTE: Please check and modify the input for your simulation purpose.")
         print("Command-line Example:")
         print(f"$ lmp_mpi -in {self.outf} -v min yes -v op npt_00 -v nstep 50000 -sf gpu -pk gpu 2")
         print(f"$ lmp_mpi -in {self.outf} -v ip npt_00 -v op npt_01 -v nstep 100000 -v -nlog 5000")
