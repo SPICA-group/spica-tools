@@ -25,7 +25,7 @@ def get_option():
     return argparser.parse_args()
 
 def get_option_script(argv):
-    argparser = ArgumentParser(usage='modion [-h] [-soluq SOLUQ] [-verbose VERBOSE] input output',
+    argparser = ArgumentParser(usage='modion [-h] [-conc CONC] [-soluq SOLUQ] [-verbose VERBOSE] input output',
                                prog ="modion")
     argparser.add_argument('input', type=str,
                             help='Specify input AA PDB file name.')
