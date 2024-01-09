@@ -58,7 +58,7 @@ You can create the documentation on your machine with the following commands:
   * `setup_lmp` : generate input files to run CG-MD with LAMMPS (https://www.lammps.org)
   * `setup_gmx` : generate input files to run CG-MD with GROMACS (https://www.gromacs.org)   
                   Apply the patch file distributed in the repository of SPICA-group 
-                  (https://github.com/SPICA-group/gromacs-SPICA) to GROMACS software to make it useful 
+                  (https://github.com/SPICA-group/gromacs-spica) to GROMACS software to make it useful 
                   for the MD with SPICA-FF
   * `gen_lmpin` : generate a LAMMPS input file for SPICA or pSPICA
   * `gen_gmxin` : generate GROMACS input files for SPICA or pSPICA
