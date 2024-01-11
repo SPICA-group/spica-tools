@@ -24,7 +24,9 @@ in the file are correct and as expected, especially for molecules containing cyc
 
 Example
 -------
-``cg_spica json2top POPC`` 
+.. code-block:: bash
+
+    cg_spica json2top POPC
 
 :download:`POPC.top <data/POPC.top>` ::
 

@@ -5,20 +5,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>setup_gmx &#8212; spica-tools 1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="gen_lmpin" href="gen_lmpin.html" />
     <link rel="prev" title="setup_lmp" href="setup_lmp.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
@@ -31,6 +30,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="gen_lmpin.html" title="gen_lmpin"
+             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="setup_lmp.html" title="setup_lmp"
              accesskey="P">previous</a> |</li>
@@ -48,8 +50,7 @@
 <h1>setup_gmx<a class="headerlink" href="#setup-gmx" title="Permalink to this heading">¶</a></h1>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
-<pre class="literal-block">cg_spica setup_gmx &lt;<strong>topfile 1</strong>&gt; &lt;<strong>nmol 1</strong>&gt; [&lt;<strong>topfile 2</strong>&gt; &lt;<strong>nmol 2</strong>&gt; ... &lt;<strong>topfile n</strong>&gt; &lt;<strong>nmol n</strong>&gt;]
-                   &lt;<strong>paramfile</strong>&gt; [&lt;<strong>coordfile</strong>&gt;] [<strong>-prot</strong>]</pre>
+<pre class="literal-block">cg_spica setup_gmx &lt;<strong>topfile 1</strong>&gt; &lt;<strong>nmol 1</strong>&gt; [&lt;<strong>topfile 2</strong>&gt; &lt;<strong>nmol 2</strong>&gt; ... &lt;<strong>topfile n</strong>&gt; &lt;<strong>nmol n</strong>&gt;] &lt;<strong>paramfile</strong>&gt; [&lt;<strong>coordinate</strong>&gt;] [<strong>-prot</strong>]</pre>
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
@@ -58,7 +59,6 @@ This program requires the following files as inputs:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">topfile</span></code>: SPICA topology file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">paramfile</span></code>: SPICA parameter file, distributed at <a class="reference external" href="https://www.spica-ff.org/download.html">SPICA web</a></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">coordfile</span></code>: CG configuration file in PDB format</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">topfile</span></code> can be generated with the <code class="docutils literal notranslate"><span class="pre">json2top</span></code> or <code class="docutils literal notranslate"><span class="pre">ENM</span></code> (for proteins only) commands.
 For more details, see <a class="reference internal" href="json2top.html"><span class="doc">json2top</span></a> and <a class="reference internal" href="ENM.html"><span class="doc">ENM</span></a>.
@@ -68,16 +68,20 @@ should be given in the same order as given in the prepared configuration file.</
 <p>Unlike the <code class="docutils literal notranslate"><span class="pre">setup_lmp</span></code> command, this program does not normally require a pdb
 configuration file, because it generates input files needed only to execute
 the <a class="reference external" href="https://manual.gromacs.org/current/onlinehelp/gmx-grompp.html">gmx grompp</a>
-command in GROMACS.
-Use the <code class="docutils literal notranslate"><span class="pre">-prot</span></code> option is used to set up systems containing proteins.
+command in GROMACS.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">-prot</span></code> option is used to set up systems containing proteins.
 This is because SPICA takes protein equilibrium angle values from the initial configuration.
 In this case, a configuration file in PDB format must be specified as the last
 argument of the program.</p>
 <p>Running the program with the appropriate input files yields the following outputs:</p>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">toppar/</span></code></p>
+<ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">SPICA.itp</span></code>: SPICA force field parameter</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">molecule.itp</span></code>: Molecule’s information, such as atom types/names, residue names, and topology.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">topol.top</span></code>: System topology file including <code class="docutils literal notranslate"><span class="pre">SPICA.itp</span></code> and <code class="docutils literal notranslate"><span class="pre">molecule.itp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{molecule}.itp</span></code>: Included topology files for each molecule.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">topol.top</span></code>: System topology file including <code class="docutils literal notranslate"><span class="pre">SPICA.itp</span></code> and <code class="docutils literal notranslate"><span class="pre">{molecule}.itp</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">CGindex.ndx</span></code>: Atom index file of a target system</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">out.psf</span></code>: Topology file of a target system in PSF format</p></li>
 </ul>
@@ -85,31 +89,39 @@ argument of the program.</p>
 <p class="topic-title">NOTE</p>
 <p>The standard GROMACS package does NOT support the SPICA angle or nonbonded interactions.
 To use SPICA with GROMACS, the package must be modified with the patch file for the angular
-interaction in <a class="reference external" href="https://github.com/SPICA-group/gromacs-SPICA">gromacs-SPICA</a> repository,
+interaction in <a class="reference external" href="https://github.com/SPICA-group/gromacs-spica">gromacs-spica</a> repository,
 and the tabulated potentials for the nonbonded interaction must be applied.</p>
 </aside>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">setup_gmx</span> <span class="pre">DOPC.top</span> <span class="pre">128</span> <span class="pre">WAT.top</span> <span class="pre">1408</span> <span class="pre">spica_db.prm</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cg_spica<span class="w"> </span>setup_gmx<span class="w"> </span>DOPC.top<span class="w"> </span><span class="m">128</span><span class="w"> </span>WAT.top<span class="w"> </span><span class="m">1408</span><span class="w"> </span>spica_db.prm
+</pre></div>
+</div>
 <p><a class="reference download internal" download="" href="_downloads/c2b106deaf88869d08cfdf2eb3bbd605/DOPC.top"><code class="xref download docutils literal notranslate"><span class="pre">DOPC.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/25310e5143479c4b4d54a57887abd994/WAT.top"><code class="xref download docutils literal notranslate"><span class="pre">WAT.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/013e4c01db335200cc2735253f1ccb43/spica_db.prm"><code class="xref download docutils literal notranslate"><span class="pre">spica_db.prm</span></code></a></p>
-<p><a class="reference download internal" download="" href="_downloads/ed47a3361a6d6b1c30c723bbb4f65945/SPICA.itp"><code class="xref download docutils literal notranslate"><span class="pre">SPICA.itp</span></code></a>
-<a class="reference download internal" download="" href="_downloads/8e9cdde22baa024f4aff91f9c1e56f2d/molecule.itp"><code class="xref download docutils literal notranslate"><span class="pre">molecule.itp</span></code></a>
-<a class="reference download internal" download="" href="_downloads/dac3244e26aa141123a6aaa4f9295d9c/topol.top"><code class="xref download docutils literal notranslate"><span class="pre">topol.top</span></code></a>
+<p><a class="reference download internal" download="" href="_downloads/dac3244e26aa141123a6aaa4f9295d9c/topol.top"><code class="xref download docutils literal notranslate"><span class="pre">topol.top</span></code></a>
+<a class="reference download internal" download="" href="_downloads/fd62ccdc59bcf331005bbe4cdec7270a/SPICA.itp"><code class="xref download docutils literal notranslate"><span class="pre">SPICA.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/1381f2b60675407f7edbcfe24216b466/DOPC.itp"><code class="xref download docutils literal notranslate"><span class="pre">DOPC.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/0b33250c1101ed0b1466cc903f7bc650/WAT.itp"><code class="xref download docutils literal notranslate"><span class="pre">WAT.itp</span></code></a>
 <a class="reference download internal" download="" href="_downloads/2dc9ad4d6e8f6c68e09661e6396164b0/CGindex.ndx"><code class="xref download docutils literal notranslate"><span class="pre">CGindex.ndx</span></code></a>
 <a class="reference download internal" download="" href="_downloads/14022ce587619f9f48d2aeea539f8b70/out.psf"><code class="xref download docutils literal notranslate"><span class="pre">out.psf</span></code></a></p>
-<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">setup_gmx</span> <span class="pre">1d6x.cg.top</span> <span class="pre">1</span> <span class="pre">DOPC.top</span> <span class="pre">128</span> <span class="pre">WAT.top</span> <span class="pre">2134</span> <span class="pre">CLA.top</span> <span class="pre">4</span> <span class="pre">spica_db.prm</span> <span class="pre">prot_memb.cg.pdb</span> <span class="pre">-prot</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cg_spica<span class="w"> </span>setup_gmx<span class="w"> </span>1d6x.cg.top<span class="w"> </span><span class="m">1</span><span class="w"> </span>DOPC.top<span class="w"> </span><span class="m">128</span><span class="w"> </span>WAT.top<span class="w"> </span><span class="m">2134</span><span class="w"> </span>CLA.top<span class="w"> </span><span class="m">4</span><span class="w"> </span>spica_db.prm<span class="w"> </span>prot_memb.cg.pdb<span class="w"> </span>-prot
+</pre></div>
+</div>
 <p><a class="reference download internal" download="" href="_downloads/5540ead703cd5cbb78ffd65d59ab1186/1d6x.cg.top"><code class="xref download docutils literal notranslate"><span class="pre">1d6x.cg.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/c2b106deaf88869d08cfdf2eb3bbd605/DOPC.top"><code class="xref download docutils literal notranslate"><span class="pre">DOPC.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/25310e5143479c4b4d54a57887abd994/WAT.top"><code class="xref download docutils literal notranslate"><span class="pre">WAT.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/dea5c2693b8b198d339c1c55c8aec4ec/CLA.top"><code class="xref download docutils literal notranslate"><span class="pre">CLA.top</span></code></a>
 <a class="reference download internal" download="" href="_downloads/013e4c01db335200cc2735253f1ccb43/spica_db.prm"><code class="xref download docutils literal notranslate"><span class="pre">spica_db.prm</span></code></a>
 <a class="reference download internal" download="" href="_downloads/47fdcf09025d7bfb6d8eeb5a488a16ce/prot_memb.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">prot_memb.cg.pdb</span></code></a></p>
-<p><a class="reference download internal" download="" href="_downloads/5f9083195e2926ec77c75c26f375c331/SPICA.itp"><code class="xref download docutils literal notranslate"><span class="pre">SPICA.itp</span></code></a>
-<a class="reference download internal" download="" href="_downloads/3cb476d9e8b095e7bf140e430ec921ec/molecule.itp"><code class="xref download docutils literal notranslate"><span class="pre">molecule.itp</span></code></a>
-<a class="reference download internal" download="" href="_downloads/600f82dc1cc23cb716a6ce5abb28d965/topol.top"><code class="xref download docutils literal notranslate"><span class="pre">topol.top</span></code></a>
+<p><a class="reference download internal" download="" href="_downloads/600f82dc1cc23cb716a6ce5abb28d965/topol.top"><code class="xref download docutils literal notranslate"><span class="pre">topol.top</span></code></a>
+<a class="reference download internal" download="" href="_downloads/4dd5d04cce34d0107c140560451f70d8/SPICA.itp"><code class="xref download docutils literal notranslate"><span class="pre">SPICA.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/615d8e6aecfad37ad3319600fe802a12/1d6x.cg.itp"><code class="xref download docutils literal notranslate"><span class="pre">1d6x.cg.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/312a9dc5433928f7c182d1ea91f298a7/DOPC.itp"><code class="xref download docutils literal notranslate"><span class="pre">DOPC.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/4e84d3e27aae26fc3a241cf00e9ab313/WAT.itp"><code class="xref download docutils literal notranslate"><span class="pre">WAT.itp</span></code></a>
+<a class="reference download internal" download="" href="_downloads/0033fcdf992510d40fa67884f91f30ac/CLA.itp"><code class="xref download docutils literal notranslate"><span class="pre">CLA.itp</span></code></a>
 <a class="reference download internal" download="" href="_downloads/f15f3bee47d070d3786d2188699f8d1e/CGindex.ndx"><code class="xref download docutils literal notranslate"><span class="pre">CGindex.ndx</span></code></a>
 <a class="reference download internal" download="" href="_downloads/3a6488a03aaeb7c18565975878e2a8ec/out.psf"><code class="xref download docutils literal notranslate"><span class="pre">out.psf</span></code></a></p>
 </section>
@@ -161,6 +173,11 @@ and the tabulated potentials for the nonbonded interaction must be applied.</p>
     <p class="topless"><a href="setup_lmp.html"
                           title="previous chapter">setup_lmp</a></p>
   </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="gen_lmpin.html"
+                          title="next chapter">gen_lmpin</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -189,6 +206,9 @@ and the tabulated potentials for the nonbonded interaction must be applied.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="gen_lmpin.html" title="gen_lmpin"
+             >next</a> |</li>
+        <li class="right" >
           <a href="setup_lmp.html" title="setup_lmp"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
@@ -197,7 +217,7 @@ and the tabulated potentials for the nonbonded interaction must be applied.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Yusuke Miyazaki.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

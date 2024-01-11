@@ -4790,9 +4790,9 @@ PSF
     2170    2171    2172    2171    2172    2173    2172    2173    2174
     2173    2174    2175    2174    2175    2176
 
-0       !NPHI: dihedrals
-0       !NIMPHI: impropers
-       0 !NDON: donors
+       0 !NPHI: dihedrals
 
-       0 !NACC: acceptors
+
+       0 !NIMPHI: impropers
+
 

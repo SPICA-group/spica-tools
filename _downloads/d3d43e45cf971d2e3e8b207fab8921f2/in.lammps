@@ -1,0 +1,74 @@
+### LAMMPS input for SPICA FF ###
+# Define variables
+variable       t     equal 310.0
+variable       p     equal 1.0
+variable       ip    index none
+variable       op    index run_00
+variable       min   index no
+variable       nstep index 100000
+variable       nlog  index 1000
+variable       ndump index 10000
+variable       nrest index 50000
+
+# Unit and data file style
+units          real
+atom_style     full
+
+# Set Newton's third law for interactions
+if "$(is_active(package,gpu))" then &
+"newton         off" &
+else &
+"newton         on off"
+
+# Load data and parameter files
+if "${ip} == none" then &
+"read_data      DATA.FILE" &
+else &
+"read_restart   ${ip}.rest"
+include        PARM.FILE
+
+# Coulomb interaction
+variable       gs equal 5
+variable       nx equal round(lx/${gs})
+variable       ny equal round(ly/${gs})
+variable       nz equal round(lz/${gs})
+kspace_style   pppm/cg 1.0e-5
+kspace_modify  mesh ${nx} ${ny} ${nz} order 3
+
+# Neighbor list setup
+neighbor       2.0 bin
+neigh_modify   delay 4
+
+# Minimization
+if "${min} == yes" then &
+"min_style      cg" &
+"minimize       1.0e-4 1.0e-6 100 1000" &
+"velocity       all create $t 12345 dist gaussian rot yes"
+
+# Zero timestep
+reset_timestep 0
+
+# Timestep for integration [fs]
+timestep       10
+
+# Specify fix for time integration
+fix            1 all momentum 1 linear 1 1 1
+fix            2 all npt temp $t $t 500. aniso $p $p 5000. couple xy
+
+# Output log information
+thermo         ${nlog}
+thermo_style   custom cpu step temp pxx pyy pzz lx ly lz pe density
+
+# Output trajectory options
+dump           1 all xtc ${ndump} ${op}.xtc
+dump_modify    1 unwrap yes
+
+# Number of steps to generate restart file
+restart        ${nrest} ${op}.rest ${op}.rest
+
+# Number of steps to integrate and Perform MD
+run            ${nstep}
+
+# Output the final snapshot
+write_dump     all xtc ${op}.fin.xtc modify unwrap yes
+

@@ -5,22 +5,20 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>ENM &#8212; spica-tools 1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="wat2polar" href="wat2polar.html" />
-    <link rel="prev" title="maptraj" href="maptraj.html" />
+    <link rel="next" title="Go" href="Go.html" />
+    <link rel="prev" title="modion" href="modion.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -33,10 +31,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="wat2polar.html" title="wat2polar"
+          <a href="Go.html" title="Go"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="maptraj.html" title="maptraj"
+          <a href="modion.html" title="modion"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ENM</a></li> 
@@ -52,7 +50,7 @@
 <h1>ENM<a class="headerlink" href="#enm" title="Permalink to this heading">¶</a></h1>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
-<pre class="literal-block">cg_spica ENM <strong>CG_PDB</strong> <strong>CG_TOP</strong> [<strong>-maxr</strong> <em>&lt;float&gt;</em>] [<strong>-kENM</strong> <em>&lt;float&gt;</em>] [<strong>-pspica</strong>]</pre>
+<pre class="literal-block">cg_spica ENM <strong>CG_PDB</strong> <strong>CG_TOP</strong> [<strong>-maxr</strong> <em>&lt;float&gt;</em>] [<strong>-kENM</strong> <em>&lt;float&gt;</em>] [<strong>-pspica</strong>] [<strong>-v1</strong>] [<strong>-dssp</strong> <em>&lt;string&gt;</em>] [<strong>-aapdb</strong> <em>&lt;string&gt;</em>]</pre>
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
@@ -60,16 +58,33 @@
 topology files to prepare input files for running CG-MD with SPICA.
 ENM requires values for cutoff length and force constants,
 specified with the <code class="docutils literal notranslate"><span class="pre">-maxr</span></code> and <code class="docutils literal notranslate"><span class="pre">-kENM</span></code> options, respectively.
-The default values are set to 9.0 A and 1.195 kcal/A2, and these values are ueed
-in the SPICA protein model (See the <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.jctc.1c01207">protein SPICA</a> paper).</p>
+The default values are set to 9.0 A and 1.195 kcal/A<sup>2</sup>/mol, and these values are used
+in the SPICA protein model (See the <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.jctc.1c01207">SPICA protein ver1</a> or <a class="reference external" href="https://pubs.acs.org/doi/10.1021/acs.jctc.3c01016">SPICA protein ver2</a> paper).</p>
+<p>The SPICA protein ver1 does not have backbone parameters dependent on protein secondary structure.
+So, when using the ver1 parameter set, add an option <code class="docutils literal notranslate"><span class="pre">-v1</span></code> for not applying DSSP.</p>
+<p>For SPICA protein ver2, incorporating secondary structure-dependent backbone parameters,
+the <a class="reference external" href="https://swift.cmbi.umcn.nl/gv/dssp">DSSP</a> program and protein atomistic configuration (in PDB format)
+are needed. <code class="docutils literal notranslate"><span class="pre">-dssp</span></code> and <code class="docutils literal notranslate"><span class="pre">-aapdb</span></code> options take a file path to DSSP and the protein PDB, respectively.
+When DSSP can be used through a command on a console, the <code class="docutils literal notranslate"><span class="pre">-dssp</span></code> option can be skipped.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">cg_spica</span> <span class="pre">ENM</span> <span class="pre">2mag.cg.pdb</span> <span class="pre">2mag.cg.top</span></code></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cg_spica<span class="w"> </span>ENM<span class="w"> </span>2mag.cg.pdb<span class="w"> </span>2mag.cg.top.v1<span class="w"> </span>-v1
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cg_spica<span class="w"> </span>ENM<span class="w"> </span>2mag.cg.pdb<span class="w"> </span>2mag.cg.top.v2<span class="w"> </span>-aapdb<span class="w"> </span>2mag.aa.pdb<span class="w"> </span>-dssp<span class="w"> </span>/usr/bin/dssp
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cg_spica<span class="w"> </span>ENM<span class="w"> </span>2mag.cg.pdb<span class="w"> </span>2mag.cg.top.pspica<span class="w"> </span>-pspica
+</pre></div>
+</div>
 <a class="reference internal image-reference" href="_images/ENM_example.jpg"><img alt="_images/ENM_example.jpg" src="_images/ENM_example.jpg" style="width: 264.9px; height: 274.2px;" /></a>
 <p>protein CG configuration (CPK) applied ENM (red)</p>
 <p><a class="reference download internal" download="" href="_downloads/acb6ef50e53365ffe7be54c2ac67a28e/2mag.cg.pdb"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.pdb</span></code></a>
-<a class="reference download internal" download="" href="_downloads/3f844940f71883aeeef4a7b771cf347e/2mag.cg.top"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.top</span></code></a></p>
+<a class="reference download internal" download="" href="_downloads/7c9b013acd3ff4c39ec943005fc5e4a0/2mag.aa.pdb"><code class="xref download docutils literal notranslate"><span class="pre">2mag.aa.pdb</span></code></a></p>
+<p><a class="reference download internal" download="" href="_downloads/3332f46d84bd2df780c1751672152d9a/2mag.cg.top.v1"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.top.v1</span></code></a>
+<a class="reference download internal" download="" href="_downloads/414fed60ee2db411bf240b4f7c7c5b15/2mag.cg.top.v2"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.top.v2</span></code></a>
+<a class="reference download internal" download="" href="_downloads/1074d047bac31407b30628ff6b3e3e70/2mag.cg.top.pspica"><code class="xref download docutils literal notranslate"><span class="pre">2mag.cg.top.pspica</span></code></a></p>
 </section>
 <section id="positional-args">
 <h2>Positional args<a class="headerlink" href="#positional-args" title="Permalink to this heading">¶</a></h2>
@@ -85,9 +100,15 @@ in the SPICA protein model (See the <a class="reference external" href="https://
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">-maxr</span></code> &lt;float&gt; (9.0) [A]</dt><dd><p>cutoff length for applying ENM</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">-kENM</span></code> &lt;float&gt; (1.195) [kcal/A2]</dt><dd><p>force constant of harmonic potential for ENM</p>
+<dt><code class="docutils literal notranslate"><span class="pre">-kENM</span></code> &lt;float&gt; (1.195) [kcal/A<sup>2</sup>]</dt><dd><p>force constant of harmonic potential for ENM</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">-pspica</span></code> (off)</dt><dd><p>Assign partial charge (0.5590) for pSPICA FF (default: 0.1118, for SPICA FF)</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-v1</span></code> (off)</dt><dd><p>Generate topology file for SPICA ver1, not considering backbone parameters dependent on protein secondary structure</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-dssp</span></code> &lt;string&gt;</dt><dd><p>File path to the DSSP program</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-aapdb</span></code> &lt;string&gt;</dt><dd><p>Atomistic protein configuration for applying DSSP</p>
 </dd>
 </dl>
 </section>
@@ -116,13 +137,13 @@ in the SPICA protein model (See the <a class="reference external" href="https://
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="maptraj.html"
-                          title="previous chapter">maptraj</a></p>
+    <p class="topless"><a href="modion.html"
+                          title="previous chapter">modion</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="wat2polar.html"
-                          title="next chapter">wat2polar</a></p>
+    <p class="topless"><a href="Go.html"
+                          title="next chapter">Go</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -152,10 +173,10 @@ in the SPICA protein model (See the <a class="reference external" href="https://
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="wat2polar.html" title="wat2polar"
+          <a href="Go.html" title="Go"
              >next</a> |</li>
         <li class="right" >
-          <a href="maptraj.html" title="maptraj"
+          <a href="modion.html" title="modion"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">spica-tools 1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">ENM</a></li> 
@@ -163,7 +184,7 @@ in the SPICA protein model (See the <a class="reference external" href="https://
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2022, Yusuke Miyazaki.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

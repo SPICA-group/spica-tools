@@ -38,7 +38,9 @@ of molecules included in the system.
 
 Example
 -------
-``cg_spica setup_lmp DOPC.top 128 WAT.top 1408 spica_db.prm dopc.cg.pdb`` 
+.. code-block:: bash
+
+    cg_spica setup_lmp DOPC.top 128 WAT.top 1408 spica_db.prm dopc.cg.pdb
 
 :download:`DOPC.top <data/DOPC.top>`  
 :download:`WAT.top <data/WAT.top>`  
