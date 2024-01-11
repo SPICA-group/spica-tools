@@ -22,16 +22,22 @@ You will need a bash environment to execute the tools using the command in a con
 You can download this repository, including the setup file to use the command,
 with the following command:
 
-``git clone git@github.com:SPICA-group/spica-tools.git``
+.. code-block:: bash
+
+    git clone git@github.com:SPICA-group/spica-tools.git
 
 Then, change the current directory to the top directory of the repository:
 
-``cd spica-tools/``  
+.. code-block:: bash
+
+    cd spica-tools/
 
 There is a bash script set.sh, to add the path to use the command, 
 run it with the following command:
 
-``source set.sh``  
+.. code-block:: bash
+
+    source set.sh
 
 The path to cg_spica has been added to the PATH environmental variable. 
 Adding the above line to a configuration file such as files *.bash_profile* may
@@ -39,9 +45,10 @@ be useful if you need to use the spica-tools frequently.
 To verify that the commands to integrate python codes in the src/ directory 
 is available in the console, run the following commands:
 
-``cg_spica -h``  
+.. code-block:: bash
 
-``cg_spica map2cg -h``  
+    cg_spica -h
+    cg_spica map2cg -h
 
 You can see the available options for the commands, if the command path 
 has been correctly added to the PATH. Cg_spica requires several python libraries to 
@@ -49,7 +56,9 @@ execute some codes, including arithmetic operations, and to read trajectory file
 obtained from MD simulations. These libraries are listed in requirements.txt in 
 the top directory and can be installed using pip with the following command:
 
-``pip install -r requirements.txt``
+.. code-block:: bash
+
+    pip install -r requirements.txt
 
 
 Available command-line tools
@@ -60,10 +69,14 @@ Available command-line tools
    json2top
    map2cg
    maptraj
+   modion
    ENM
+   Go
    wat2polar
    setup_lmp
    setup_gmx
+   gen_lmpin
+   gen_gmxin
 
 .. Indices and tables
 .. ==================

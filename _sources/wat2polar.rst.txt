@@ -4,7 +4,7 @@ Usage
 --------
 .. parsed-literal::
 
-    cg_spica map2cg :strong:`SPICA_PDB` :strong:`pSPICA_PDB`
+    cg_spica wat2polar :strong:`SPICA_PDB` :strong:`pSPICA_PDB`
 
 Description
 -----------
@@ -22,7 +22,9 @@ water, respectively.
 
 Example
 -------
-``cg_spica map2cg dopc.cg.pdb p_dopc.cg.pdb`` 
+.. code-block:: bash
+
+    cg_spica wat2polar dopc.cg.pdb p_dopc.cg.pdb
 
 .. image:: figures/wat2polar_example.jpg
     :scale: 40
