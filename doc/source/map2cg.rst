@@ -15,7 +15,9 @@ With the ``-json`` option, you can specify other json files to be used for mappi
 
 Example
 -------
-``cg_spica map2cg dopc.aa.pdb dopc.cg.pdb`` 
+.. code-block:: bash
+
+    cg_spica map2cg dopc.aa.pdb dopc.cg.pdb
 
 .. image:: figures/map2cg_example.jpg
     :scale: 40

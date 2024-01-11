@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 def get_option():
     argparser = ArgumentParser()
     argparser.add_argument('input', type=str,
-                            help='Specify input AA PDB file name.')
+                            help='Specify input CG PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output CG PDB file name.')
     argparser.add_argument('-conc', type=float,
@@ -28,7 +28,7 @@ def get_option_script(argv):
     argparser = ArgumentParser(usage='modion [-h] [-conc CONC] [-soluq SOLUQ] [-verbose VERBOSE] input output',
                                prog ="modion")
     argparser.add_argument('input', type=str,
-                            help='Specify input AA PDB file name.')
+                            help='Specify input CG PDB file name.')
     argparser.add_argument('output', type=str,
                             help='Specify output CG PDB file name.')
     argparser.add_argument('-conc', type=float,

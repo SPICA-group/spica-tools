@@ -28,7 +28,9 @@ mapped trajectory.
 
 Example
 -------
-``cg_spica maptraj dopc.aa.pdb dopc.aa.xtc dopc.cg.xtc`` 
+.. code-block:: bash
+
+    cg_spica maptraj dopc.aa.pdb dopc.aa.xtc dopc.cg.xtc
 
 Positional args
 ---------------
