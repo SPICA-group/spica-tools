@@ -1,0 +1,22 @@
+; GROMACS input for SPICA FF
+
+title                = Energy minimization
+pbc                  = xyz
+integrator           = steep
+emtol                = 1000
+nsteps               = 50000
+
+vdw-type             = user
+energygrps           = LJ124W LJ96W SOLW
+energygrp_table      = LJ124W SOLW LJ96W SOLW SOLW SOLW
+cutoff-scheme        = Group
+
+ns_type              = grid
+nstlist              = 5
+rlist                = 1.5
+rcoulomb             = 1.5
+rvdw                 = 1.5
+
+coulombtype          = PME
+pme_order            = 4
+fourierspacing       = 0.5
