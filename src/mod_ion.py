@@ -4,6 +4,7 @@ import sys, json, random, math
 from pathlib import Path
 import numpy as np
 from argparse import ArgumentParser
+from tqdm import tqdm
 
 def get_option():
     argparser = ArgumentParser()
@@ -103,7 +104,7 @@ def read_pdb(infile):
     return natom, pdb_list, cryst, ters
 
 def rem(lst, xs):
-    for x in xs:
+    for x in tqdm(xs):
         lst.remove(x)
     return lst
 
@@ -279,7 +280,7 @@ class mod_ion:
                print("TER", file=f)
                ter_flag = False
             print('%-6s%5s %4s%1s%-4s%1s%5s   %8.3f%8.3f%8.3f%6.2f%6.2f%10s' \
-                        %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,segid), file=f)
+                        %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,resname), file=f)
             if resid in self.ters and not ter_flag:
                 ter_id = resid
                 ter_flag = True
@@ -315,7 +316,7 @@ class mod_ion:
                 segid    = self.pdb_data[i][PDB_SEGID].strip()
                 index    = str(cnt)
                 print('%-6s%5s %4s%1s%-4s%1s%5s   %8.3f%8.3f%8.3f%6.2f%6.2f%10s' \
-                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,segid), file=f)
+                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,resname), file=f)
                 cnt += 1
         for k in sorted(self.sol_index["sod"]):
             for j in range(np):  
@@ -344,7 +345,7 @@ class mod_ion:
                 segid    = self.pdb_data[i][PDB_SEGID].strip()
                 index    = str(cnt)
                 print('%-6s%5s %4s%1s%-4s%1s%5s   %8.3f%8.3f%8.3f%6.2f%6.2f%10s' \
-                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,segid), file=f)
+                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,resname), file=f)
                 cnt += 1
         for k in sorted(self.sol_index["cla"]):
             for j in range(np):  
@@ -373,7 +374,7 @@ class mod_ion:
                 segid    = self.pdb_data[i][PDB_SEGID].strip()
                 index    = str(cnt)
                 print('%-6s%5s %4s%1s%-4s%1s%5s   %8.3f%8.3f%8.3f%6.2f%6.2f%10s' \
-                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,segid), file=f)
+                            %(recname,index[0:5],atmname,indicat,resname,chainid,resid,posX,posY,posZ,occup,tfact,resname), file=f)
                 cnt += 1
         print('%s' % "END", file=f)
         f.close()
