@@ -10,31 +10,41 @@ def get_option():
     argparser.add_argument('-json', type=str,
                             default=json,
                             help='input json file name (default: spica_top.json).')
+    argparser.add_argument('-pspica', action="store_true",
+                            help='assign pSPICA partial charges.')
+    argparser.add_argument('-onec', action="store_true",
+                            help='apply a unit charge of 1.0.')
     argparser.add_argument('-dupang', action="store_true",
                             help='not delete duplicated angle indices.')
     return argparser.parse_args()
 
 def get_option_script(argv):
     json = Path(__file__).parents[0] / "spica_top.json"
-    argparser = ArgumentParser(usage='json2top [-h] [-json JSON] resname',
+    argparser = ArgumentParser(usage='json2top [-h] [-json JSON] [-pspica] [-onec] [-dupang] resname',
                                prog ="json2top")
     argparser.add_argument('resname', type=str,
                             help='Specify a resname defined in json.')
     argparser.add_argument('-json', type=str,
                             default=json,
                             help='input json file name (default: spica_top.json).')
+    argparser.add_argument('-pspica', action="store_true",
+                            help='assign pSPICA partial charges.')
+    argparser.add_argument('-onec', action="store_true",
+                            help='apply a unit charge of 1.0.')
     argparser.add_argument('-dupang', action="store_true",
                             help='not delete duplicated angle indices.')
     return argparser.parse_args(argv)
 
 class json_to_top:
-    def __init__(self, jsonfile, dupang):
+    def __init__(self, jsonfile, pspica, onec, dupang):
         self.res_type = {}
         self.res_name = {}
         self.res_ch   = {}
         self.res_ms   = {}
         self.bnd_list = {}
         self.jsonfile = jsonfile
+        self.pspica   = pspica
+        self.onec     = onec
         self.dupang   = dupang
         self.read_json(jsonfile)
 
@@ -68,6 +78,69 @@ class json_to_top:
             bndx.append([d[x]+1 for x in self.bnd_list[ir][idx]])
         self.bndx = bndx
         return False
+
+    def mod_charge(self, res_ch, res_type):
+        unit_spica  = 0.1118
+        unit_pspica = 0.5590
+        if res_type == "WO":
+            if self.onec:
+                return -0.8360
+            else:
+                return -0.4673
+        elif res_type == "WH":
+            if self.onec:
+                return  0.8360
+            else:
+                return  0.4673
+        elif res_type == "SOD1":
+            if self.onec:
+                return  1.3360
+            else:
+                return  0.7468
+        elif res_type == "SOD2":
+            if self.onec:
+                return -0.3360
+            else:
+                return -0.1878
+        elif res_type == "CLA1":
+            if self.onec:
+                return -1.3360
+            else:
+                return -0.7468
+        elif res_type == "CLA2":
+            if self.onec:
+                return  0.3360
+            else:
+                return  0.1878
+        else:
+            if res_ch == 0.0:
+                return res_ch
+            else:
+               rch = round(res_ch, 4)
+               q1 = rch == 0
+               q2 = rch % unit_spica == 0
+               q3 = rch % unit_pspica == 0
+               if q1:
+                   if self.pspica:
+                       return rch * unit_pspica
+                   elif self.onec:
+                       return rch
+                   else:
+                       return res_ch * unit_spica
+               if q2:
+                   if self.pspica:
+                       return rch/unit_spica * unit_pspica
+                   elif self.onec:
+                       return rch/unit_spica
+                   else:
+                       return res_ch
+               if q3:
+                   if self.pspica:
+                       return rch
+                   elif self.onec:
+                       return rch/unit_pspica
+                   else:
+                       return res_ch/unit_pspica * unit_spica
     
     def write_atom(self, ir, f):
         res_type = self.res_type[ir]
@@ -75,7 +148,7 @@ class json_to_top:
         res_ms   = self.res_ms[ir]
         res_ch   = self.res_ch[ir]
         for i, (n, t, m, c) in enumerate(zip(res_name, res_type, res_ms, res_ch)):
-            print ("atom %5d %5s %5s %5s  %8.4f  %8.4f  U" % (i+1, ir, n, t, m, c), file=f)
+            print ("atom %5d %5s %5s %5s  %8.4f  %8.4f  U" % (i+1, ir, n, t, m, self.mod_charge(c, t)), file=f)
         print(file=f)
     
     def write_bond(self, ir, f):
@@ -137,25 +210,32 @@ class json_to_top:
     def finalize(self, outfile):
         print(f"{outfile} was generated.")
         print(f"Json file: {self.jsonfile}.")
-        print("NOTE: Please make sure that the bond and angle indices are correct in the generated top file, especially for molecules including ring groups.")
+        print("NOTE: Please make sure that the bond and angle indices are correct")
+        print("      in the generated top file, especially for molecules including")
+        print("      ring groups.")
     
     def run(self, res, outfile):
         with open(outfile, "w") as f:
             nobnd = self.name2idx(res)
             self.write_atom(res, f)
             if nobnd:
+                self.finalize(outfile)
                 return
             self.write_bond(res, f)
             if len(self.bndx) == 1:
+                self.finalize(outfile)
                 return
             self.write_angle(res, f)
-        self.finalize(outfile)
+            self.finalize(outfile)
+            return
 
 if __name__ == "__main__":
-    args  = get_option()
-    res   = args.resname
-    top   = f"{res}.top"
-    jfile = args.json
-    da    = args.dupang
-    jt = json_to_top(jfile, da)
+    args   = get_option()
+    res    = args.resname
+    top    = f"{res}.top"
+    jfile  = args.json
+    pspica = args.pspica
+    onec   = args.onec
+    da     = args.dupang
+    jt = json_to_top(jfile, pspica, onec, da)
     jt.run(res, top)

@@ -59,12 +59,14 @@ def main():
         gen     = gen_top_Go.gen_top_Go(cgpdb, outfile, eps, MAXdr, pspica, v1, dssp, aapdb)
         gen.run()
     elif args.tool_name == "json2top":
-        args  = json_to_top.get_option_script(sub)
-        res   = args.resname
-        top   = f"{res}.top"
-        jfile = args.json
-        da    = args.dupang
-        jt    = json_to_top.json_to_top(jfile, da)
+        args   = json_to_top.get_option_script(sub)
+        res    = args.resname
+        top    = f"{res}.top"
+        jfile  = args.json
+        pspica = args.pspica
+        onec   = args.onec
+        da     = args.dupang
+        jt     = json_to_top.json_to_top(jfile, pspica, onec, da)
         jt.run(res, top)
     elif args.tool_name == "map2cg":
         args     = map_to_cg.get_option_script(sub)
