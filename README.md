@@ -1,9 +1,10 @@
 # spica-tools  
+[![DOI](https://zenodo.org/badge/454726379.svg)](https://zenodo.org/doi/10.5281/zenodo.10611578)  
 This repository provides tools to set up coarse-grained (CG) molecular dynamics (MD) simulation 
 using the SPICA force field and tools to support SPICA CG parametrization.
-The tools are basically written in Python and can be invoked with the commands described below.  
-The tools were developed by members of the SPICA group. More information about the SPICA force field and 
-the members can be found on the [SPICA website](https://www.spica-ff.org).  
+The tools are written in Python and can be invoked with the below commands.
+Members of the SPICA group developed the tool; for more information about the SPICA force field and 
+its development members, visit the [SPICA website](https://www.spica-ff.org).  
 
 ## Installation  
 The command to invoke the tools in the src/ directory is `cg_spica` and requires the 
