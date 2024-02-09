@@ -5,6 +5,7 @@ from math import sqrt
 from math import pi
 from argparse import ArgumentParser
 
+
 def get_option():
     argparser = ArgumentParser()
     argparser.add_argument('input_files', type=str, nargs="+",
@@ -12,6 +13,7 @@ def get_option():
     argparser.add_argument('-prot', action="store_true",
                             help='read a pdb file to extract reference angle for protein models.')
     return argparser.parse_args()
+
 
 def get_option_script(argv):
     argparser = ArgumentParser(usage='setup_gmx [-h] [-prot] input_files',
@@ -22,9 +24,10 @@ def get_option_script(argv):
                             help='read a pdb file to extract reference angle for protein models.')
     return argparser.parse_args(argv)
 
+
 def get_angle(r1, r2, r3):
-    r12   = r1 - r2
-    r32   = r3 - r2
+    r12 = r1 - r2
+    r32 = r3 - r2
     r13_inn = np.dot(r12, r32)
     r13_mag = np.linalg.norm(r12)*np.linalg.norm(r32)
     cos13   = r13_inn/r13_mag
@@ -35,20 +38,21 @@ def get_angle(r1, r2, r3):
     else:
        return np.arccos(cos13)
 
+
 def get_dihedral(r1, r2, r3, r4):
-    r12   = r1 - r2
-    r32   = r3 - r2
-    r43   = r4 - r3
-    r23   = r2 - r3
+    r12 = r1 - r2
+    r32 = r3 - r2
+    r43 = r4 - r3
+    r23 = r2 - r3
     r13_inn = np.dot(r12, r32)
     r42_inn = np.dot(r43, r23)
     r13_mag = np.linalg.norm(r12)*np.linalg.norm(r32)
     r42_mag = np.linalg.norm(r43)*np.linalg.norm(r23)
-    cos13   = r13_inn/r13_mag
-    cos42   = r42_inn/r42_mag
+    cos13 = r13_inn/r13_mag
+    cos42 = r42_inn/r42_mag
     p1 = r12 - cos13*r32/np.linalg.norm(r32)*np.linalg.norm(r12)
     p4 = r43 - cos42*r23/np.linalg.norm(r23)*np.linalg.norm(r43)
-    cosp    = np.dot(p1, p4)/(np.linalg.norm(p1)*np.linalg.norm(p4))
+    cosp = np.dot(p1, p4)/(np.linalg.norm(p1)*np.linalg.norm(p4))
     p14_crs = np.cross(p1, p4)
     if np.dot(p14_crs, r32) > 0.0:
         sign = 1
@@ -61,6 +65,7 @@ def get_dihedral(r1, r2, r3, r4):
     else:
         return sign*np.arccos(cosp)
     
+
 class Sysdat:
     nats = nbnds = nangs = nimps = ndihs = ntops = 0 
     total_ats = total_bnds = total_angs = total_imps = total_dihs = 0
@@ -70,6 +75,7 @@ class Sysdat:
     coordx, coordy, coordz = [], [], []
     boxx = boxy = boxz = 0.0
 
+
 class Topdat:
     def __init__(self):
         self.fname = None
@@ -77,24 +83,30 @@ class Topdat:
         self.gondx1, self.gondx2, self.gofunctype, self.eps, self.sig = [], [], [], [], []
         self.bndndx1, self.bndndx2, self.bndtype = [], [], []
         self.angndx1, self.angndx2, self.angndx3, self.angtype = [], [], [], []
-        self.imp_func, self.impndx1, self.impndx2, self.impndx3, self.impndx4, self.imptype   = [], [], [], [], [], []
-        self.dih_func, self.dihndx1, self.dihndx2, self.dihndx3, self.dihndx4, self.dihtype, self.dihn = [], [], [], [], [], [], []
+        self.impndx1, self.impndx2, self.impndx3, self.impndx4 = [], [], [], []
+        self.dihndx1, self.dihndx2, self.dihndx3, self.dihndx4 = [], [], [], []
+        self.dih_func, self.imp_func, self.dihtype, self.imptype, self.dihn = [], [], [], [], []
         self.dihpset, self.imppset, self.bndpset, self.angpset = [], [], [], []
         self.ind, self.parm_atomtype = [], []
         self.dihfk, self.ndih, self.diheq = [], [], []
-        self.mass, self.charge, self.bndfk, self.bndeq, self.angfk, self.angeq, self.impfk, self.impeq = [], [], [], [], [], [], [], []
+        self.mass, self.charge = [], []
+        self.bndfk, self.bndeq = [], []
+        self.angfk, self.angeq = [], []
+        self.impfk, self.impeq = [], []
         self.atomname, self.atomtype, self.segid, self.resname = [], [], [], []
    
+
 class Database:
-     fbnd, bnde, fang, ange, eps, sig, angsdk = [], [], [], [], [], [], []
-     fdih, dihn, dihe, fimp, impe = [], [], [], [], []
-     nvdwtype, nbndtype, nangtype, ndihtype, nimptype = [], [], [], [], []
-     vdwtype1, vdwtype2, vdwstyle = [], [], []
-     bndtype1, bndtype2 = [], []
-     angtype1, angtype2, angtype3 = [], [], []
-     dihtype1, dihtype2, dihtype3, dihtype4 = [], [], [], []
-     imptype1, imptype2, imptype3, imptype4 = [], [], [], []
-     loop_pair = []
+    fbnd, bnde, fang, ange, eps, sig, angsdk = [], [], [], [], [], [], []
+    fdih, dihn, dihe, fimp, impe = [], [], [], [], []
+    nvdwtype, nbndtype, nangtype, ndihtype, nimptype = [], [], [], [], []
+    vdwtype1, vdwtype2, vdwstyle = [], [], []
+    bndtype1, bndtype2 = [], []
+    angtype1, angtype2, angtype3 = [], [], []
+    dihtype1, dihtype2, dihtype3, dihtype4 = [], [], [], []
+    imptype1, imptype2, imptype3, imptype4 = [], [], [], []
+    loop_pair = []
+
 
 def read_pdb(fname, sysdat):
     col = 30
@@ -124,6 +136,7 @@ def read_pdb(fname, sysdat):
             print("WARNING: Did not find cell size.")
             print("Box size will have be set by hand.")
 
+
 def read_coords(database, topdat, sysdat):
     os.makedirs("toppar", exist_ok=True)
     for idx in range(sysdat.ntops):
@@ -137,29 +150,42 @@ def read_coords(database, topdat, sysdat):
             else:
                 print("{}      2".format(topdat[idx].fname), file=fout)
             print(file=fout)
+
             print("[ atoms ]", file=fout)
             print("; nr    type    resnr    residu   atom   cgnr   charge  mass", file=fout);
-
             for jdx in range(topdat[idx].nat):
-                print("{:6d} {:>6s}    1    {:>6s} {:>6s} {:6d} {:8.4f}".format(jdx+1,topdat[idx].atomtype[jdx],
-                        topdat[idx].resname[jdx],topdat[idx].atomname[jdx],jdx+1,topdat[idx].charge[jdx]), file=fout)
+                print("{:6d} {:>6s}    1    {:>6s} {:>6s} {:6d} {:8.4f}".format(
+                       jdx+1, 
+                       topdat[idx].atomtype[jdx],
+                       topdat[idx].resname[jdx], 
+                       topdat[idx].atomname[jdx],
+                       jdx+1,
+                       topdat[idx].charge[jdx]), file=fout)
+
             if topdat[idx].nbnd > 0:
                 print(file=fout)
                 print("[ bonds ]", file=fout)
                 print(file=fout)
                 for jdx in range(topdat[idx].nbnd):
-                    if topdat[idx].bndpset[jdx] == True:
-                        tmpcalca = topdat[idx].bndeq[jdx]/10.0
-                        tmpcalcb= topdat[idx].bndfk[jdx]*4.184*2.0*100
-                        print("{:5d} {:5d}    6  {:8.4f}  {:8.4f} ; EN specified by bondparam".format(topdat[idx].bndndx1[jdx],
-                                topdat[idx].bndndx2[jdx],tmpcalca,tmpcalcb), file=fout)
+                    if topdat[idx].bndpset[jdx]:
+                        tmpcalca = topdat[idx].bndeq[jdx]*0.1
+                        tmpcalcb = topdat[idx].bndfk[jdx]*4.184*2.0*100
+                        print("{:5d} {:5d}    6  {:8.4f}  {:8.4f} ; EN specified by bondparam".format(
+                               topdat[idx].bndndx1[jdx],
+                               topdat[idx].bndndx2[jdx],
+                               tmpcalca, tmpcalcb), file=fout)
                     else :
-                        print("{:5d} {:5d}    1".format(topdat[idx].bndndx1[jdx],topdat[idx].bndndx2[jdx]), file=fout)
+                        print("{:5d} {:5d}    1".format(
+                               topdat[idx].bndndx1[jdx],
+                               topdat[idx].bndndx2[jdx]), file=fout)
                 if topdat[idx].resname[0] in ["PWAT", "PSOD", "PCLA"]:
                     print(file=fout)
                     print("[ constraints ]", file=fout)
                     print(file=fout)
-                    print("{:5d} {:5d}    1  0.11".format(topdat[idx].bndndx1[0],topdat[idx].bndndx2[0]), file=fout)
+                    print("{:5d} {:5d}    1  0.11".format(
+                           topdat[idx].bndndx1[0],
+                           topdat[idx].bndndx2[0]), file=fout)
+
             # Go model for protein backbones
             if topdat[idx].ngo > 0:
                 print(file=fout)
@@ -167,10 +193,15 @@ def read_coords(database, topdat, sysdat):
                 print("; Go model for protein backbone", file=fout)
                 print("; ai   aj    funct    c6    c12", file=fout)
                 for jdx in range(topdat[idx].ngo):
-                    topdat[idx].sig[jdx] /= 10
-                    print("{:5d} {:5d}    1  {:14.5e} {:14.5e};  {} {:5.6f} {:5.6f}".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx],
-                            4.184*4.0*topdat[idx].eps[jdx]*pow(topdat[idx].sig[jdx],6),4.184*4.0*topdat[idx].eps[jdx]*pow(topdat[idx].sig[jdx],12),
-                            topdat[idx].gofunctype[jdx],topdat[idx].eps[jdx],topdat[idx].sig[jdx]), file=fout)
+                    tmpcalcb = topdat[idx].sig[jdx]*0.1
+                    print("{:5d} {:5d}    1  {:14.5e} {:14.5e};  {} {:5.6f} {:5.6f}".format(
+                           topdat[idx].gondx1[jdx],
+                           topdat[idx].gondx2[jdx],
+                           4.184*4.0*topdat[idx].eps[jdx]*pow(tmpcalcb, 6),
+                           4.184*4.0*topdat[idx].eps[jdx]*pow(tmpcalcb, 12),
+                           topdat[idx].gofunctype[jdx],
+                           topdat[idx].eps[jdx],
+                           tmpcalcb), file=fout)
                 print(file=fout)
 
             if topdat[idx].nang > 0:
@@ -178,7 +209,7 @@ def read_coords(database, topdat, sysdat):
                 print("[ angles ]",file=fout)
                 print(file=fout)
                 for jdx in range(topdat[idx].nang):
-                    if topdat[idx].angpset[jdx] == True:
+                    if topdat[idx].angpset[jdx]:
                         if topdat[idx].angfk[jdx] == -1:
                             for kdx in range(database.nangtype):
                                 if cmp_wc(database.angtype2[kdx], topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]):
@@ -195,9 +226,13 @@ def read_coords(database, topdat, sysdat):
                         tmpcalca = topdat[idx].angeq[jdx]
                         tmpcalcb = topdat[idx].angfk[jdx]*4.184*2.0
                         print("{:5d} {:5d} {:5d}    1  {:8.4f} {:8.4f} ; {:>6s} {:>6s} {:>6s}".format(
-                                topdat[idx].angndx1[jdx], topdat[idx].angndx2[jdx], topdat[idx].angndx3[jdx],tmpcalca, tmpcalcb,
-                                topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
-                                topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
+                               topdat[idx].angndx1[jdx], 
+                               topdat[idx].angndx2[jdx], 
+                               topdat[idx].angndx3[jdx],
+                               tmpcalca, tmpcalcb,
+                               topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
+                               topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
+                               topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]), file=fout)
                     else:
                         # now compare to the database
                         for kdx in range(database.nangtype):
@@ -212,22 +247,6 @@ def read_coords(database, topdat, sysdat):
                                 if f1 and f2:
                                     datndx = kdx
                                     break
-                        ifound = 0
-                        for kdx in range(database.nvdwtype):
-                            f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                            f2 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                            f3 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
-                            f4 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
-                            if f1 and f2:
-                                ifound = 1
-                                vdwtmp = kdx
-                                break
-                            elif f3 and f4:
-                                ifound = 1
-                                vdwtmp = kdx
-                                break
-                        eps = database.eps[vdwtmp]*4.184
-                        sig = database.sig[vdwtmp]/10.0
                         tmpcalca = database.ange[datndx]
                         tmpcalcb = database.fang[datndx]*4.184*2.0
                         if tmpcalca < 0:
@@ -238,39 +257,66 @@ def read_coords(database, topdat, sysdat):
                             r2 = np.array([sysdat.coordx[i2],sysdat.coordy[i2],sysdat.coordz[i2]])
                             r3 = np.array([sysdat.coordx[i3],sysdat.coordy[i3],sysdat.coordz[i3]])
                             angle_in_pdb = 180.0/pi*get_angle(r1,r2,r3)
-                            print("{:5d} {:5d} {:5d}    1  {:8.4f} {:8.4f} ; {:>6s} {:>6s} {:>6s} taken from pdb"
-                                    .format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx],
-                                            angle_in_pdb,tmpcalcb,database.angtype1[datndx],database.angtype2[datndx],database.angtype3[datndx]), file=fout)
+                            print("{:5d} {:5d} {:5d}    1  {:8.4f} {:8.4f} ; {:>6s} {:>6s} {:>6s} taken from pdb".format(
+                                   topdat[idx].angndx1[jdx],
+                                   topdat[idx].angndx2[jdx],
+                                   topdat[idx].angndx3[jdx],
+                                   angle_in_pdb, tmpcalcb, 
+                                   database.angtype1[datndx],
+                                   database.angtype2[datndx],
+                                   database.angtype3[datndx]), file=fout)
                         else:
-                            if database.angsdk[datndx] == 0:
-                                print("{:5d} {:5d} {:5d}    1".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
+                            if database.angsdk[datndx]:
+                                print("{:5d} {:5d} {:5d}    4".format(
+                                       topdat[idx].angndx1[jdx],
+                                       topdat[idx].angndx2[jdx],
+                                       topdat[idx].angndx3[jdx]), file=fout)
                             else:
-                                print("{:5d} {:5d} {:5d}    4".format(topdat[idx].angndx1[jdx],topdat[idx].angndx2[jdx],topdat[idx].angndx3[jdx]), file=fout)
+                                print("{:5d} {:5d} {:5d}    1".format(
+                                       topdat[idx].angndx1[jdx],
+                                       topdat[idx].angndx2[jdx],
+                                       topdat[idx].angndx3[jdx]), file=fout)
+
             if topdat[idx].ndih > 0:
                 print(file=fout)
                 print("[ dihedrals ]",file=fout)
                 print(file=fout)
                 for jdx in range(topdat[idx].ndih):
-                    if topdat[idx].dihpset[jdx] == True:
+                    if topdat[idx].dihpset[jdx]:
                         print("{:5d} {:5d} {:5d} {:5d}  1  {:<3f} {:8.4f} {:<3d} ; FROM TOP".format(
-                                    topdat[idx].dihndx1[jdx],topdat[idx].dihndx2[jdx],topdat[idx].dihndx3[jdx],topdat[idx].dihndx4[jdx],
-                                    topdat[idx].diheq[jdx],topdat[idx].dihfk[jdx]*4.184,topdat[idx].dihn[jdx]), file=fout)
+                               topdat[idx].dihndx1[jdx],
+                               topdat[idx].dihndx2[jdx],
+                               topdat[idx].dihndx3[jdx],
+                               topdat[idx].dihndx4[jdx],
+                               topdat[idx].diheq[jdx],
+                               topdat[idx].dihfk[jdx]*4.184,
+                               topdat[idx].dihn[jdx]), file=fout)
                     else:
                         print("{:5d} {:5d} {:5d} {:5d}  9".format(
-                                    topdat[idx].dihndx1[jdx],topdat[idx].dihndx2[jdx],topdat[idx].dihndx3[jdx],topdat[idx].dihndx4[jdx]), file=fout)
+                               topdat[idx].dihndx1[jdx],
+                               topdat[idx].dihndx2[jdx],
+                               topdat[idx].dihndx3[jdx],
+                               topdat[idx].dihndx4[jdx]), file=fout)
 
             if topdat[idx].nimp > 0:
                 print(file=fout)
                 print("[ dihedrals ]", file=fout)
                 print(file=fout)
                 for jdx in range(topdat[idx].nimp):
-                    if topdat[idx].imppset[jdx] == True:
+                    if topdat[idx].imppset[jdx]:
                         print("{:5d} {:5d} {:5d} {:5d}  2  {:8.4f} {:8.4f} ; FROM TOP".format(
-                                topdat[idx].impndx1[jdx],topdat[idx].impndx2[jdx],topdat[idx].impndx3[jdx],topdat[idx].impndx4[jdx],
-                                topdat[idx].impfk[jdx]*4.184*2.0,topdat[idx].impeq[jdx]), file=fout)
+                               topdat[idx].impndx1[jdx],
+                               topdat[idx].impndx2[jdx],
+                               topdat[idx].impndx3[jdx],
+                               topdat[idx].impndx4[jdx],
+                               topdat[idx].impfk[jdx]*4.184*2.0,
+                               topdat[idx].impeq[jdx]), file=fout)
                     else:
                         print("{:5d} {:5d} {:5d} {:5d}  2".format(
-                                topdat[idx].impndx1[jdx],topdat[idx].impndx2[jdx],topdat[idx].impndx3[jdx],topdat[idx].impndx4[jdx]), file=fout)
+                               topdat[idx].impndx1[jdx],
+                               topdat[idx].impndx2[jdx],
+                               topdat[idx].impndx3[jdx],
+                               topdat[idx].impndx4[jdx]), file=fout)
 
             # Remove non-native vdw interaction between protein backbone beads forming native contact
             if True in topdat[idx].bndpset or topdat[idx].ngo > 0:
@@ -280,12 +326,17 @@ def read_coords(database, topdat, sysdat):
                     print(file=fout)
                     for jdx in range(topdat[idx].ngo):
                         if jdx == 0:
-                            print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
+                            print("{:4d} {:4d} ".format(
+                                   topdat[idx].gondx1[jdx],
+                                   topdat[idx].gondx2[jdx]), end='', file=fout)
                         elif topdat[idx].gondx1[jdx] != topdat[idx].gondx1[jdx-1]:
                             print(file=fout)
-                            print("{:4d} {:4d} ".format(topdat[idx].gondx1[jdx],topdat[idx].gondx2[jdx]), end='', file=fout)
+                            print("{:4d} {:4d} ".format(
+                                   topdat[idx].gondx1[jdx],
+                                   topdat[idx].gondx2[jdx]), end='', file=fout)
                         else:
-                            print("{:4d} ".format(topdat[idx].gondx2[jdx]), end='', file=fout)
+                            print("{:4d} ".format(
+                                   topdat[idx].gondx2[jdx]), end='', file=fout)
                 if True in topdat[idx].bndpset:
                     tmp_bndndx1 = 0
                     for jdx in range(topdat[idx].nbnd):
@@ -293,12 +344,16 @@ def read_coords(database, topdat, sysdat):
                             if topdat[idx].bndndx1[jdx] != tmp_bndndx1:
                                 tmp_bndndx1 = topdat[idx].bndndx1[jdx]
                                 print(file=fout)
-                                print("{:4d} {:4d} ".format(topdat[idx].bndndx1[jdx],topdat[idx].bndndx2[jdx]), end='', file=fout)
+                                print("{:4d} {:4d} ".format(
+                                       topdat[idx].bndndx1[jdx],
+                                       topdat[idx].bndndx2[jdx]), end='', file=fout)
                             else:
-                                print("{:4d} ".format(topdat[idx].bndndx2[jdx]), end='', file=fout)
+                                print("{:4d} ".format(
+                                       topdat[idx].bndndx2[jdx]), end='', file=fout)
             print(file=fout)
 
-def write_psf(database, topdat, sysdat):
+
+def write_psf(topdat, sysdat):
     with open("out.psf", "w") as fout:
         print("PSF ", file=fout)
         print(file=fout)
@@ -313,8 +368,9 @@ def write_psf(database, topdat, sysdat):
                 molidx += 1
                 for kdx in range(topdat[idx].nat):
                     atidx += 1
-                    print("{:8} {:<4}{:5} {:<4} {:<4} {:<4}  {:9.6f}  {:12.4f}".format(atidx, topdat[idx].resname[kdx], min(9999,molidx), 
-                           topdat[idx].resname[kdx], topdat[idx].atomname[kdx],topdat[idx].atomtype[kdx], 
+                    print("{:8} {:<4}{:5} {:<4} {:<4} {:<4}  {:9.6f}  {:12.4f}".format(
+                           atidx, topdat[idx].resname[kdx], min(9999,molidx), 
+                           topdat[idx].resname[kdx], topdat[idx].atomname[kdx], topdat[idx].atomtype[kdx], 
                            topdat[idx].charge[kdx], topdat[idx].mass[kdx]), file=fout)
         print(file=fout)
         print("{:8} !NBOND: bonds".format(sysdat.total_bnds), file=fout)
@@ -323,8 +379,9 @@ def write_psf(database, topdat, sysdat):
             for jdx in range(topdat[idx].nmol):
                 for kdx in range(topdat[idx].nbnd):
                     bondidx += 1
-                    print("{:>8}{:>8}".format(topdat[idx].bndndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                              topdat[idx].bndndx2[kdx]+(jdx*topdat[idx].nat)+offset),
+                    print("{:>8}{:>8}".format(
+                           topdat[idx].bndndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].bndndx2[kdx]+(jdx*topdat[idx].nat)+offset),
                            file=fout, end="")
                     if bondidx % 4 == 0:
                         print(file=fout)
@@ -337,9 +394,10 @@ def write_psf(database, topdat, sysdat):
             for jdx in range(topdat[idx].nmol):
                 for kdx in range(topdat[idx].nang):
                     angleidx += 1
-                    print("{:>8}{:>8}{:>8}".format(topdat[idx].angndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                   topdat[idx].angndx2[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                   topdat[idx].angndx3[kdx]+(jdx*topdat[idx].nat)+offset),
+                    print("{:>8}{:>8}{:>8}".format(
+                           topdat[idx].angndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].angndx2[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].angndx3[kdx]+(jdx*topdat[idx].nat)+offset),
                            file=fout, end="")
                     if angleidx % 3 ==0:
                         print(file=fout)
@@ -374,24 +432,22 @@ def write_psf(database, topdat, sysdat):
             for jdx in range(topdat[idx].nmol):
                 for kdx in range(topdat[idx].nimp):
                     improidx += 1
-                    print("{:>8}{:>8}{:>8}{:>8}".format(topdat[idx].impndx1[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx2[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx3[kdx]+(jdx*topdat[idx].nat)+offset,
-                                                        topdat[idx].impndx4[kdx]+(jdx*topdat[idx].nat)+offset),
+                    print("{:>8}{:>8}{:>8}{:>8}".format(
+                           topdat[idx].impndx1[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].impndx2[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].impndx3[kdx]+(jdx*topdat[idx].nat)+offset,
+                           topdat[idx].impndx4[kdx]+(jdx*topdat[idx].nat)+offset),
                            file=fout, end="")
                     if improidx % 2 ==0:
                         print(file=fout)
             offset += topdat[idx].nmol*topdat[idx].nat
         print(file=fout)
         print(file=fout)
-        #print("{:<7} !NPHI: dihedrals".format(sysdat.total_dihs),    file=fout)
-        #print(file=fout)
-        #print("{:<7} !NIMPHI: impropers".format(sysdat.total_imps), file=fout)
-        #print(file=fout)
         #print("       0 !NDON: donors", file=fout)
         #print(file=fout)
         #print("       0 !NACC: acceptors", file=fout)
         #print(file=fout)
+
 
 def cmp_wc(s1, s2):
     if s1[-1] == "*":
@@ -403,6 +459,7 @@ def cmp_wc(s1, s2):
     else:
         return s1 == s2
 
+
 def get_unique(database, topdat, sysdat):
     uniq_nats = uniq_bnds = uniq_angs = uniq_imps = uniq_dihs = 0
     uniq_atype, uniq_mass, uniq_charge = [], [], []
@@ -413,17 +470,16 @@ def get_unique(database, topdat, sysdat):
     with open("toppar/SPICA.itp","w") as fout:
         print("; Generated by setup_gmx", file=fout)
         print(file=fout)
-
         # first gather the unique atom types
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].nat):
-                ikeep = 1
+                keep = True
                 for kdx in range(uniq_nats):
                     if topdat[idx].atomtype[jdx] == uniq_atype[kdx]:
-                        ikeep = 0
+                        keep = False
                         topdat[idx].parm_atomtype.append(kdx)
                         break
-                if ikeep == 1:
+                if keep:
                     uniq_atype.append(topdat[idx].atomtype[jdx])
                     uniq_mass.append(topdat[idx].mass[jdx])
                     uniq_charge.append(topdat[idx].charge[jdx])
@@ -437,9 +493,9 @@ def get_unique(database, topdat, sysdat):
         print("[ atomtypes ]", file=fout);
         print("; name   mass   charge   ptype   sigma   epsilon", file=fout);
         for idx in range(uniq_nats):
-            print("{:>8s} {:8.4f} {:8.4f}    A    0.0    0.0".format(uniq_atype[idx], uniq_mass[idx], uniq_charge[idx]), file=fout)
+            print("{:>8s} {:8.4f} {:8.4f}    A    0.0    0.0".format(
+                   uniq_atype[idx], uniq_mass[idx], uniq_charge[idx]), file=fout)
         print(file=fout)
-
         # get pair interactions
         bb_sec = ['GBML','GBBL','ABBL','GBTL','ABTL','GBMS','GBBS','ABBS','GBTS','ABTS']
         print("[ nonbond_params ]", file=fout);
@@ -463,25 +519,19 @@ def get_unique(database, topdat, sysdat):
                         tmp_type2 = uniq_atype[jdx][0:3]
                     else:
                         tmp_type2 = uniq_atype[jdx]
-
-                ifound=0;
+                found = False;
                 for kdx in range(database.nvdwtype):
                     if database.vdwtype1[kdx] == tmp_type1 and database.vdwtype2[kdx] == tmp_type2:
-                        ifound = 1
+                        found = True
                         vdwtmp = kdx
                         break
                     elif database.vdwtype2[kdx] == tmp_type1 and database.vdwtype1[kdx] == tmp_type2:
-                        ifound = 1
+                        found = True
                         vdwtmp = kdx
                         break
-                if ifound == 0:
-                    print("*********************")
-                    print("WARNING: No params for VDW interaction between {} and {}".format(uniq_atype[idx],uniq_atype[jdx]))
-                    print("UPDATE DATABASE!!!")
-                    sys.exit(1)
-                elif ifound == 1:
+                if found:
                     eps = database.eps[vdwtmp]
-                    sig = database.sig[vdwtmp]/10.0
+                    sig = database.sig[vdwtmp]*0.1
                     sigsq = sig*sig
                     sigcub = sig*sig*sig
                     if database.vdwstyle[vdwtmp] == "lj12_4":
@@ -501,11 +551,17 @@ def get_unique(database, topdat, sysdat):
 	                    disp = pf126*eps*sigcub*sigcub
 	                    repul = pf126*eps*sigcub*sigcub*sigcub*sigcub
                     else:
-                        print("ERROR: Write correct LJ type {} {} (e.g.) lj12_4".format(database.vdwtype1[vdwtmp],database.vdwtype2[vdwtmp]))
-                        sys.exit(0)
-
-                    print("{:>6s} {:>6s}    1  {:14.5e} {:14.5e} ;  {} {:5.6f} {:5.6f}".format
-                            (uniq_atype[idx], uniq_atype[jdx], disp, repul,database.vdwstyle[vdwtmp],eps,sig), file=fout)
+                        sys.exit("ERROR: Write correct LJ type {} {} (e.g.) lj12_4".format(
+                                  database.vdwtype1[vdwtmp],database.vdwtype2[vdwtmp]))
+                    print("{:>6s} {:>6s}    1  {:14.5e} {:14.5e} ;  {} {:5.6f} {:5.6f}".format(
+                            uniq_atype[idx], uniq_atype[jdx], 
+                            disp, repul, database.vdwstyle[vdwtmp], 
+                            eps, sig), file=fout)
+                else:
+                    print("*********************")
+                    print("WARNING: No params for VDW interaction between {} and {}".format(uniq_atype[idx],uniq_atype[jdx]))
+                    print("Update database")
+                    sys.exit(1)
         
         # get bond interactions
         print(file=fout)
@@ -514,12 +570,9 @@ def get_unique(database, topdat, sysdat):
             print("; i     j     func     b0     kb", file=fout)
             for idx in range(sysdat.ntops):
                 for jdx in range(topdat[idx].nbnd):
-                    ikeep = 1
+                    keep = True
                     datndx = -1
-                    # AT THIS POINT WE WILL CHECK TO SEE IF THE PARAMS WERE GIVEN */
-                    # IN THE TOP FILE....IF SO WE WILL SKIP A LOT OF THIS AND ADD */
-                    # THIS AS A UNIQUE BOND....IF NOT WE GO THROUGH THE PROCEDURE */
-                    if topdat[idx].bndpset[jdx] == False:
+                    if not topdat[idx].bndpset[jdx]:
                         # now compare to the database 
                         for kdx in range(database.nbndtype):
                                 f1 = cmp_wc(database.bndtype1[kdx], topdat[idx].atomtype[topdat[idx].bndndx1[jdx]-1]) 
@@ -542,19 +595,18 @@ def get_unique(database, topdat, sysdat):
                                         topdat[idx].bndndx2[jdx],
                                         topdat[idx].atomtype[topdat[idx].bndndx1[jdx]-1],
                                         topdat[idx].atomtype[topdat[idx].bndndx2[jdx]-1]))
-
                         # Now make sure we do not already know we have this interaction
                         for kdx in range(uniq_bnds):
                             if bnd_name1[kdx] == b1tmp and bnd_name2[kdx] == b2tmp:
-                                ikeep = 0
+                                keep = False
                                 topdat[idx].bndtype.append(kdx)
                                 break
                             if bnd_name2[kdx] == b1tmp and bnd_name1[kdx] == b2tmp:
-                                ikeep = 0
+                                keep = False
                                 topdat[idx].bndtype.append(kdx)
                                 break
-                        # ikeep = 1 if we found a new one 
-                        if ikeep == 1:
+                        # keep = True if we found a new one 
+                        if keep:
                             bnd_params.append(datndx)
                             bnd_name1.append(b1tmp)
                             bnd_name2.append(b2tmp)
@@ -563,7 +615,6 @@ def get_unique(database, topdat, sysdat):
                             uniq_bnds += 1
                             tmpcalca = database.bnde[bnd_params[uniq_bnds-1]]/10.0
                             tmpcalcb = database.fbnd[bnd_params[uniq_bnds-1]]*4.184*2.0*100
-                            print("{} {}".format(database.bndtype1[bnd_params[uniq_bnds-1]],database.bndtype2[bnd_params[uniq_bnds-1]]))
                             print("{:>6s} {:>6s}    1  {:8.4f}  {:8.4f}".format(b1tmp,b2tmp,tmpcalca,tmpcalcb), file=fout)
         sysdat.uniq_nbnds = uniq_bnds
 
@@ -575,10 +626,7 @@ def get_unique(database, topdat, sysdat):
             for idx in range(sysdat.ntops):
                 for jdx in range(topdat[idx].nang):
                     datndx = -1
-                    # AT THIS POINT WE WILL CHECK TO SEE IF THE PARAMS WERE GIVEN */
-                    # IN THE TOP FILE....IF SO WE WILL SKIP A LOT OF THIS AND ADD */
-                    # THIS AS A UNIQUE BOND....IF NOT WE GO THROUGH THE PROCEDURE */
-                    if topdat[idx].angpset[jdx] == False:
+                    if not topdat[idx].angpset[jdx]:
                         # now compare to the database
                         for kdx in range(database.nangtype):
                             if cmp_wc(database.angtype2[kdx], topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1]):
@@ -592,43 +640,45 @@ def get_unique(database, topdat, sysdat):
                                 if f1 and f2:
                                     datndx = kdx
                                     break
-                        ifound = 0
+                        found = False
                         for kdx in range(database.nvdwtype):
                             f1 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
                             f2 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
                             f3 = database.vdwtype1[kdx] == topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]
                             f4 = database.vdwtype2[kdx] == topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1]
                             if f1 and f2:
-                                ifound = 1
+                                found = True
                                 vdwtmp = kdx
                                 break
                             elif f3 and f4:
-                                ifound = 1
+                                found = True
                                 vdwtmp = kdx
                                 break
-                        if ifound == 0:
+                        if not found:
                             print("*********************");
-                            print("ERROR: No params for VDW interaction between {} and {} for angle (database)".format(topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
+                            print("ERROR: No params for VDW interaction between {} and {} for angle (database)".format(
+                                   topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
                                    topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1]))
-                            print("Update database.")
+                            print("Update database")
+                            sys.exit(1)
                         # end VDW for CG angles 
                         # No params for this interaction in the database
                         if datndx == -1:
-                            print("ERROR: Did not find angle parameters in database {} {} {} ({} {} {})".format(topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
+                            sys.exit("ERROR: Did not find angle parameters in database {} {} {} ({} {} {})".format(
+                                   topdat[idx].atomtype[topdat[idx].angndx1[jdx]-1],
                                    topdat[idx].atomtype[topdat[idx].angndx2[jdx]-1],
                                    topdat[idx].atomtype[topdat[idx].angndx3[jdx]-1],
                                    topdat[idx].angndx1[jdx],
                                    topdat[idx].angndx2[jdx],
                                    topdat[idx].angndx3[jdx]))
-                            sys.exit(1)
                         # Now make sure we do not already have this one
-                        ikeep = 1
+                        keep = True
                         for kdx in range(uniq_angs):
                             if datndx == ang_params[kdx]:
-                                ikeep = 0
+                                keep = False
                                 topdat[idx].angtype.append(kdx)
                                 break
-                        if ikeep == 1:
+                        if keep:
                             eps = database.eps[vdwtmp]*4.184
                             sig = database.sig[vdwtmp]/10.0
                             ang_params.append(datndx)
@@ -639,18 +689,18 @@ def get_unique(database, topdat, sysdat):
                             tmpcalca = database.ange[ang_params[uniq_angs-1]]
                             tmpcalcb = database.fang[ang_params[uniq_angs-1]]*4.184*2.0
                             if tmpcalca > 0:
-                                if database.angsdk[datndx] == 0:
-                                    print("{:>6s} {:>6s} {:>6s}    1  {:8.4f} {:8.4f}".format(
-                                            database.angtype1[ang_params[ uniq_angs-1]],
-                                            database.angtype2[ang_params[ uniq_angs-1]],
-                                            database.angtype3[ang_params[ uniq_angs-1]],
-                                            tmpcalca, tmpcalcb), file=fout)
-                                else:
+                                if database.angsdk[datndx]:
                                     print("{:>6s} {:>6s} {:>6s}    4  {:8.4f} {:8.4f} {:8.4f} {:8.4f}".format(
-                                            database.angtype1[ang_params[ uniq_angs-1]],
-                                            database.angtype2[ang_params[ uniq_angs-1]],
-                                            database.angtype3[ang_params[ uniq_angs-1]],
+                                            database.angtype1[ang_params[uniq_angs-1]],
+                                            database.angtype2[ang_params[uniq_angs-1]],
+                                            database.angtype3[ang_params[uniq_angs-1]],
                                             tmpcalca, tmpcalcb, sig, eps), file=fout)
+                                else:
+                                    print("{:>6s} {:>6s} {:>6s}    1  {:8.4f} {:8.4f}".format(
+                                            database.angtype1[ang_params[uniq_angs-1]],
+                                            database.angtype2[ang_params[uniq_angs-1]],
+                                            database.angtype3[ang_params[uniq_angs-1]],
+                                            tmpcalca, tmpcalcb), file=fout)
         sysdat.uniq_nangs = uniq_angs
         # get dihedral interactions
         print(file=fout)
@@ -660,7 +710,7 @@ def get_unique(database, topdat, sysdat):
             for idx in range(sysdat.ntops):
                 for jdx in range(topdat[idx].ndih):
                     datndx = []
-                    if topdat[idx].dihpset[jdx] == False:
+                    if not topdat[idx].dihpset[jdx]:
                         top_atype1 = topdat[idx].atomtype[topdat[idx].dihndx1[jdx]-1]
                         top_atype2 = topdat[idx].atomtype[topdat[idx].dihndx2[jdx]-1]
                         top_atype3 = topdat[idx].atomtype[topdat[idx].dihndx3[jdx]-1]
@@ -692,27 +742,25 @@ def get_unique(database, topdat, sysdat):
                         # No params for this interaction in the database
                         if len(datndx) == 0:
                             sys.exit("ERROR: Did not find dihedral parameters in database {} {} {} {} ({} {} {} {})".format(
-                                   top_atype1,
-                                   top_atype2,
-                                   top_atype3,
-                                   top_atype4,
-                                   topdat[idx].dihndx1[jdx],
-                                   topdat[idx].dihndx2[jdx],
-                                   topdat[idx].dihndx3[jdx],
-                                   topdat[idx].dihndx4[jdx],
-                            ))
+                                      top_atype1,
+                                      top_atype2,
+                                      top_atype3,
+                                      top_atype4,
+                                      topdat[idx].dihndx1[jdx],
+                                      topdat[idx].dihndx2[jdx],
+                                      topdat[idx].dihndx3[jdx],
+                                      topdat[idx].dihndx4[jdx]))
                         # Now make sure we do not already have this one
-                        ikeep = True
+                        keep = True
                         keeps = []
                         for ldx in datndx:
                             if database.dihe[ldx] != -1:
                                 for kdx in range(uniq_dihs):
                                     if ldx == dih_params[kdx]:
-                                        ikeep = False
+                                        keep = False
                                         keeps.append(kdx)
-                        if not ikeep:
+                        if not keep:
                             topdat[idx].dihtype.append([uniq_dihs, keeps])
-                        # ikeep = True if we found a new one
                         else:
                             dih_params += datndx
                             sysdat.param_dihs += datndx
@@ -736,7 +784,7 @@ def get_unique(database, topdat, sysdat):
             for idx in range(sysdat.ntops):
                 for jdx in range(topdat[idx].nimp):
                     datndx = -1
-                    if topdat[idx].imppset[jdx] == False:
+                    if not topdat[idx].imppset[jdx]:
                         # now compare to the database
                         for kdx in range(database.nimptype):
                             if cmp_wc(database.imptype2[kdx], topdat[idx].atomtype[topdat[idx].impndx2[jdx]-1]):
@@ -756,23 +804,22 @@ def get_unique(database, topdat, sysdat):
                         # No params for this interaction in the database
                         if datndx == -1:
                             sys.exit("ERROR: Did not find improper parameters in database {} {} {} ({} {} {})".format(
-                                   topdat[idx].atomtype[topdat[idx].impndx1[jdx]-1],
-                                   topdat[idx].atomtype[topdat[idx].impndx2[jdx]-1],
-                                   topdat[idx].atomtype[topdat[idx].impndx3[jdx]-1],
-                                   topdat[idx].atomtype[topdat[idx].impndx3[jdx]-1],
-                                   topdat[idx].impndx1[jdx],
-                                   topdat[idx].impndx2[jdx],
-                                   topdat[idx].impndx3[jdx],
-                                   topdat[idx].impndx4[jdx],
-                            ))
+                                      topdat[idx].atomtype[topdat[idx].impndx1[jdx]-1],
+                                      topdat[idx].atomtype[topdat[idx].impndx2[jdx]-1],
+                                      topdat[idx].atomtype[topdat[idx].impndx3[jdx]-1],
+                                      topdat[idx].atomtype[topdat[idx].impndx3[jdx]-1],
+                                      topdat[idx].impndx1[jdx],
+                                      topdat[idx].impndx2[jdx],
+                                      topdat[idx].impndx3[jdx],
+                                      topdat[idx].impndx4[jdx]))
                         # Now make sure we do not already have this one
-                        ikeep = 1
+                        keep = True
                         for kdx in range(uniq_imps):
                             if datndx == imp_params[kdx]:
-                                ikeep = 0
+                                keep = False
                                 topdat[idx].imptype.append(kdx)
                                 break
-                        if ikeep == 1:
+                        if keep:
                             imp_params.append(datndx)
                             sysdat.param_imps.append(datndx)
                             topdat[idx].imptype.append(uniq_imps)
@@ -788,6 +835,7 @@ def get_unique(database, topdat, sysdat):
         sysdat.uniq_nimps = uniq_imps
         print(file=fout)
 
+
 # Read the database file and store unique params
 # Warn if you find duplicates
 def read_database(fname, database):
@@ -800,44 +848,44 @@ def read_database(fname, database):
                 line = fin.readline()
                 continue
             if items[0] == "pair":
-                ikeep = 1
+                keep = True
                 vdwtype1 = items[1]
                 vdwtype2 = items[2]
                 vdwstyle = items[3]
-                eps      = float(items[4])
-                sig      = float(items[5])
+                eps = float(items[4])
+                sig = float(items[5])
                 for idx in range(nvdw):
-                    if   vdwtype1 == database.vdwtype1[idx] and vdwtype2 == database.vdwtype2[idx]:
+                    if vdwtype1 == database.vdwtype1[idx] and vdwtype2 == database.vdwtype2[idx]:
                         print("WARNING: Found dup vdw param {} {}".format(vdwtype1,vdwtype2))
-                        ikeep = 0
+                        keep = False
                     elif vdwtype1 == database.vdwtype2[idx] and vdwtype2 == database.vdwtype1[idx]:
                         print("WARNING: Found dup vdw param {} {}".format(vdwtype1,vdwtype2))
-                        ikeep = 0
-                if ikeep == 1:
-                        database.vdwtype1.append(vdwtype1)
-                        database.vdwtype2.append(vdwtype2)
-                        database.vdwstyle.append(vdwstyle)
-                        database.eps.append(eps)
-                        database.sig.append(sig)
-                        nvdw += 1
+                        keep = False
+                if keep:
+                    database.vdwtype1.append(vdwtype1)
+                    database.vdwtype2.append(vdwtype2)
+                    database.vdwstyle.append(vdwstyle)
+                    database.eps.append(eps)
+                    database.sig.append(sig)
+                    nvdw += 1
                 if vdwtype1 == 'GBML':
                     database.loop_pair.append(vdwtype2)
                 elif vdwtype2 == 'GBML':
                     database.loop_pair.append(vdwtype1)
             if items[0] == "bond":
-                ikeep = 1
+                keep = True
                 bndtype1 = items[1]
                 bndtype2 = items[2]
-                fbnd     = float(items[3])
-                bnde     = float(items[4])
+                fbnd = float(items[3])
+                bnde = float(items[4])
                 for idx in range(nbnd):
-                        if   bndtype1 == database.bndtype1[idx] and bndtype2 == database.bndtype2[idx]:
-                            print("WARNING: Found dup bond param {} {}".format(bndtype1,bndtype2))
-                            ikeep = 0
-                        elif bndtype1 == database.bndtype2[idx] and bndtype2 == database.bndtype1[idx]:
-                            print("WARNING: Found dup bond param {} {}".format(bndtype1,bndtype2))
-                            ikeep = 0
-                if ikeep == 1:
+                    if bndtype1 == database.bndtype1[idx] and bndtype2 == database.bndtype2[idx]:
+                        print("WARNING: Found dup bond param {} {}".format(bndtype1,bndtype2))
+                        keep = False
+                    elif bndtype1 == database.bndtype2[idx] and bndtype2 == database.bndtype1[idx]:
+                        print("WARNING: Found dup bond param {} {}".format(bndtype1,bndtype2))
+                        keep = False
+                if keep:
                     database.bndtype1.append(bndtype1)
                     database.bndtype2.append(bndtype2)
                     database.fbnd.append(fbnd)
@@ -845,24 +893,24 @@ def read_database(fname, database):
                     nbnd += 1
             if items[0] == "angle":
                 if "harmonic" in line:
-                    angsdk = 0
+                    angsdk = False
                 else:
-                    angsdk = 1
-                ikeep = 1
+                    angsdk = True
+                keep = True
                 angtype1 = items[1]
                 angtype2 = items[2]
                 angtype3 = items[3]
-                fang     = float(items[4])
-                ange     = float(items[5])
+                fang = float(items[4])
+                ange = float(items[5])
                 for idx in range(nang):
                     if angtype2 == database.angtype2[idx]:
-                        if   angtype1 == database.angtype1[idx] and angtype3 == database.angtype3[idx]:
-                                print("WARNING: Found dup angle param {} {} {}".format(angtype1,angtype2,angtype3))
-                                ikeep = 0
+                        if angtype1 == database.angtype1[idx] and angtype3 == database.angtype3[idx]:
+                            print("WARNING: Found dup angle param {} {} {}".format(angtype1,angtype2,angtype3))
+                            keep = False
                         elif angtype3 == database.angtype1[idx] and angtype1 == database.angtype3[idx]:
-                                print("WARNING: Found dup angle param {} {} {}".format(angtype1,angtype2,angtype3))
-                                ikeep = 0
-                if ikeep == 1:
+                            print("WARNING: Found dup angle param {} {} {}".format(angtype1,angtype2,angtype3))
+                            keep = False
+                if keep:
                     database.angtype1.append(angtype1)
                     database.angtype2.append(angtype2)
                     database.angtype3.append(angtype3)
@@ -871,25 +919,25 @@ def read_database(fname, database):
                     database.angsdk.append(angsdk)
                     nang += 1
             if items[0] == "dihedral":
-                ikeep = 1
+                keep = True
                 dihtype1 = items[1]
                 dihtype2 = items[2]
                 dihtype3 = items[3]
                 dihtype4 = items[4]
-                fdih     = float(items[6])
-                dihn     = float(items[7])
-                dihe     = float(items[8])
+                fdih = float(items[6])
+                dihn = float(items[7])
+                dihe = float(items[8])
                 for idx in range(ndih):
                     if dihn == database.dihn[idx]:
                         if dihtype2 == database.dihtype2[idx] and dihtype3 == database.dihtype3[idx]:
                             if dihtype1 == database.dihtype1[idx] and dihtype4 == database.dihtype4[idx]:
-                                    print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3,dihtype4))
-                                    ikeep = 0
+                                print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3,dihtype4))
+                                keep = False
                         if dihtype2 == database.dihtype3[idx] and dihtype3 == database.dihtype2[idx]:
                             if dihtype1 == database.dihtype4[idx] and dihtype4 == database.dihtype1[idx]:
-                                    print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3,dihtype4))
-                                    ikeep = 0
-                if ikeep == 1:
+                                print("WARNING: Found dup dihedral param {} {} {} {}".format(dihtype1,dihtype2,dihtype3,dihtype4))
+                                keep = False
+                if keep:
                     database.dihtype1.append(dihtype1)
                     database.dihtype2.append(dihtype2)
                     database.dihtype3.append(dihtype3)
@@ -899,7 +947,7 @@ def read_database(fname, database):
                     database.dihe.append(dihe)
                     ndih += 1
             if items[0] == "improper":
-                ikeep = 1
+                keep = True
                 imptype1 = items[1]
                 imptype2 = items[2]
                 imptype3 = items[3]
@@ -908,14 +956,14 @@ def read_database(fname, database):
                 impe     = float(items[6])
                 for idx in range(nimp):
                     if imptype2 == database.imptype2[idx] and imptype3 == database.imptype3[idx]:
-                        if   imptype1 == database.imptype1[idx] and imptype4 == database.imptype4[idx]:
-                                print("WARNING: Found dup improper param {} {} {} {}".format(imptype1,imptype2,imptype3,imptype4))
-                                ikeep = 0
+                        if imptype1 == database.imptype1[idx] and imptype4 == database.imptype4[idx]:
+                            print("WARNING: Found dup improper param {} {} {} {}".format(imptype1,imptype2,imptype3,imptype4))
+                            keep = False
                     if imptype2 == database.imptype3[idx] and imptype3 == database.imptype2[idx]:
                         if imptype1 == database.imptype4[idx] and imptype4 == database.imptype1[idx]:
-                                print("WARNING: Found dup improper param {} {} {} {}".format(imptype1,imptype2,imptype3,imptype4))
-                                ikeep = 0
-                if ikeep == 1:
+                            print("WARNING: Found dup improper param {} {} {} {}".format(imptype1,imptype2,imptype3,imptype4))
+                            keep = False
+                if keep:
                     database.imptype1.append(imptype1)
                     database.imptype2.append(imptype2)
                     database.imptype3.append(imptype3)
@@ -929,6 +977,7 @@ def read_database(fname, database):
         database.nangtype = nang
         database.ndihtype = ndih
         database.nimptype = nimp
+
 
 # Count the number of params in the database so we can allocate for storage
 def count_params(fname, database):
@@ -956,6 +1005,7 @@ def count_params(fname, database):
                 database.nimptype += 1
             line = fin.readline()
         
+
 # count the number of things in the topology files so we can allocate
 def count_atoms(fname, topdat, ntop):
     topdat[ntop].nat = 0
@@ -984,18 +1034,19 @@ def count_atoms(fname, topdat, ntop):
                 topdat[ntop].nimp += 1
             line = fin.readline()
         if topdat[ntop].nat == 0:
-            sys.exit("ERROR: natom in {} is zero.".format(fname))
+            sys.exit("ERROR: # of atoms in {} is zero.".format(fname))
+
 
 # Read the topology file and store the data
 def read_top(fname, sysdat, topdat, ntop):
     log_bndprm = log_angprm = log_dihprm = log_impprm = log_charge = True
     ndx = bndx = andx = dndx = indx = lc = 0
     print("######################")
-    print("##### READING {}".format(fname))
+    print("##### Reading {}".format(fname))
     with open(fname, "r") as fin:
         line = fin.readline()
         while line:
-            lc    += 1
+            lc += 1
             items = line.split()
             if len(items) == 0:
                 line = fin.readline()
@@ -1026,7 +1077,6 @@ def read_top(fname, sysdat, topdat, ntop):
                     topdat[ntop].sig.append((float(items[5])))
                 except:
                     sys.exit("ERROR: File {}, line {}".format(fname, lc))
-
             if items[0] == "bond":
                 try:
                     topdat[ntop].bndndx1.append(int(items[1]))
@@ -1039,7 +1089,7 @@ def read_top(fname, sysdat, topdat, ntop):
                 bndx += 1
             if items[0] == "bondparam":
                 if log_bndprm:
-                    print("WARNING: Using bond parameters from the top file.")
+                    print("NOTE: Using bond parameters from the top file.")
                     log_bndprm = False
                 if len(items) < 5:
                     sys.exit("ERROR: Not enough args for bondparam: must be: ndx1 ndx2 fk eq.")
@@ -1065,7 +1115,7 @@ def read_top(fname, sysdat, topdat, ntop):
                 andx += 1
             if items[0] == "angleparam":
                 if log_angprm:
-                    print("WARNING: Using angle parameters from the top file.")
+                    print("NOTE: Using angle parameters from the top file.")
                     log_angprm = False
                 if len(items) < 6:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk eq.")
@@ -1093,7 +1143,7 @@ def read_top(fname, sysdat, topdat, ntop):
                 indx += 1
             if items[0] == "improperparam":
                 if log_impprm:
-                    print("WARNING: Using improper parameters from the top file.")
+                    print("NOTE: Using improper parameters from the top file.")
                     log_impprm = False
                 if len(items) < 7:
                     sys.exit("ERROR: Not enough args for improperparam: must be: ndx1 ndx2 ndx3 ndx4 fk eq.")
@@ -1123,7 +1173,7 @@ def read_top(fname, sysdat, topdat, ntop):
                 dndx += 1
             if items[0] == "dihedralparam":
                 if log_dihprm:
-                    print("WARNING: Using dihedral parameters from the top file.")
+                    print("NOTE: Using dihedral parameters from the top file.")
                     log_dihprm = False
                 if len(items) < 9:
                     sys.exit("ERROR: Not enough args for angleparam: must be: ndx1 ndx2 ndx3 fk n eq onefour.")
@@ -1141,7 +1191,8 @@ def read_top(fname, sysdat, topdat, ntop):
                 dndx += 1
             line = fin.readline()
 
-def make_ndx(database,topdat,sysdat):
+
+def make_ndx(database, topdat, sysdat):
     ljtypes = {}
     grps = ["lj12_4", "lj9_6", "sol", "psol"]
     sols = ["W", "SOD", "CLA", "POT", "MAG", "CAL"]
@@ -1158,7 +1209,6 @@ def make_ndx(database,topdat,sysdat):
             ljtypes[vt2] = database.vdwstyle[kdx]
         elif vt2 in sols or vt2 in psolsp:
             ljtypes[vt1] = database.vdwstyle[kdx]
-
     with open("CGindex.ndx", "w") as fpind:
         print(f"[ system ]", file=fpind)
         atindex = 0
@@ -1193,12 +1243,15 @@ def make_ndx(database,topdat,sysdat):
                 print(file=fpind)
                 print(file=fpind)
 
-def make_top(database,topdat,sysdat):
+
+def make_top(topdat, sysdat):
     with open("topol.top", "w") as fout:
         print("; generated by cg_spica setup_gmax", file=fout)
         print("#include \"toppar/SPICA.itp\"", file=fout)
-        for idx in range(sysdat.ntops):
-          print(f"#include \"toppar/{topdat[idx].fname}.itp\"", file=fout)
+        lst = [ topdat[idx].fname for idx in range(sysdat.ntops) ]
+        topnames = sorted(set(lst), key=lst.index)
+        for topname in topnames:
+            print(f"#include \"toppar/{topname}.itp\"", file=fout)
         print(file=fout)
         print("[ system ]", file=fout)
         print("; Name", file=fout)
@@ -1207,12 +1260,12 @@ def make_top(database,topdat,sysdat):
         print("[ molecules ]", file=fout)
         print("; Compound   #mols", file=fout)
         for idx in range(sysdat.ntops):
-          print("{}     {}".format(topdat[idx].fname, topdat[idx].nmol), file=fout)
+            print("{}     {}".format(topdat[idx].fname, topdat[idx].nmol), file=fout)
+
 
 # Main routine. Call and allocate                                       
 # The idea is to read in the topologies and then check the database for 
 # all of the required interaction params.                              
-
 def run(args):
     inputs = args.input_files
     nargs = len(inputs)
@@ -1225,18 +1278,17 @@ def run(args):
         print("setup_gmx for SPICA protein model.")
         ntops = int((nargs-2)/2)
     else:
-        if nargs < 3 or nargs%2  == 0:
+        if nargs < 3 or nargs % 2  == 0:
             print("Dumps input files for a GROMACS run.")
             print("usage: setup_gmx [-p] <topfile 1> <nmol 1> [ <topfile 2> <nmol 2> ..... <topfile n> <nmol n>] <database>")
             print("Takes at least three arguments (one component system): 1) Topology, 2) number of molecules, 3) parameter database.")
             sys.exit(1)
         print("setup_gmx for SPICA.")
         ntops = int((nargs-1)/2)
-    topdat   = [Topdat() for _ in range(ntops)]
+    topdat = [Topdat() for _ in range(ntops)]
     database = Database()
-    sysdat   = Sysdat()
+    sysdat = Sysdat()
     print("Will read {} topology file(s).".format(ntops))
-
     # Loop through the topologies and count the number of atoms, bonds and bends
     sysdat.ntops = ntops
     sysdat.nats = 0
@@ -1286,13 +1338,12 @@ def run(args):
             print("Takes angles from {}".format(inputs[nargs-1]))
             read_pdb(inputs[nargs-1],sysdat)
         else:
-            print("No PDB files to take angles!")
-            sys.exit(1)
+            sys.exit("ERROR: No pdb files to take angles!")
     get_unique(database, topdat, sysdat)
     read_coords(database, topdat, sysdat)
-    make_top(database, topdat, sysdat)
+    make_top(topdat, sysdat)
     make_ndx(database, topdat, sysdat)
-    write_psf(database, topdat, sysdat)
+    write_psf(topdat, sysdat)
 
 if __name__ == "__main__":
     args = get_option()
