@@ -176,6 +176,7 @@ class gen_lmp_inp:
         print(f"variable       ip    index none", file=f)
         print(f"variable       op    index run_00", file=f)
         print(f"variable       min   index no", file=f)
+        print(f"variable       dt    index 10", file=f)
         print(f"variable       nstep index 100000", file=f)
         print(f"variable       nlog  index 1000", file=f)
         print(f"variable       ndump index 10000", file=f)
@@ -230,7 +231,7 @@ class gen_lmp_inp:
         print(f"reset_timestep 0", file=f)
         print(file=f)
         print("# Timestep for integration [fs]", file=f)
-        print(f"timestep       10", file=f)
+        print(f"timestep       ${dt}", file=f)
         print(file=f)
         print("# Specify fix for time integration", file=f)
         if self.pspica:
