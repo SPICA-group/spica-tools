@@ -64,12 +64,6 @@ make html
   * `gen_lmpin` : generate a LAMMPS input file for SPICA or pSPICA
   * `gen_gmxin` : generate GROMACS input files for SPICA or pSPICA
 
-* C (in `c/`, cannot be used with cg_spica, must be compiled by the unix command `make` in each directory) 
-  * setup_lammps  
-  * setup_gromacs  
-  
-  The setup_lammps/gromacs codes have the same functionality as setup_lmp/gmx described above, 
-  respectively. They may be useful for generating MD input files for very large systems.  
 
 ## License
 
