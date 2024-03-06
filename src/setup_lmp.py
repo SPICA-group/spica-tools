@@ -280,16 +280,22 @@ def write_psf(topdat, sysdat):
         print("* dummy", file=fout)
         print(file=fout)
         print("{:8} !NATOM".format(sysdat.total_ats), file=fout)
-        atidx = molidx = 0
+        atidx = molidx = 0 
+        tot_charge = 0.0
         for idx in range(sysdat.ntops):
             for jdx in range(topdat[idx].nmol):
                 molidx += 1
                 for kdx in range(topdat[idx].nat):
                     atidx += 1
+                    tot_charge += topdat[idx].charge[kdx]
                     print("{:8} {:<4}{:5} {:<4} {:<4} {:<4}  {:9.6f}  {:12.4f}".format(
                            atidx, topdat[idx].resname[kdx], min(9999,molidx), 
                            topdat[idx].resname[kdx], topdat[idx].atomname[kdx],topdat[idx].atomtype[kdx], 
                            topdat[idx].charge[kdx], topdat[idx].mass[kdx]), file=fout)
+        if abs(tot_charge) < 1e-6:
+            print("Total charge is zero")
+        else:
+            print("WARNING: Total charge is not zero ({})".format(tot_charge))
         print(file=fout)
         if sysdat.total_bnds > 0:
             print("{:8} !NBOND: bonds".format(sysdat.total_bnds), file=fout)
@@ -888,32 +894,43 @@ def get_unique(database, topdat, sysdat):
                         dih_params += datndx
                         sysdat.param_dihs += datndx
                         topdat[idx].dihtype.append([uniq_dihs, [uniq_dihs + x for x in range(len(datndx))]])
+                        diht_lst0 = ["dum" for _ in range(4)]
                         for kdx in range(len(datndx)):
                             uniq_dihs += 1
                             top_ndih += 1
                             if database.dihd[datndx[kdx]] != -1:
+                                diht1 = database.dihtype1[dih_params[uniq_dihs-1]]
+                                diht2 = database.dihtype2[dih_params[uniq_dihs-1]]
+                                diht3 = database.dihtype3[dih_params[uniq_dihs-1]]
+                                diht4 = database.dihtype4[dih_params[uniq_dihs-1]]
+                                diht_lst = [diht1, diht2, diht3, diht4]
+                                if all(x == y and type(x) == type(y) for x, y in zip(diht_lst, diht_lst0)):
+                                    wf = 0.0
+                                else:
+                                    wf = 1.0
                                 if sysdat.nimps > 0:
                                     print("dihedral_coeff {:<8}    charmm {:8.4f} {:2} {:4} {:2.1f} # {} {} {} {}".format(
                                            uniq_dihs,
                                            database.fdih[dih_params[uniq_dihs-1]],
                                            database.dihn[dih_params[uniq_dihs-1]],
                                            int(database.dihd[dih_params[uniq_dihs-1]]),
-                                           0.0,
-                                           database.dihtype1[dih_params[uniq_dihs-1]],
-                                           database.dihtype2[dih_params[uniq_dihs-1]],
-                                           database.dihtype3[dih_params[uniq_dihs-1]],
-                                           database.dihtype4[dih_params[uniq_dihs-1]]), file=fout)
+                                           wf,
+                                           diht1,
+                                           diht2,
+                                           diht3,
+                                           diht4), file=fout)
                                 else:
                                     print("dihedral_coeff {:<8} {:8.4f} {:2} {:4} {:2.1f} # {} {} {} {}".format(
                                            uniq_dihs,
                                            database.fdih[dih_params[uniq_dihs-1]],
                                            database.dihn[dih_params[uniq_dihs-1]],
                                            int(database.dihd[dih_params[uniq_dihs-1]]),
-                                           0.0,
-                                           database.dihtype1[dih_params[uniq_dihs-1]],
-                                           database.dihtype2[dih_params[uniq_dihs-1]],
-                                           database.dihtype3[dih_params[uniq_dihs-1]],
-                                           database.dihtype4[dih_params[uniq_dihs-1]]), file=fout)
+                                           wf,
+                                           diht1,
+                                           diht2,
+                                           diht3,
+                                           diht4), file=fout)
+                                diht_lst0 = diht_lst
                             else:
                                 i1 = topdat[idx].dihndx1[jdx]-1 + index0;
                                 i2 = topdat[idx].dihndx2[jdx]-1 + index0;
@@ -933,7 +950,7 @@ def get_unique(database, topdat, sysdat):
                                        database.fdih[dih_params[uniq_dihs-1]],
                                        database.dihn[dih_params[uniq_dihs-1]],
                                        int(database.dihd[dih_params[uniq_dihs-1]]),
-                                       0.0,
+                                       1.0,
                                        database.dihtype1[dih_params[uniq_dihs-1]],
                                        database.dihtype2[dih_params[uniq_dihs-1]],
                                        database.dihtype3[dih_params[uniq_dihs-1]],
