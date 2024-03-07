@@ -895,6 +895,7 @@ def get_unique(database, topdat, sysdat):
                         sysdat.param_dihs += datndx
                         topdat[idx].dihtype.append([uniq_dihs, [uniq_dihs + x for x in range(len(datndx))]])
                         diht_lst0 = ["dum" for _ in range(4)]
+                        wf = 0.0
                         for kdx in range(len(datndx)):
                             uniq_dihs += 1
                             top_ndih += 1
@@ -904,10 +905,10 @@ def get_unique(database, topdat, sysdat):
                                 diht3 = database.dihtype3[dih_params[uniq_dihs-1]]
                                 diht4 = database.dihtype4[dih_params[uniq_dihs-1]]
                                 diht_lst = [diht1, diht2, diht3, diht4]
-                                if all(x == y and type(x) == type(y) for x, y in zip(diht_lst, diht_lst0)):
-                                    wf = 0.0
-                                else:
-                                    wf = 1.0
+                                #if all(x == y and type(x) == type(y) for x, y in zip(diht_lst, diht_lst0)):
+                                #    wf = 0.0
+                                #else:
+                                #    wf = 1.0
                                 if sysdat.nimps > 0:
                                     print("dihedral_coeff {:<8}    charmm {:8.4f} {:2} {:4} {:2.1f} # {} {} {} {}".format(
                                            uniq_dihs,
