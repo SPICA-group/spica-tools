@@ -231,7 +231,7 @@ class gen_lmp_inp:
         print(f"reset_timestep 0", file=f)
         print(file=f)
         print("# Timestep for integration [fs]", file=f)
-        print(f"timestep       ${dt}", file=f)
+        print("timestep       ${dt}", file=f)
         print(file=f)
         print("# Specify fix for time integration", file=f)
         if self.pspica:
