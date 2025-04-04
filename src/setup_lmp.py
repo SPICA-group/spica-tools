@@ -289,7 +289,7 @@ def write_psf(topdat, sysdat):
                     atidx += 1
                     tot_charge += topdat[idx].charge[kdx]
                     print("{:8} {:<4}{:5} {:<4} {:<4} {:<4}  {:9.6f}  {:12.4f}".format(
-                           atidx, topdat[idx].resname[kdx], min(9999,molidx), 
+                           atidx, topdat[idx].resname[kdx], molidx % 10000, 
                            topdat[idx].resname[kdx], topdat[idx].atomname[kdx],topdat[idx].atomtype[kdx], 
                            topdat[idx].charge[kdx], topdat[idx].mass[kdx]), file=fout)
         if abs(tot_charge) < 1e-6:
