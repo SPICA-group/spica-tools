@@ -64,7 +64,8 @@ make html
   * `gen_lmpin` : generate a LAMMPS input file for SPICA or pSPICA
   * `gen_gmxin` : generate GROMACS input files for SPICA or pSPICA
 
-
+* External tool
+  * [cgbuilder](https://yskmiyazaki.github.io/cgbuilder/) : generate CG configuration and mapping information files from an AA configuration file ([github](https://github.com/yskmiyazaki/cgbuilder?tab=readme-ov-file)).
 ## License
 
 Tools included in this repository are distributed under the MIT license.  
