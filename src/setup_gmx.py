@@ -369,7 +369,7 @@ def write_psf(topdat, sysdat):
                 for kdx in range(topdat[idx].nat):
                     atidx += 1
                     print("{:8} {:<4}{:5} {:<4} {:<4} {:<4}  {:9.6f}  {:12.4f}".format(
-                           atidx, topdat[idx].resname[kdx], min(9999,molidx), 
+                           atidx, topdat[idx].resname[kdx], molidx % 10000, 
                            topdat[idx].resname[kdx], topdat[idx].atomname[kdx], topdat[idx].atomtype[kdx], 
                            topdat[idx].charge[kdx], topdat[idx].mass[kdx]), file=fout)
         print(file=fout)
