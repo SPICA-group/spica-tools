@@ -33,7 +33,7 @@
 # BY ISSEI KAWABATA 2022/4
 #################################################################################
 
-import sys, math
+import sys, os, math
 import numpy as np
 from argparse import ArgumentParser
 import subprocess
@@ -552,18 +552,27 @@ class gen_top_ENM:
         resid = self.resid
         if cmdis == None:
             sys.exit("ERROR: DSSP binary was not found")
-        cmd = f"{dssp} {aapdb} dssp.out"
-        subprocess.call(cmd.split())
+        if "mkdssp" in dssp:
+            cmd = f"{dssp} --output-format dssp {aapdb} dssp.out"
+        else:
+            cmd = f"{dssp} {aapdb} dssp.out"
+        res = subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if res.returncode != 0 or not os.path.isfile('dssp.out'):
+            if res.stderr:
+                sys.stderr.write(res.stderr)
+            sys.exit("ERROR: DSSP failed to generate dssp.out")
         f = open('dssp.out','r')
         lines = f.readlines()
         f.close()
         for line in lines[28:]:
-            if line[13] == '!':
+            if len(line) > 13 and line[13] == '!':
                 continue
-            elif line[16] == ' ':
+            elif len(line) > 16 and line[16] == ' ':
                 self.structure.append('C')
-            else:
+            elif len(line) > 16:
                 self.structure.append(line[16])
+            else:
+                self.structure.append('C')
         if resid[-1] != len(self.structure) - 1:
             self.structure.append('C')
         if self.structure[1] in helix:
