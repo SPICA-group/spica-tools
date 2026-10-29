@@ -215,54 +215,54 @@ dcdfile = mdout.dcd
 
 [ENERGY]
 forcefield      = SPICA        # [CHARMM]
-electrostatic   = PME           # [CUTOFF,PME]
-switchdist      = 12.0          # switch distance
-cutoffdist      = 15.0          # cutoff distance
-pairlistdist    = 18.0          # pair-list distance
+electrostatic   = PME          # [CUTOFF,PME]
+switchdist      = 12.0         # switch distance
+cutoffdist      = 15.0         # cutoff distance
+pairlistdist    = 18.0         # pair-list distance
 pme_nspline     = 4
-water_model     = NONE
-vdw_force_switch = NO
 pme_max_spacing = {pme_max_spacing}
+#contact_check   = YES          # avoid atomic crash
+                               # minimization or early equilibration
+#nonb_limiter    = YES          # minimization or early equilibration
+                               # for large ENM system
+#minimum_contact = 0.5          # in the case of nonb_limiter = YES
 
-contact_check   = YES          # avoid atomic crash
-nonb_limiter    = YES # for large ENM system, you need to use this even for NPT
-minimum_contact = 0.5
-force_max_assign = YES
-force_max       = 100.0
+# contact_check, nonb_limiter, minimum_contact can be used for initial unstable structure.
 
 [DYNAMICS]
-integrator      = VVER          # [LEAP,VVER]
-timestep        = 0.01        # timestep (ps)
+integrator      = VVER         # [VVER, VRES]
+timestep        = 0.01         # timestep (ps)
 nsteps          = 10000        # short test
 crdout_period   = 10000
-eneout_period   = 1000          # energy output period
+eneout_period   = 1000         # energy output period
 rstout_period   = 10000      
 nbupdate_period = 10 
-# MTS の場合は次
-# elec_long_period = 5
+
+# In the case of MTS, you can write 
+# integrator        = VRES   
+# elec_long_period  = 5
 # thermostat_period = 10
-# barostat_period = 10
+# barostat_period   = 10
  
 [CONSTRAINTS]
 rigid_bond      = NO           # constraints all bonds involving hydrogen
 fast_water      = {fast_water}
-shake_tolerance = 1.0D-10
 
 [ENSEMBLE]
-ensemble        = NPT           # [NVE,NVT,NPT]
-tpcontrol       = BUSSI      # thermostat and barostat
-temperature     = 310
-pressure        = 1.0           # atm
-isotropy        = ISO
+ensemble        = NPT          # [NVE,NVT,NPT]
+tpcontrol       = BUSSI        # thermostat and barostat
+temperature     = 310          # K
+pressure        = 1.0          # atm
+isotropy        = ISO          # SEMI-ISO for the membrane case
 
 [BOUNDARY]
 type            = PBC           # [PBC]
 box_size_x      = {box_x:.3f}
 box_size_y      = {box_y:.3f}
 box_size_z      = {box_z:.3f}
-domain_x = {domain_x}    # {domain_x_str} is reasonable
-domain_y = {domain_y}    # {domain_y_str} is reasonable
-domain_z = {domain_z}    # {domain_z_str} is reasonable
+#domain_x = {domain_x}
+#domain_y = {domain_y}
+#domain_z = {domain_z}
 """
     
     # Write to file
